@@ -1,7 +1,7 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
 
-API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
+API_TOKEN = ''
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,9 +19,11 @@ async def send_welcome(message: types.Message):
 async def send_welcome(message: types.Message):
   
     options = ['snaipa','pyro','demomen']
-    await bot.send_poll(chat_id=message.chat.id, question='GOLOSOVANIJE', is_anonymous=False, options=options)
-    
-
+    polll = bot.send_poll(chat_id=message.chat.id, question='GOLOSOVANIJE', is_anonymous=False, options=options)
+    await polll
+    polll.
+    # await updater.dispatcher.add_handler(PollHandler(main_handler, pass_chat_data=True, pass_user_data=True))
+    await bot.stop_poll(chat_id=message.chat.id, message_id=)
 
 @dp.message_handler()
 async def echo(message: types.Message):
