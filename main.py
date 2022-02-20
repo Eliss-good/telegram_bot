@@ -10,7 +10,7 @@ from app.handlers.register_user import register_handlers_register
 from app.handlers.common import register_handlers_common
 
 
-API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
+API_TOKEN = ''
 
 
 async def set_commands(bot: Bot):
