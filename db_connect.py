@@ -86,12 +86,12 @@ class DataConnect:
         
         print(com)
         self.cursor.execute(com)
-        """
+        
         try:
             self.cursor.execute(com)
         except:
             print('ERROR: custom_insert')
-        """
+        
         
 
     def select_db(self, name_tb, name_cl, add_com = ''):
@@ -115,11 +115,10 @@ class DataConnect:
 
         self.cursor.execute(com)
 
-        """
         try:
             self.cursor.execute(com)
         except:
             print('ERROR: custom_select')
             return
-        """
+        
         return self.cursor.fatchall()
