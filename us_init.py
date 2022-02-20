@@ -1,28 +1,16 @@
 from db_connect import DataConnect
 import full_pars
-import re
 
 db = DataConnect()
 
-"""def init_group_less(name_group):
+def connect_gr_th(name_group, data):
+    for t_item in data:
+        con_data = [str(db.select_db('group_tb', ['id'], add_com = " where group_name = " + name_group)[0][0])]
+        con_data.append (str(db.select_db('teach_tb', ['id'], add_com = ' where teach_name = ' + t_item['prepod'])[0][0]))
 
-    data = full_pars.parse_group(name_group)
-    set_data = []
-
-    status = True
-    for item in data:
-        for u_item in set_data:
-            if item['prepod'] == u_item['prepod'] and item['lesson'] == u_item['lesson']:
-                status = False
-                break     
-        
-        if status:
-            set_data.append(item)
-        else:
-            status = True
-
-    print(set_data) """
-
+        if db.cheack_data_bd('connect_tb', ['id'], ['group_id', 'teach_id'],con_data=con_data):
+            db.insert_db('connect_tb', ['group_id', 'teach_id'], con_data)
+    
 def cheack_data(t_item):
     t_item['lesson'] = "'" + t_item['lesson'] + "'"
     t_item['prepod'] = "'" + t_item['prepod'] + "'"
@@ -37,7 +25,6 @@ def cheack_data(t_item):
         + str(db.select_db('lesson_tb', ['id'], add_com = ' where lesson_name = ' +  t_item['lesson'])[0][0]) + ')')
     
 
-
 def pars_data_for_gp(name_group):
     name_group = name_group.replace("'", '')
     print(name_group)
@@ -47,13 +34,16 @@ def pars_data_for_gp(name_group):
     for item in data:
         print('++')
         cheack_data(item)
+
+    return data
         
 
 def add_group(name_group):
     if db.cheack_data_bd('group_tb', ['id'], ['group_name']  ,[name_group]):
         db.insert_db('group_tb', ['group_name'] , [name_group])
     
-    pars_data_for_gp(name_group)
+    print(name_group)
+    connect_gr_th(name_group, pars_data_for_gp(name_group))
 
 add_group("'М3О-212Б-20'")
 

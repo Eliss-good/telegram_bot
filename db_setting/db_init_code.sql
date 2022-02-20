@@ -29,9 +29,10 @@ CREATE TABLE teach_tb
     teach_role varchar(8)
 );
 
-CREATE TABLE group_connect
+CREATE TABLE connect_tb
 (
-    group_id int REFERENCES group_tb(id)
+    id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    group_id int REFERENCES group_tb(id),
     teach_id int REFERENCES teach_tb(id)
 );
 
