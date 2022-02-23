@@ -28,4 +28,4 @@ def parse_group_today(index):
 
 
 # print(parse_group('М3О-221Б-20'))
-print(parse_group_today('М3О-221Б-20'))
+# print(parse_group_today('М3О-221Б-20'))

@@ -32,32 +32,6 @@ class DataConnect:
         return str1
 
 
-    def cheack_data_bd(self, name_tb, name_cl, equality_cl, con_data):
-        select_com = 'select count('
-        select_com = self.par_and_in_tb(select_com, name_cl) + ') from ' + name_tb + ' where '
-
-        if len(equality_cl) != len(con_data):
-            print("ERROR блять")
-            return
-        
-        for i in range (0, len(equality_cl)):
-            select_com += str(equality_cl[i]) + ' = ' + str(con_data[i])  
-            if i < len(equality_cl) - 1:
-                select_com +=  ' and '
-        print(select_com) 
-
-        try:
-            self.cursor.execute(select_com)
-        except:
-            print('ERROR: _cheack_data_db')
-            return 
-
-        if self.cursor.fetchall()[0][0] > 0:
-            return False
-        else:
-            return True
-
-
     def par_and_in_tb(self, str1, list1):
         str1 += " ("
         for item in list1:
@@ -91,9 +65,53 @@ class DataConnect:
             self.cursor.execute(com)
         except:
             print('ERROR: custom_insert')
-        
-        
 
+
+    def __select_where(self, name_tb, name_cl):
+        select_com = 'select '
+        select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + ' where '
+        return select_com
+
+    def __select_count(self, name_tb, name_cl):
+        select_com = 'select count'
+        select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + ' where '
+        return select_com
+
+    def __select_choice(self, name_tb, name_cl, status):
+        if status == 'where':
+            return self.__select_where(name_tb, name_cl)
+        elif status == 'count' or status == 'check':
+            return self.__select_count(name_tb, name_cl)
+
+    def select_db_where(self, name_tb, name_cl, equality_cl, con_data, status):
+
+        select_com = self.__select_choice(name_tb,name_cl, status)
+        print(con_data)
+        if len(equality_cl) != len(con_data):
+            print("ERROR блять")
+            return
+        
+        for i in range (0, len(equality_cl)):
+            select_com += str(equality_cl[i]) + ' = ' + str(con_data[i])  
+            if i < len(equality_cl) - 1:
+                select_com +=  ' and '
+        print(select_com)    
+
+        try:
+            self.cursor.execute(select_com)
+        except:
+            print('ERROR: select_db_where')
+            return 
+        
+        if status == 'check':
+            if self.cursor.fetchone() == (0,):
+                return True
+            else:
+                return False
+
+
+        return self.cursor.fetchall()
+    
     def select_db(self, name_tb, name_cl, add_com = ''):
         select_com = 'select '
         select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + add_com
