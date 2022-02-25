@@ -22,24 +22,28 @@ mem = []
 # cring
 
 
+
 @dp.message_handler(commands=["poll"])
 async def cmd_poll(message: types.message):
     await message.answer('Высылаю опрос')
     options = ['MaXImus', 'DmitRUS', 'FedoSUS', 'Ilyxus', 'ArtemOS']
     chat_id = message.chat.id
     is_anonymous = True
-    open_period = 10
+    # open_period = 10
     question = 'you are'
     global poll
-    poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, open_period=open_period, question=question, chat_id=chat_id)
+    poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=chat_id)
     mem.append(poll)
+    
+    await asyncio.sleep(5)
+    res = await bot.stop_poll(chat_id=poll.chat.id, message_id=poll.message_id)
+    print(res)
 
+# @dp.poll_handler()
+# async def handle_poll_answer(poll_answer: types.Poll):
+#     # ans = aiogram.types.update.Update.poll.options
 
-@dp.poll_handler()
-async def handle_poll_answer(poll_answer: types.Poll):
-    # ans = aiogram.types.update.Update.poll.options
-
-    print(poll_answer)
+#     print(poll_answer)
     # await bot.stop_poll(poll.chat_id, poll.message_id)
 
 
