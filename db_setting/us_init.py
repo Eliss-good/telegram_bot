@@ -1,6 +1,11 @@
+from msilib import type_key
 from db_connect import DataConnect
-import full_pars as fl
 import json
+
+import sys
+sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot')
+import full_pars as fl
+
 
 db = DataConnect()
 
@@ -8,6 +13,10 @@ def correct_str(t_item):
     t_item = "'" + t_item +"'" 
     return t_item 
 
+def add_us(id_us):
+    id_us_ck = db.select_db_where('global_tb', ['id'], ['gl_teleg_id'] ,[id_us],'check')
+    if id_us_ck:
+        db.insert_db('global_tb', ['gl_teleg_id'], [id_us])
 
 def add_lesson(name_lesson):
     lesson_ck = db.select_db_where('lesson_tb', ['id'], ['lesson_name'] ,[name_lesson],'check')
@@ -24,6 +33,14 @@ def add_prepod(name_prepod):
 def add_group(name_group, status):
     if db.select_db_where('group_tb', ['id'], ['group_name', 'group_approved']  ,[name_group, status], 'check'):
         db.insert_db('group_tb', ['group_name', 'group_approved'] , [name_group, status])
+
+
+def add_student(name_student, teleg_id, name_group):
+    con_data =[name_student, find_id_group(name_group)]
+
+    if db.select_db_where('student_tb', ['id'], ['student_name', 'group_id' ]  ,con_data, 'check'):
+        con_data.append(find_id_global(teleg_id))
+        db.insert_db('student_tb', ['student_name', 'group_id', 'gl_id'], con_data)
 
 
 def add_group_from_json():
@@ -51,6 +68,9 @@ def find_id_teach(name_teach):
     return str(db.select_db_where('teach_tb', ['id'], ['teach_name'], [name_teach], 'where')[0][0])
 
 
+def find_id_global(teleg_id):
+    return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
+
 
 def connect_gr_th(name_group, t_item):
     con_data = [find_id_group(name_group), find_id_teach(t_item['prepod']), find_id_lesson(t_item['lesson']), t_item['role']]
@@ -58,6 +78,7 @@ def connect_gr_th(name_group, t_item):
     if db.select_db_where('connect_tb', ['id'], ['group_id','teach_id', 'lesson_id', 'teach_role'], con_data, 'check'):
         db.insert_db('connect_tb', ['group_id','teach_id', 'lesson_id', 'teach_role'], con_data)
     
+
 def check_data_for_group(name_group,t_item):
     t_item['lesson'] = correct_str(t_item['lesson'])
     t_item['prepod'] = correct_str(t_item['prepod'])
@@ -75,5 +96,6 @@ def start_gr(name_group):
 
     for item in data:
         check_data_for_group(name_group, item)
-        
-start_gr('М3О-221Б-20')
+
+
+
