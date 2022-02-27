@@ -81,6 +81,18 @@ def find_id_global(teleg_id):
     teleg_id = correct_str(str(teleg_id))
     return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
 
+#для проверки одобренности группы
+"""
+def _group_cheack_approved(name_group):
+    with open('approved_group.json','r', encoding='utf-8') as file:
+        apr_group = json.load(file)
+
+        try:
+            status = apr_group[name_group]
+            return status
+        except KeyError:
+            return False
+"""
 
 def connect_gr_th(name_group, t_item):
     con_data = [find_id_group(name_group), find_id_teach(t_item['prepod']), find_id_lesson(t_item['lesson']), t_item['role']]
@@ -94,15 +106,30 @@ def connect_gr_th(name_group, t_item):
         db.insert_db('connect_tb', ['group_id','teach_id', 'lesson_id', 'teach_role'], con_data)
     
 
-def check_data_for_group(name_group,t_item):
+def data_for_group(name_group,t_item):
     add_lesson(t_item['lesson'])
     add_prepod(t_item['prepod'])
 
     connect_gr_th(name_group,t_item)
+
+
+def data_for_prepod(t_item):
+    add_group(t_item['group'])
+    add_lesson(t_item['lesson'])
+    
+    connect_gr_th(t_item['group'], t_item)
+
+
+def start_pr(name_prepod):
+    data = fl.parse_prepod(name_prepod)
+
+    for item in data:
+        data_for_prepod(item)
+
 
 def start_gr(name_group):
     data = fl.parse_group(name_group)
     name_group = correct_str(name_group)
 
     for item in data:
-        check_data_for_group(name_group, item)
+        data_for_group(name_group, item)
