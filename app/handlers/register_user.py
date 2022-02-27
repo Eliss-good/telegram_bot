@@ -44,7 +44,7 @@ async def group_chosen(message: types.Message, state: FSMContext):
     await message.answer(f"Ваши ФИО: {user_data['chosen_fio']}.\n")
     await message.answer(f"Ваш ID: {message.from_user.id}")
 
-    tg_db.student_start(user_data['chosen_fio'], user_data['chosen_group'], message.from_user.id)
+    tg_db.reg_us(user_data['chosen_fio'], message.from_user.id, 'stud' ,group_stud = user_data['chosen_group'])
 
     # выбранную группу можно взять с помощью user_data['chosen_group']
 
