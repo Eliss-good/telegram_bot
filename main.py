@@ -73,7 +73,7 @@ async def choose_group(message: types.Message, state: FSMContext):
     await state.finish()
 
 @dp.callback_query_handler(text="is_student")
-async def send_random_value(call: types.CallbackQuery, state: FSMContext):
+async def is_stud(call: types.CallbackQuery, state: FSMContext):
     await registerUser.waiting_for_role.set()
     await state.update_data(chosen_role="student")
     await call.answer()
@@ -82,7 +82,7 @@ async def send_random_value(call: types.CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(text="is_prepod")
-async def send_random_value(call: types.CallbackQuery, state: FSMContext):
+async def is_prep(call: types.CallbackQuery, state: FSMContext):
     await registerUser.waiting_for_role.set()
     await state.update_data(chosen_role="prepod")
     await call.answer()
