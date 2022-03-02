@@ -1,7 +1,10 @@
 import asyncio
 from aiogram import Dispatcher, types, Bot
 
-from aiogram.types import BotCommand
+
+from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
+
+
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 
@@ -10,6 +13,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from aiogram.dispatcher.filters import Text
+
 
 API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
 bot = Bot(token=API_TOKEN)
@@ -25,10 +29,10 @@ class registerUser(StatesGroup):
     waiting_for_group = State()
 
 
-
 @dp.message_handler(commands='register')
 async def choose_role(message: types.Message):
     
+
     buttons = [
         types.InlineKeyboardButton(text="Студент", callback_data="is_student"),
         types.InlineKeyboardButton(
@@ -37,7 +41,7 @@ async def choose_role(message: types.Message):
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     await message.answer("Выберите роль      ", reply_markup=keyboard)
-    
+
 
 @dp.message_handler(state=registerUser.waiting_for_fio)
 async def fio_choosen(message: types.Message, state: FSMContext):
@@ -46,11 +50,20 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     await state.update_data(chosen_fio=fio)
     user_data = await state.get_data()
     if user_data['chosen_role'] == 'student':
+        
+        all_groups = [('xyu',), ('govno',)]
+        marakap = ReplyKeyboardMarkup()
+        # db.select_db('group_tb', ['group_name']):
+        for data in all_groups:
+            # data[0]
+            marakap.add(KeyboardButton(data[0]))
         await registerUser.next()
-        await message.answer('Выберите группу')
+        await message.reply('Выберите группу', reply_markup=marakap)
+
     else:
         await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
-        state.finish()
+        await state.finish()
+
 
 @dp.message_handler(state='*', commands='cancel')
 @dp.message_handler(Text(equals='cancel', ignore_case=True), state='*')
@@ -66,11 +79,16 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 async def choose_group(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     if user_data['chosen_role'] != "prepod":
-        await state.update_data(chosen_group=message.text)
-        user_data = await state.get_data()
-        await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n")
-    
+        all_groups = ['xyu', 'govno',]
+        group = message.text
+        if group in all_groups:
+            await state.update_data(chosen_group=group)
+            user_data = await state.get_data()
+            await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
+        else:
+            await message.reply('Выберите корректную группу')
     await state.finish()
+
 
 @dp.callback_query_handler(text="is_student")
 async def is_stud(call: types.CallbackQuery, state: FSMContext):
@@ -90,8 +108,9 @@ async def is_prep(call: types.CallbackQuery, state: FSMContext):
     # await call.message.answer('Вы '+ user_data['chosen_role'])
     await registerUser.next()
     await call.message.answer('Введите ФИО')
-    
+
 # ################ tnd register ########
+
 
 @dp.message_handler(commands=["poll"])
 async def cmd_poll(message: types.message):
@@ -103,13 +122,14 @@ async def cmd_poll(message: types.message):
     question = 'you are'
     global poll
     poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=chat_id)
-    
-    # send chat id and poll id 
-    polls_dispcatcher.append({"chat_id": poll.chat.id, "message_id": poll.message_id})
+
+    # send chat id and poll id
+    polls_dispcatcher.append(
+        {"chat_id": poll.chat.id, "message_id": poll.message_id})
     await asyncio.sleep(5)
     count = 0
     for data in polls_dispcatcher:
-        
+
         res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
         print(count, '  ', res)
         count += 1
@@ -117,11 +137,9 @@ async def cmd_poll(message: types.message):
     count = 0
 
 
-
-
 async def set_commands(bot: Bot):
     commands = [
-        
+
         BotCommand(command="/poll", description="Опрос"),
         BotCommand(command="/register", description="Регистрация"),
         BotCommand(command="/cancel", description="Отменить текущее действие")
@@ -130,8 +148,6 @@ async def set_commands(bot: Bot):
 
 
 async def main():
-
-
 
     await set_commands(bot)
     await dp.start_polling()
