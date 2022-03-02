@@ -21,7 +21,9 @@ polls_dispcatcher = []
 
 class registerUser(StatesGroup):
     waiting_for_role = State()
+    waiting_for_fio = State()
     waiting_for_group = State()
+
 
 
 @dp.message_handler(commands='register')
@@ -36,6 +38,19 @@ async def choose_role(message: types.Message):
     keyboard.add(*buttons)
     await message.answer("Выберите роль      ", reply_markup=keyboard)
     
+
+@dp.message_handler(state=registerUser.waiting_for_fio)
+async def fio_choosen(message: types.Message, state: FSMContext):
+    fio = message.text.lower()
+    await message.answer('your fio:' + fio)
+    await state.update_data(chosen_fio=fio)
+    user_data = await state.get_data()
+    if user_data['chosen_role'] == 'student':
+        await registerUser.next()
+        await message.answer('Выберите группу')
+    else:
+        await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
+        state.finish()
 
 @dp.message_handler(state='*', commands='cancel')
 @dp.message_handler(Text(equals='cancel', ignore_case=True), state='*')
@@ -53,9 +68,8 @@ async def choose_group(message: types.Message, state: FSMContext):
     if user_data['chosen_role'] != "prepod":
         await state.update_data(chosen_group=message.text)
         user_data = await state.get_data()
-        await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']}.\n")
-    else:
-        await message.answer(f"{user_data['chosen_role']} .\n")
+        await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n")
+    
     await state.finish()
 
 
@@ -65,7 +79,7 @@ async def send_random_value(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(chosen_role="student")
     await call.answer()
     await registerUser.next()
-    await call.message.answer('Выберите группу')
+    await call.message.answer('Введите ФИО')
 
 
 @dp.callback_query_handler(text="is_prepod")
@@ -74,8 +88,9 @@ async def send_random_value(call: types.CallbackQuery, state: FSMContext):
     await state.update_data(chosen_role="prepod")
     await call.answer()
     user_data = await state.get_data()
-    await call.message.answer('Вы '+ user_data['chosen_role'])
-    await state.finish()
+    # await call.message.answer('Вы '+ user_data['chosen_role'])
+    await registerUser.next()
+    await call.message.answer('Введите ФИО')
     
 # ################ tnd register ########
 
