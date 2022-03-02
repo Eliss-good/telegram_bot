@@ -45,6 +45,7 @@ async def choose_role(message: types.Message):
 
 @dp.message_handler(state=registerUser.waiting_for_fio)
 async def fio_choosen(message: types.Message, state: FSMContext):
+    await message.reply('h  honey')
     fio = message.text.lower()
     await message.answer('your fio:' + fio)
     await state.update_data(chosen_fio=fio)
@@ -54,10 +55,10 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
 # ИЛЮХА ВОТ ЗДЕСЬ 
 
-        all_groups = db.select_db('group_tb', ['group_name'])
-        
+        # all_groups = db.select_db('group_tb', ['group_name'])
+        all_groups = ['fagot', 'farmer']
         for data in all_groups:
-            marakap.add(KeyboardButton(data[0]))
+            marakap.add(KeyboardButton(data))
 
         await registerUser.next()
         await message.reply('Выберите группу', reply_markup=marakap)
@@ -77,6 +78,10 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.reply('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
 
+@dp.message_handler(lambda message: message.text not in ["farmer", 'faggot'], state=registerUser.waiting_for_group)
+async def wrong_group(message: types.Message, state: FSMContext):
+    return await message.reply('choose right grup')
+
 @dp.message_handler(state=registerUser.waiting_for_group)
 async def choose_group(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -87,8 +92,7 @@ async def choose_group(message: types.Message, state: FSMContext):
         await state.update_data(chosen_group=group)
         user_data = await state.get_data()
         await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
-        # else:
-        #     await message.reply('Выберите корректную группу')
+    
     await state.finish()
 
 
