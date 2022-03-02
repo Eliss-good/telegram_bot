@@ -1,5 +1,4 @@
 import asyncio
-from email import message
 from aiogram import Dispatcher, types, Bot
 
 from aiogram.types import BotCommand
@@ -15,10 +14,10 @@ from aiogram.dispatcher.filters import Text
 API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
-mem = []
+polls_dispcatcher = []
 
 
-# regiser zone #############################
+# ################regiser zone #############################
 
 class registerUser(StatesGroup):
     waiting_for_role = State()
@@ -78,7 +77,7 @@ async def send_random_value(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer('Вы '+ user_data['chosen_role'])
     await state.finish()
     
-
+# ################ tnd register ########
 
 @dp.message_handler(commands=["poll"])
 async def cmd_poll(message: types.message):
@@ -90,12 +89,18 @@ async def cmd_poll(message: types.message):
     question = 'you are'
     global poll
     poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=chat_id)
-    mem.append(poll)
     
+    # send chat id and poll id 
+    polls_dispcatcher.append({"chat_id": poll.chat.id, "message_id": poll.message_id})
     await asyncio.sleep(5)
-    res = await bot.stop_poll(chat_id=poll.chat.id, message_id=poll.message_id)
-    print(res)
-
+    count = 0
+    for data in polls_dispcatcher:
+        
+        res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
+        print(count, '  ', res)
+        count += 1
+    polls_dispcatcher.clear()
+    count = 0
 
 
 
