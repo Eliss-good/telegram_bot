@@ -72,7 +72,6 @@ async def choose_group(message: types.Message, state: FSMContext):
     
     await state.finish()
 
-
 @dp.callback_query_handler(text="is_student")
 async def send_random_value(call: types.CallbackQuery, state: FSMContext):
     await registerUser.waiting_for_role.set()
