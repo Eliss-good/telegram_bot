@@ -1,6 +1,5 @@
 import prep_text_pars
 
-
 def parse_group(index):
     full_prepods_list = []
     begin_week = 1
@@ -48,6 +47,6 @@ def parse_prepod(url):
     return full_lessons_list
 
 
-print(parse_prepod('https://mai.ru/education/studies/schedule/ppc.php?guid=d72d63e7-1d99-11e0-9baf-1c6f65450efa#'))
+#print(parse_prepod('https://mai.ru/education/studies/schedule/ppc.php?guid=d72d63e7-1d99-11e0-9baf-1c6f65450efa#'))
 # print(parse_group('М3О-221Б-20'))
 # print(parse_group_today('М3О-221Б-20'))

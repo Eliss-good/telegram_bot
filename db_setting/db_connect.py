@@ -32,16 +32,42 @@ class DataConnect:
         return str1
 
 
-    def par_and_in_tb(self, str1, list1):
-        str1 += " ("
-        for item in list1:
-            str1 += item +','
+    def delete_db(self, name_tb, equality_cl, con_data):
+        if len(equality_cl) != len(con_data):
+            print("ERROR блять")
+            return
 
-        str1 = str1.rstrip(str1[-1])
-        str1 += ") " 
-        return str1
+        delete_com = 'delete from ' + name_tb + ' where '
+        for i in range(0, len(equality_cl)):
+            delete_com += equality_cl[i] + ' = ' + con_data[i]
+        print(delete_com)
 
-       
+        try:
+            self.cursor.execute(delete_com)
+        except:
+            "ERROR: delete_db"
+
+
+    def update_db(self, name_tb, name_cl, new_data, equality_cl = [], con_data = []):
+        if len(name_cl) != len(new_data)  and  len(equality_cl) != len(con_data):
+            print("ERROR блять")
+            return
+        
+        update_com = 'update ' + name_tb + ' set '
+        for i in range(0, len(name_cl)):
+            update_com += name_cl[i] + ' = ' + new_data[i]
+        update_com += ' where '
+
+        for i in range(0, len(equality_cl)):
+            update_com += equality_cl[i] + ' = ' + con_data[i]
+        print(update_com)
+
+        try:
+            self.cursor.execute(update_com)
+        except:
+            "ERROR: update_db"
+
+
     def insert_db(self, name_tb, name_cl, new_data):
         insert_com = "insert into "+ name_tb
         insert_com = self.par_and_in_tb(insert_com, name_cl) + "values"
