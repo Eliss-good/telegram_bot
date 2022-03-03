@@ -1,4 +1,3 @@
-from msilib import type_key
 from db_connect import DataConnect
 import json
 
@@ -8,6 +7,7 @@ import full_pars as fl
 
 
 db = DataConnect()
+
 
 def correct_str(t_item):
     t_item = "'" + t_item +"'" 
