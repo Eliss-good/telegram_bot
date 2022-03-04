@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import get_event_loop
+from asyncore import poll
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
@@ -11,11 +12,15 @@ from aiogram.dispatcher.filters import Text
 
 import prep_text_pars
 import sys
-sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
 
-import tg_connect_db as tg_db
-from db_connect import DataConnect
-from us_init import find_teleg_group
+import time
+
+
+# sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
+
+# import tg_connect_db as tg_db
+# from db_connect import DataConnect
+# from us_init import find_teleg_group
 
 # import sys
 # sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
@@ -41,7 +46,7 @@ for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/sch
 #     all_groups_norm.append(data[0])
 
 
-# ############### poll #################
+# ############### poll + (optional) dispatcher #################
 
 @dp.message_handler(commands=["poll"])
 async def cmd_poll(message: types.message):
@@ -54,20 +59,11 @@ async def cmd_poll(message: types.message):
     question = 'you are'
 
     poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=chat_id)
-
+    close_time = time.time() + 5
     # send chat id and poll id
     polls_dispcatcher.append(
-        {"chat_id": poll.chat.id, "message_id": poll.message_id})
-    await asyncio.sleep(5)
-    count = 0
-    for data in polls_dispcatcher:
-
-        res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
-        print(count, '  ', res, data['chat_id'])
-        count += 1
-    polls_dispcatcher.clear()
-    count = 0
-    # await asyncio.sleep(1)
+        {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
+    
 
 # ############## end poll #################
 
@@ -123,8 +119,8 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
 # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
 
-        await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
-      
+        # await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
+        await message.answer('Регистрация завершена')
 # ######################### ############### ##########
         await state.finish()
 
@@ -140,8 +136,8 @@ async def choose_group(message: types.Message, state: FSMContext):
         user_data = await state.get_data()
 # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ СТУДЕНТА ТУТ ##########
 
-        await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
-
+        # await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
+        await message.answer('Регистрация завершена')
 # #########################################################
 
     await state.finish()
@@ -173,22 +169,22 @@ async def is_prep(call: types.CallbackQuery, state: FSMContext):
 # ############## poll creator ###########
 
 
-async def make_poll(chat_id, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
+async def make_poll(chat_id, end_time, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
 
     for recipient in chat_id:
         poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
 
-        polls_dispcatcher.append(
-            {"chat_id": poll.chat.id, "message_id": poll.message_id})
-        await asyncio.sleep(5)
-        count = 0
-        for data in polls_dispcatcher:
+        # polls_dispcatcher.append(
+        #     {"chat_id": poll.chat.id, "message_id": poll.message_id})
+        # await asyncio.sleep(5)
+        # count = 0
+        # for data in polls_dispcatcher:
 
-            res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
-            print(count, '  ', res, data['chat_id'])
-            count += 1
-        polls_dispcatcher.clear()
-        count = 0
+        #     res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
+        #     print(count, '  ', res, data['chat_id'])
+        #     count += 1
+        # polls_dispcatcher.clear()
+        # count = 0
 
 
 class createPoll(StatesGroup):
@@ -209,7 +205,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     question = message.text.lower()
 
     await state.update_data(question=question)
-    await message.reply('Пришлите вопросы через запятую')
+    await message.reply('Пришлите варианты ответов через запятую')
     await createPoll.next()
 
 
@@ -233,7 +229,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 async def fio_choosen(message: types.Message, state: FSMContext):
     group = message.text.lower()
 
-    users_id_list = []
+    users_id_list = [506629389]
 
 # ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
 
@@ -263,13 +259,25 @@ async def set_commands():
     await bot.set_my_commands(commands)
 
 
+
 async def pritr():
     while True:
-        await asyncio.sleep(5)
-
-
+        await asyncio.sleep(1)
+        # poll_trigger = aiogram.types.update.Update().poll
+        # if poll_trigger:
+        
+        #     print(poll_trigger)
+        for select_poll in polls_dispcatcher:
+            if select_poll['close_time'] < time.time():
+                closed_poll = await bot.stop_poll(chat_id=select_poll['chat_id'], message_id=select_poll['message_id'])
+                # print(closed_poll)
+                print(polls_dispcatcher)
+                polls_dispcatcher.remove({"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], 'close_time': select_poll['close_time']})
+                print(polls_dispcatcher)
 if __name__ == '__main__':
 
     dp.loop.create_task(set_commands())
     dp.loop.create_task(pritr())
     executor.start_polling(dp)
+
+
