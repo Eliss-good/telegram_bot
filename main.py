@@ -14,10 +14,14 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from aiogram.dispatcher.filters import Text
 
+# ################db_zone #############################
+
 import sys
 sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot\\db_setting')
 import tg_connect_db as tg_db
+from us_init import find_teleg_group
 from db_connect import DataConnect
+
 
 API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
 bot = Bot(token=API_TOKEN)
@@ -71,7 +75,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     else:
         await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
         await state.finish()
-        print(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'])
+        tg_db.reg_us(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'])
 
 
 @dp.message_handler(state='*', commands='cancel')
@@ -100,7 +104,7 @@ async def choose_group(message: types.Message, state: FSMContext):
         await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
 
     await state.finish()
-    print(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'], user_data['chosen_group'])
+    tg_db.reg_us(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'], group_stud = user_data['chosen_group'])
 
 
 
@@ -122,7 +126,6 @@ async def is_prep(call: types.CallbackQuery, state: FSMContext):
     # await call.message.answer('Вы '+ user_data['chosen_role'])
     await registerUser.next()
     await call.message.answer('Введите ФИО')
-    # print(user_data['chosen_fio'], call.message.from_user.id, user_data['chosen_role'])
 
 # ################ end register ########
 
