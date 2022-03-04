@@ -120,10 +120,13 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
 
         # await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
-        await message.answer('Регистрация завершена')
+        await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
 # ######################### ############### ##########
         await state.finish()
 
+@dp.message_handler(lambda message: message.text not in all_groups, state=registerUser.waiting_for_group)
+async def wrong_group(message: types.Message, state: FSMContext):
+    return await message.reply('Выберите группу из списка')
 
 @dp.message_handler(state=registerUser.waiting_for_group)
 async def choose_group(message: types.Message, state: FSMContext):
@@ -221,6 +224,9 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
     await createPoll.next()
 
+@dp.message_handler(lambda message: message.text not in all_groups, state=createPoll.waiting_for_recipient)
+async def wrong_group(message: types.Message, state: FSMContext):
+    return await message.reply('Выберите группу из списка')
 
 @dp.message_handler(state=createPoll.waiting_for_recipient)
 async def fio_choosen(message: types.Message, state: FSMContext):
