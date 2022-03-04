@@ -92,22 +92,18 @@ def find_id_global(teleg_id):
     return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
 
 ####### переделается для более широкого круга работ
-def find_teleg_group(list_name_group):
+def find_teleg_group(name_group):
     group_us = []
+    name_group = name_group.upper()
 
-    for name_group in list_name_group:
-        data = db.select_db_where('student_tb', ['gl_id'], ['group_id'], [find_id_group(name_group)], 'where')
-        for i in data:
-            group_us.append(db.select_db_where('global_tb', ['gl_teleg_id'], ['id'], [i[0]], 'where')[0][0])
+    data = db.select_db_where('student_tb', ['gl_id'], ['group_id'], [find_id_group(name_group)], 'where')
+    for i in data:
+        group_us.append(db.select_db_where('global_tb', ['gl_teleg_id'], ['id'], [i[0]], 'where')[0][0])
 
+    print(group_us)
     return group_us
 
         ################## update_modul ##################
-
-def update_us(tg_role):
-    db.delete_db('')
-    db.delete_db('global_tb', ['gl_teleg_id'], ["'802504844'"])
-
 
 #для проверки одобренности группы
 """

@@ -4,7 +4,7 @@ class DataConnect:
     def __init__(self):
         try:
             self.con = ps2.connect(
-                dbname = 'test',
+                dbname = 'global_con_db',
                 user = 'postgres',
                 password = 'admin',
                 host = '127.0.0.1',
