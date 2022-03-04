@@ -102,7 +102,7 @@ async def choose_role(message: types.Message):
 
 @dp.message_handler(state=registerUser.waiting_for_fio)
 async def fio_choosen(message: types.Message, state: FSMContext):
-    fio = message.text.lower()
+    fio = message.text
     await message.answer('your fio:' + fio)
     await state.update_data(chosen_fio=fio)
     user_data = await state.get_data()
@@ -173,24 +173,21 @@ async def make_poll(chat_id, end_time, options=['NO OPTIONS'], is_anonymous=True
 
     for recipient in chat_id:
         poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
+        splited_close_time = end_time.split(':')
+        
+        close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(splited_close_time[1]) * 60 + int(splited_close_time[2])
 
-        # polls_dispcatcher.append(
-        #     {"chat_id": poll.chat.id, "message_id": poll.message_id})
-        # await asyncio.sleep(5)
-        # count = 0
-        # for data in polls_dispcatcher:
-
-        #     res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
-        #     print(count, '  ', res, data['chat_id'])
-        #     count += 1
-        # polls_dispcatcher.clear()
-        # count = 0
-
+    # send chat id and poll id
+        polls_dispcatcher.append(
+            {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
+    
+        
 
 class createPoll(StatesGroup):
     waiting_for_question = State()
     waiting_for_options = State()
     waiting_for_recipient = State()
+    waiting_for_time = State()
 
 
 @dp.message_handler(commands='create_poll')
@@ -202,7 +199,7 @@ async def choose_question(message: types.Message):
 @dp.message_handler(state=createPoll.waiting_for_question)
 async def fio_choosen(message: types.Message, state: FSMContext):
 
-    question = message.text.lower()
+    question = message.text
 
     await state.update_data(question=question)
     await message.reply('Пришлите варианты ответов через запятую')
@@ -227,22 +224,33 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=createPoll.waiting_for_recipient)
 async def fio_choosen(message: types.Message, state: FSMContext):
-    group = message.text.lower()
+    group = message.text
+    await state.update_data(group=group)
+    await message.reply('Сколько времени будет открыто голосование (Пишите в формате часы:минуты:секунды)', reply_markup=types.ReplyKeyboardRemove())
+    await createPoll.next()
+    
+
+@dp.message_handler(state=createPoll.waiting_for_time)
+async def fio_choosen(message: types.Message, state: FSMContext):
+    select_time = message.text
+    await state.update_data(time=select_time)
+    user_data = await state.get_data()
 
     users_id_list = [506629389]
 
 # ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
-
+    # выбранная группа = user_data['group']
 
 # ############### # ############### # ############### # ############### 
-    await state.update_data(group=group)
+    
     user_data = await state.get_data()
-    await message.answer('ГОТОВО', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('ГОТОВО')
     await state.finish()
-    await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'])
+    await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'], end_time=user_data['time'])
     # await make_poll(chat_id=find_teleg_group(group), question=user_data['question'], options=user_data['options'])
     
     
+
 
 # ################# creatr end #########
 
