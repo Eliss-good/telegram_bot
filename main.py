@@ -211,6 +211,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     await make_poll(chat_id=me, question=user_data['question'], options=user_data['options'])
     await state.finish()
 
+# ################# creatr end #########
 
 async def set_commands(bot: Bot):
     commands = [
