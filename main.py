@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import get_event_loop
+from asyncore import poll
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
@@ -7,10 +8,14 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-
 from aiogram.dispatcher.filters import Text
 
 import prep_text_pars
+import sys
+
+import time
+
+
 import sys
 sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot\\db_setting')
 
@@ -19,6 +24,16 @@ from us_init import find_teleg_group
 from db_connect import DataConnect
 from us_init import find_teleg_group
 
+# sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
+
+# import tg_connect_db as tg_db
+# from db_connect import DataConnect
+# from us_init import find_teleg_group
+
+# import sys
+# sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
+# import tg_connect_db as tg_db
+# from db_connect import DataConnect
 
 API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
 bot = Bot(token=API_TOKEN)
@@ -26,7 +41,7 @@ dp = Dispatcher(bot, storage=MemoryStorage(), loop=get_event_loop())
 polls_dispcatcher = []
 
 
-db = DataConnect()
+# db = DataConnect()
 all_groups = []
 for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/schedule/ppc.php?guid=d0c04806-1d99-11e0-9baf-1c6f65450efa#'):
     all_groups.append(data['group'])
@@ -39,7 +54,7 @@ for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/sch
 #     all_groups_norm.append(data[0])
 
 
-# ############### poll #################
+# ############### poll + (optional) dispatcher #################
 
 @dp.message_handler(commands=["poll"])
 async def cmd_poll(message: types.message):
@@ -52,20 +67,11 @@ async def cmd_poll(message: types.message):
     question = 'you are'
 
     poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=chat_id)
-
+    close_time = time.time() + 5
     # send chat id and poll id
     polls_dispcatcher.append(
-        {"chat_id": poll.chat.id, "message_id": poll.message_id})
-    await asyncio.sleep(5)
-    count = 0
-    for data in polls_dispcatcher:
-
-        res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
-        print(count, '  ', res, data['chat_id'])
-        count += 1
-    polls_dispcatcher.clear()
-    count = 0
-    # await asyncio.sleep(1)
+        {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
+    
 
 # ############## end poll #################
 
@@ -118,10 +124,11 @@ async def fio_choosen(message: types.Message, state: FSMContext):
         await message.reply('Выберите группу', reply_markup=marakap)
 
     else:
-        tg_db.reg_us(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'])
 
-        await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
-      
+# ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
+
+        # await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
+        await message.answer('Регистрация завершена')
 # ######################### ############### ##########
         await state.finish()
 
@@ -135,10 +142,10 @@ async def choose_group(message: types.Message, state: FSMContext):
 
         await state.update_data(chosen_group=group)
         user_data = await state.get_data()
-        tg_db.reg_us(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'], group_stud = user_data['chosen_group'])
+# ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ СТУДЕНТА ТУТ ##########
 
-        await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
-
+        # await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
+        await message.answer('Регистрация завершена')
 # #########################################################
 
     await state.finish()
@@ -170,22 +177,22 @@ async def is_prep(call: types.CallbackQuery, state: FSMContext):
 # ############## poll creator ###########
 
 
-async def make_poll(chat_id, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
+async def make_poll(chat_id, end_time, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
 
     for recipient in chat_id:
         poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
 
-        polls_dispcatcher.append(
-            {"chat_id": poll.chat.id, "message_id": poll.message_id})
-        await asyncio.sleep(5)
-        count = 0
-        for data in polls_dispcatcher:
+        # polls_dispcatcher.append(
+        #     {"chat_id": poll.chat.id, "message_id": poll.message_id})
+        # await asyncio.sleep(5)
+        # count = 0
+        # for data in polls_dispcatcher:
 
-            res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
-            print(count, '  ', res, data['chat_id'])
-            count += 1
-        polls_dispcatcher.clear()
-        count = 0
+        #     res = await bot.stop_poll(chat_id=data['chat_id'], message_id=data['message_id'])
+        #     print(count, '  ', res, data['chat_id'])
+        #     count += 1
+        # polls_dispcatcher.clear()
+        # count = 0
 
 
 class createPoll(StatesGroup):
@@ -206,7 +213,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     question = message.text.lower()
 
     await state.update_data(question=question)
-    await message.reply('Пришлите вопросы через запятую')
+    await message.reply('Пришлите варианты ответов через запятую')
     await createPoll.next()
 
 
@@ -231,7 +238,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     group = message.text.lower()
 
     users_id_list = []
-    users_id_list = find_teleg_group(group)
+    users_id_list = find_teleg_group(group)   
 
 
 # ############### # ############### # ############### # ############### 
@@ -259,11 +266,21 @@ async def set_commands():
     await bot.set_my_commands(commands)
 
 
+
 async def pritr():
     while True:
-        await asyncio.sleep(5)
-
-
+        await asyncio.sleep(1)
+        # poll_trigger = aiogram.types.update.Update().poll
+        # if poll_trigger:
+        
+        #     print(poll_trigger)
+        for select_poll in polls_dispcatcher:
+            if select_poll['close_time'] < time.time():
+                closed_poll = await bot.stop_poll(chat_id=select_poll['chat_id'], message_id=select_poll['message_id'])
+                # print(closed_poll)
+                print(polls_dispcatcher)
+                polls_dispcatcher.remove({"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], 'close_time': select_poll['close_time']})
+                print(polls_dispcatcher)
 if __name__ == '__main__':
 
     dp.loop.create_task(set_commands())
