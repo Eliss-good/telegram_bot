@@ -9,7 +9,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 
-from poll import Poll
+
 # import sys
 # sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
 # import tg_connect_db as tg_db
