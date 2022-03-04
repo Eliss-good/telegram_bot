@@ -2,7 +2,7 @@ from db_connect import DataConnect
 import json
 
 import sys
-sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot')
+sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/')
 import full_pars as fl
 
 
