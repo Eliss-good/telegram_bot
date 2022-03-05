@@ -93,9 +93,12 @@ def find_id_teach(name_teach):
 
 def find_id_global(teleg_id):
     teleg_id = correct_str(str(teleg_id))
-    k = str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
-    print(k)
-    return k
+    data = db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id],'check')
+    print(data)
+    if data != []: 
+        return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
+
+
 
 #для проверки одобренности группы
 """
@@ -148,4 +151,3 @@ def start_gr(name_group):
 
     for item in data:
         data_for_group(name_group, item)
-

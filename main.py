@@ -20,6 +20,7 @@ import time
 # sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
 
 import tg_connect_db as tg_db
+import poll_connect_db as poll_db
 from db_connect import DataConnect
 # from us_init import find_teleg_group
 
@@ -92,11 +93,9 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 # ###### проверка зареган ли пользователь #######
 #  после lamda добавь проверку есть ли юзер в бд (чтобы возвращало true/false)
-@dp.message_handler(commands='register', lambda message: message.from_user.id)
+@dp.message_handler(lambda message: message.from_user.id, tg_db.ck_data_db(types.message.from_user.id),commands = 'register')
 async def register_check(message: types.Message):
-
     await message.answer("Вы уже зарегистрированы", reply_markup=types.ReplyKeyboardRemove())
-
 
 
 

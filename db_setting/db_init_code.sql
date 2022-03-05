@@ -40,7 +40,7 @@ CREATE TABLE connect_tb
     id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     group_id int REFERENCES group_tb(id),
     teach_id int REFERENCES teach_tb(id),
-    lesson_id int REFERENCES teach_tb(id),
+    lesson_id int REFERENCES lesson_tb(id),
     teach_role varchar(8)
 );
 
