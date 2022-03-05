@@ -2,7 +2,7 @@ from db_connect import DataConnect
 import json
 
 import sys
-sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/')
+sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot')
 import full_pars as fl
 
 
@@ -21,8 +21,10 @@ def add_us(id_us, role):
     id_us_ck = db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [id_us],'check')
     if id_us_ck:
         db.insert_db('global_tb', ['gl_teleg_id', 'gl_role'], [id_us, role])
+        return True
     else:
         print(id_us, ' уже существует')
+        return False
 
 def add_lesson(name_lesson):
     name_lesson = correct_str(str(name_lesson))
@@ -61,7 +63,8 @@ def add_student(name_student, teleg_id, name_group):
     else:
         print(name_student, name_group,' уже существует')
 
-######### рудимент
+
+"""
 def add_group_from_json():
     with open('approved_group.json','r', encoding='utf-8') as file:
         apr_group = json.load(file)
@@ -69,7 +72,8 @@ def add_group_from_json():
         for item in apr_group:
             print(item)
             add_group(correct_str(item), str(apr_group[item]))
-########        
+"""
+
 
         ################## select_modul ##################
 def find_id_group(name_group):
@@ -89,21 +93,9 @@ def find_id_teach(name_teach):
 
 def find_id_global(teleg_id):
     teleg_id = correct_str(str(teleg_id))
-    return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
-
-####### переделается для более широкого круга работ
-def find_teleg_group(name_group):
-    group_us = []
-    name_group = name_group.upper()
-
-    data = db.select_db_where('student_tb', ['gl_id'], ['group_id'], [find_id_group(name_group)], 'where')
-    for i in data:
-        group_us.append(db.select_db_where('global_tb', ['gl_teleg_id'], ['id'], [i[0]], 'where')[0][0])
-
-    print(group_us)
-    return group_us
-
-        ################## update_modul ##################
+    k = str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
+    print(k)
+    return k
 
 #для проверки одобренности группы
 """

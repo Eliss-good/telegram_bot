@@ -1,5 +1,6 @@
 import prep_text_pars
 
+
 def parse_group(index):
     full_prepods_list = []
     begin_week = 1
