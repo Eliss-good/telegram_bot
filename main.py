@@ -200,7 +200,7 @@ async def choose_question(message: types.Message):
 
 
 @dp.message_handler(state=createPoll.waiting_for_question)
-async def fio_choosen(message: types.Message, state: FSMContext):
+async def get_question(message: types.Message, state: FSMContext):
 
     question = message.text
 
@@ -210,7 +210,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=createPoll.waiting_for_options)
-async def fio_choosen(message: types.Message, state: FSMContext):
+async def get_options(message: types.Message, state: FSMContext):
 
     options = message.text.split(',')
     await state.update_data(options=options)
@@ -229,7 +229,7 @@ async def wrong_group(message: types.Message, state: FSMContext):
     return await message.reply('Выберите группу из списка')
 
 @dp.message_handler(state=createPoll.waiting_for_recipient)
-async def fio_choosen(message: types.Message, state: FSMContext):
+async def get_recipient(message: types.Message, state: FSMContext):
     group = message.text
     await state.update_data(group=group)
     await message.reply('Сколько времени будет открыто голосование (Пишите в формате часы:минуты:секунды)', reply_markup=types.ReplyKeyboardRemove())
@@ -237,7 +237,7 @@ async def fio_choosen(message: types.Message, state: FSMContext):
     
 
 @dp.message_handler(state=createPoll.waiting_for_time)
-async def fio_choosen(message: types.Message, state: FSMContext):
+async def get_time(message: types.Message, state: FSMContext):
     select_time = message.text
     await state.update_data(time=select_time)
     user_data = await state.get_data()
