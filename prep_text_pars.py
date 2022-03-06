@@ -67,5 +67,3 @@ def get_prepod_page(url):
                                     lessons_list.append({"prepod": prepod_name, "lesson": lesson_part_one + " " + lesson_part_two, "group": group})
     return lessons_list
                                 
-                                
-# print(get_prepod_page('https://mai.ru/education/studies/schedule/ppc.php?guid=d72d63e7-1d99-11e0-9baf-1c6f65450efa&week=1#'))

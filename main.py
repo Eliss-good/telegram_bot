@@ -13,7 +13,7 @@ from aiogram.dispatcher.filters import Text
 
 import prep_text_pars
 import sys
-sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot\\db_setting')
+sys.path.append('/home/eliss/ptoject/telegram_bot/db_setting')
 import time
 
 
@@ -93,11 +93,18 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 # ###### проверка зареган ли пользователь #######
 #  после lamda добавь проверку есть ли юзер в бд (чтобы возвращало true/false)
-@dp.message_handler(lambda message: message.from_user.id, tg_db.ck_data_db(types.message.from_user.id),commands = 'register')
-async def register_check(message: types.Message):
-    await message.answer("Вы уже зарегистрированы", reply_markup=types.ReplyKeyboardRemove())
+#  получить айдишник  =       message.from_user.id
+@dp.message_handler(lambda message: tg_db.ck_data_db(message.from_user.id), commands='register')
+async def wrong_group(message: types.Message, state: FSMContext):
+    await message.reply('Вы уже зарегистрированы')
+    buttons = [
+        types.InlineKeyboardButton(text="Да", callback_data="change_register_tr"),
+        types.InlineKeyboardButton(
+            text="Нет", callback_data="is_prepod")
+    ]
 
 
+    await message.reply('Хотите изменить регистрационные данные?')
 
 @dp.message_handler(commands='register')
 async def choose_role(message: types.Message):

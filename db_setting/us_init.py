@@ -2,7 +2,7 @@ from db_connect import DataConnect
 import json
 
 import sys
-sys.path.append('C:\\Users\\ИЛЮХА-БОСС\\Desktop\\Прога\\Python\\telegram_bot')
+sys.path.append('/home/eliss/ptoject/telegram_bot')
 import full_pars as fl
 
 
@@ -36,7 +36,7 @@ def add_lesson(name_lesson):
         print(name_lesson, ' уже существует')
 
 
-def add_prepod(name_prepod, id_us_tg):
+def add_prepod(name_prepod, id_us_tg = None):
     con_data =[correct_str(str(name_prepod)), find_id_global(id_us_tg)]
     prepod_ck = db.select_db_where('teach_tb', ['id'], ['teach_name', 'gl_id'], con_data, 'check')
     if prepod_ck:
@@ -93,12 +93,12 @@ def find_id_teach(name_teach):
 
 def find_id_global(teleg_id):
     teleg_id = correct_str(str(teleg_id))
-    data = db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id],'check')
+    data = db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id],'where')
     print(data)
     if data != []: 
         return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
-
-
+    else:
+        return '0'
 
 #для проверки одобренности группы
 """
@@ -127,7 +127,7 @@ def connect_gr_th(name_group, t_item):
 
 def data_for_group(name_group,t_item):
     add_lesson(t_item['lesson'])
-    add_prepod(t_item['prepod'], None)
+    add_prepod(t_item['prepod'], 1)
 
     connect_gr_th(name_group,t_item)
 
@@ -140,8 +140,9 @@ def data_for_prepod(t_item):
 
 
 def start_pr(name_prepod):
+    print('hey')
     data = fl.parse_prepod(name_prepod)
-    
+    print(data)
     for item in data:
         data_for_prepod(item)
 

@@ -51,7 +51,7 @@ def student_start(name_user, id_us_tg,name_group):
 
 
 def prepod_start(name_user, id_us_tg):
-    us_init.add_prepod(name_user, id_us_tg)
+    us_init.add_prepod(name_user, id_us_tg  = id_us_tg)
     us_init.start_pr(input("введите ссылку на препода: "))
 
 
@@ -80,10 +80,9 @@ def pars_data_spisok(command):
 
 
 def ck_data_db(teleg_id):
-    id = '0'
     id = us_init.find_id_global(teleg_id)
-
-    if id == '0':
+    print(id)
+    if id == 0:
         return False
     else:
         return True
