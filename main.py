@@ -1,6 +1,7 @@
 import asyncio
 from asyncio import get_event_loop
 from asyncore import poll
+from email import message
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
@@ -33,18 +34,10 @@ dp = Dispatcher(bot, storage=MemoryStorage(), loop=get_event_loop())
 polls_dispcatcher = []
 
 
-# db = DataConnect()
+# example
 all_groups = []
 for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/schedule/ppc.php?guid=d0c04806-1d99-11e0-9baf-1c6f65450efa#'):
     all_groups.append(data['group'])
-
-# all_groups = ['blat', 'gfto', 'ayli']
-
-# all_groups = db.select_db('group_tb', ['group_name'])
-# all_groups_norm = []
-# for data in all_groups:
-#     all_groups_norm.append(data[0])
-
 
 # ############### poll + (optional) dispatcher #################
 
@@ -63,7 +56,7 @@ async def cmd_poll(message: types.message):
     # send chat id and poll id
     polls_dispcatcher.append(
         {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
-    
+    print('poll created')
 
 # ############## end poll #################
 
@@ -87,6 +80,21 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.answer('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
 
+# ######### is registered check ##################
+
+@dp.message_handler(lambda message: True, commands='register')
+async def wrong_group(message: types.Message, state: FSMContext):
+    await message.answer('вы уже зареганы')
+    buttons = [
+        types.InlineKeyboardButton(text="Да", callback_data="register_change_true"),
+        types.InlineKeyboardButton(
+            text="Нет", callback_data="register_change_false")
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    await message.answer('Хотите изменить рег данные?', reply_markup=keyboard)
+
+
 @dp.message_handler(commands='register')
 async def choose_role(message: types.Message):
 
@@ -103,11 +111,10 @@ async def choose_role(message: types.Message):
 @dp.message_handler(state=registerUser.waiting_for_fio)
 async def fio_choosen(message: types.Message, state: FSMContext):
     fio = message.text
-    await message.answer('your fio:' + fio)
     await state.update_data(chosen_fio=fio)
     user_data = await state.get_data()
     if user_data['chosen_role'] == 'student':
-        marakap = ReplyKeyboardMarkup()
+        marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
 
         for data in all_groups:
             marakap.add(KeyboardButton(data))
@@ -117,16 +124,19 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
     else:
 
-# ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
+        # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
 
         # await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
         await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
-# ######################### ############### ##########
+
+        # ######################### ############### ##########
         await state.finish()
+
 
 @dp.message_handler(lambda message: message.text not in all_groups, state=registerUser.waiting_for_group)
 async def wrong_group(message: types.Message, state: FSMContext):
     return await message.reply('Выберите группу из списка')
+
 
 @dp.message_handler(state=registerUser.waiting_for_group)
 async def choose_group(message: types.Message, state: FSMContext):
@@ -140,30 +150,51 @@ async def choose_group(message: types.Message, state: FSMContext):
 # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ СТУДЕНТА ТУТ ##########
 
         # await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
-        await message.answer('Регистрация завершена')
+        await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
 # #########################################################
 
     await state.finish()
 
 
-@dp.callback_query_handler(text="is_student")
+@dp.callback_query_handler(text="register_change_true")
 async def is_stud(call: types.CallbackQuery, state: FSMContext):
-    await registerUser.waiting_for_role.set()
-    await state.update_data(chosen_role="student")
-    await call.answer()
-    await registerUser.next()
-    await call.message.answer('Введите ФИО')
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+    
+####### ДОБАВИТЬ ПРОВЕРКУ НА ПРЕПА/СТУДЕНТА 
+
+    buttons = [
+        types.InlineKeyboardButton(text="ФИО", callback_data="register_change_fio"),
+        types.InlineKeyboardButton(
+            text="Группу", callback_data="register_change_group")
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    await call.message.answer('Что именно изменить?', reply_markup=keyboard)
 
 
-@dp.callback_query_handler(text="is_prepod")
+@dp.callback_query_handler(text="register_change_false")
 async def is_prep(call: types.CallbackQuery, state: FSMContext):
-    await registerUser.waiting_for_role.set()
-    await state.update_data(chosen_role="prepod")
-    await call.answer()
-    # user_data = await state.get_data()
-    # await call.message.answer('Вы '+ user_data['chosen_role'])
-    await registerUser.next()
-    await call.message.answer('Введите ФИО')
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+    await call.message.answer('Окес')
+
+
+
+@dp.callback_query_handler(text="register_change_fio")
+async def is_prep(call: types.CallbackQuery, state: FSMContext):
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+
+# сделать изменения в бд и проверку, есть ли уже такое
+
+    await call.message.answer('фио изменено')
+
+
+@dp.callback_query_handler(text="register_change_group")
+async def is_prep(call: types.CallbackQuery, state: FSMContext):
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+    
+# сделать изменения в бд и проверку, есть ли уже такое
+
+    await call.message.answer('группа изменена')
 
 
 # ################ end register ########
@@ -177,14 +208,14 @@ async def make_poll(chat_id, end_time, options=['NO OPTIONS'], is_anonymous=True
     for recipient in chat_id:
         poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
         splited_close_time = end_time.split(':')
-        
-        close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(splited_close_time[1]) * 60 + int(splited_close_time[2])
+
+        close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(
+            splited_close_time[1]) * 60 + int(splited_close_time[2])
 
     # send chat id and poll id
         polls_dispcatcher.append(
             {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
-    
-        
+
 
 class createPoll(StatesGroup):
     waiting_for_question = State()
@@ -215,7 +246,7 @@ async def get_options(message: types.Message, state: FSMContext):
     options = message.text.split(',')
     await state.update_data(options=options)
 
-    marakap = ReplyKeyboardMarkup()
+    marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
 
     for data in all_groups:
         marakap.add(KeyboardButton(data))
@@ -224,9 +255,11 @@ async def get_options(message: types.Message, state: FSMContext):
 
     await createPoll.next()
 
+
 @dp.message_handler(lambda message: message.text not in all_groups, state=createPoll.waiting_for_recipient)
 async def wrong_group(message: types.Message, state: FSMContext):
     return await message.reply('Выберите группу из списка')
+
 
 @dp.message_handler(state=createPoll.waiting_for_recipient)
 async def get_recipient(message: types.Message, state: FSMContext):
@@ -234,7 +267,7 @@ async def get_recipient(message: types.Message, state: FSMContext):
     await state.update_data(group=group)
     await message.reply('Сколько времени будет открыто голосование (Пишите в формате часы:минуты:секунды)', reply_markup=types.ReplyKeyboardRemove())
     await createPoll.next()
-    
+
 
 @dp.message_handler(state=createPoll.waiting_for_time)
 async def get_time(message: types.Message, state: FSMContext):
@@ -247,15 +280,13 @@ async def get_time(message: types.Message, state: FSMContext):
 # ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
     # выбранная группа = user_data['group']
 
-# ############### # ############### # ############### # ############### 
-    
+# ############### # ############### # ############### # ###############
+
     user_data = await state.get_data()
     await message.answer('ГОТОВО')
     await state.finish()
     await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'], end_time=user_data['time'])
     # await make_poll(chat_id=find_teleg_group(group), question=user_data['question'], options=user_data['options'])
-    
-    
 
 
 # ################# creatr end #########
@@ -273,25 +304,29 @@ async def set_commands():
     await bot.set_my_commands(commands)
 
 
-
-async def pritr():
+async def polls_dispatcher():
     while True:
         await asyncio.sleep(1)
-        # poll_trigger = aiogram.types.update.Update().poll
-        # if poll_trigger:
         
-        #     print(poll_trigger)
         for select_poll in polls_dispcatcher:
             if select_poll['close_time'] < time.time():
                 closed_poll = await bot.stop_poll(chat_id=select_poll['chat_id'], message_id=select_poll['message_id'])
                 # print(closed_poll)
                 print(polls_dispcatcher)
-                polls_dispcatcher.remove({"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], 'close_time': select_poll['close_time']})
+                polls_dispcatcher.remove(
+                    {"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], 'close_time': select_poll['close_time']})
                 print(polls_dispcatcher)
+                
+
+async def rasp_notification():
+    while True:
+        await asyncio.sleep(1)
+        
+
+
 if __name__ == '__main__':
 
     dp.loop.create_task(set_commands())
-    dp.loop.create_task(pritr())
+    dp.loop.create_task(polls_dispatcher())
+    dp.loop.create_task(rasp_notification())
     executor.start_polling(dp)
-
-
