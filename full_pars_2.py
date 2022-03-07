@@ -64,64 +64,11 @@ def parse_group_today(group):
             if time.localtime().tm_mday == time_start.day and time.localtime().tm_mon == time_start.month and time_start.year == time.localtime().tm_year:
             
                 group_rasp.append({"time_start_hour": time_start.hour, "time_start_minutes": time_start.minute, "time_end": time_end.hour, "time_end_minutes": time_end.minute, "name": name, "type": type, "lector": lector, "room": room, "group": group, "notify": group_notify_status})
-    # return group_rasp
+    return group_rasp
 
-# for data in (parse_group_today('М3О-221Б-20')):
-#     print(str(data))
 # parse_group_today('М3О-221Б-20')
 
 def parse_prepod(md5):
-    link = "https://public.mai.ru/schedule/data/{0}.json".format(md5)
-    # print(link)
-    prep = urllib.request.urlopen(link).read()
-    prep = json.loads(prep)
-    # print(prep['schedule'])
-
-    for day in prep['schedule']:
-        # print(day)
-        pary = (prep['schedule'][day]['pairs'])
-        for _para in pary.items():
-            para = _para[1]
-            
-            time_start = datetime.fromisoformat(
-                str(parser.parse(para["time_start"])))
-            time_start = datetime.combine(date.date(), time_start.time())
-            time_end = datetime.fromisoformat(str(parser.parse(para["time_end"])))
-            time_end = datetime.combine(date.date(), time_end.time())
-
-            name = []
-            for _name in para["class"].items():
-                name.append(_name[0])
-            name = ' / '.join(name)
-
-            lector = []
-            for _lector in para["lector"].items():
-                lector.append(_lector[1])
-            lector = ', '.join(lector)
-
-            type = []
-            for _type in para["type"].items():
-                type = _type[0]
-
-            room = []
-            for _room in para["room"].items():
-                room.append(_room[1])
-            room = ', '.join(room)
-        # date = datetime.fromisoformat(str(parser.parse(day, dayfirst=True)))
-        # print(date.date())
-        # time_start = datetime.fromisoformat(
-        #         str(parser.parse(para["time_start"])))
-        # time_start = datetime.combine(date.date(), time_start.time())
-        # time_end = datetime.fromisoformat(str(parser.parse(para["time_end"])))
-        # time_end = datetime.combine(date.date(), time_end.time())
-        # print(para['time_start'])
-            
-    # print(name)
-
-# parse_prepod('d72d63e7-1d99-11e0-9baf-1c6f65450efa')
-
-
-def kek(md5):
     link = "https://public.mai.ru/schedule/data/{0}.json".format(md5)
     
     prep = urllib.request.urlopen(link).read()
@@ -145,21 +92,6 @@ def kek(md5):
             
             print(time_start, time_end, para['name'], para['types'], para['rooms'], para['groups'])
 
-            # print(para)
-            # name = []
-            # for _name in para["name"].items():
-            #     name.append(_name[0])
-            # name = ' / '.join(name)
-
+        
             
-
-            # type = []
-            # for _type in para["types"].items():
-            #     type = _type[0]
-
-            # room = []
-            # for _room in para["rooms"].items():
-            #     room.append(_room[1])
-            # room = ', '.join(room)
-            
-kek('d72d63e7-1d99-11e0-9baf-1c6f65450efa')
+# parse_prepod('d72d63e7-1d99-11e0-9baf-1c6f65450efa')
