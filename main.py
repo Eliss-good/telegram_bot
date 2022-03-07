@@ -41,6 +41,7 @@ rasp = full_pars_2.parse_group_today('М3О-221Б-20')
 
 # ############### poll + (optional) dispatcher #################
 
+
 @dp.message_handler(commands=["poll"])
 async def cmd_poll(message: types.message):
     await message.answer('Высылаю опрос')
@@ -86,7 +87,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 async def wrong_group(message: types.Message, state: FSMContext):
     await message.answer('вы уже зареганы')
     buttons = [
-        types.InlineKeyboardButton(text="Да", callback_data="register_change_true"),
+        types.InlineKeyboardButton(
+            text="Да", callback_data="register_change_true"),
         types.InlineKeyboardButton(
             text="Нет", callback_data="register_change_false")
     ]
@@ -159,11 +161,12 @@ async def choose_group(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text="register_change_true")
 async def is_stud(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    
-####### ДОБАВИТЬ ПРОВЕРКУ НА ПРЕПА/СТУДЕНТА 
+
+# ДОБАВИТЬ ПРОВЕРКУ НА ПРЕПА/СТУДЕНТА
 
     buttons = [
-        types.InlineKeyboardButton(text="ФИО", callback_data="register_change_fio"),
+        types.InlineKeyboardButton(
+            text="ФИО", callback_data="register_change_fio"),
         types.InlineKeyboardButton(
             text="Группу", callback_data="register_change_group")
     ]
@@ -178,7 +181,6 @@ async def is_prep(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer('Окес')
 
 
-
 @dp.callback_query_handler(text="register_change_fio")
 async def is_prep(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
@@ -191,7 +193,7 @@ async def is_prep(call: types.CallbackQuery, state: FSMContext):
 @dp.callback_query_handler(text="register_change_group")
 async def is_prep(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    
+
 # сделать изменения в бд и проверку, есть ли уже такое
 
     await call.message.answer('группа изменена')
@@ -307,7 +309,7 @@ async def set_commands():
 async def polls_dispatcher():
     while True:
         await asyncio.sleep(1)
-        
+
         for select_poll in polls_dispcatcher:
             if select_poll['close_time'] < time.time():
                 closed_poll = await bot.stop_poll(chat_id=select_poll['chat_id'], message_id=select_poll['message_id'])
@@ -316,7 +318,7 @@ async def polls_dispatcher():
                 polls_dispcatcher.remove(
                     {"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], 'close_time': select_poll['close_time']})
                 print(polls_dispcatcher)
-                
+
 
 async def rasp_notification():
     while True:
@@ -325,7 +327,9 @@ async def rasp_notification():
 
         await asyncio.sleep(1)
         for data in rasp:
-            time_diff = -(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes'])
+            time_diff = -(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + \
+                int(data['time_start_hour']) * 60 + \
+                int(data['time_start_minutes'])
             if time_diff <= 15 and time_diff > 0:
                 for user in data['notify']:
                     if int(user['notify_status']) != 1:
