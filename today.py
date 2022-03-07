@@ -1,9 +1,11 @@
 import time
-
+import hashlib
 import urllib.request
 import json
 from datetime import datetime
 from dateutil import parser
+
+from full_pars import prep_text_pars
 
 link = "https://public.mai.ru/schedule/data/bdc71a9a967c1e24f6e55a208f452202.json"
 rasp = urllib.request.urlopen(link).read()
@@ -46,8 +48,19 @@ for day in rasp.items():
             room.append(_room[1])
         room = ', '.join(room)
         
-        if time.localtime().tm_mday + 1 == time_start.day and time.localtime().tm_mon == time_start.month and time_start.year == time.localtime().tm_year:
+        if time.localtime().tm_mday == time_start.day and time.localtime().tm_mon == time_start.month and time_start.year == time.localtime().tm_year:
         
             group_rasp.append({"time_start": time_start.ctime(), "time_end": time_end.ctime(
-        ), "name": name, "type": type, "lector": lector, "room": room})
+        ), "name": name, "type": type, "lector": lector, "room": room, "group": "М3О-221Б-20"})
+
+all_groups = []
+
+for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/schedule/ppc.php?guid=d0c04806-1d99-11e0-9baf-1c6f65450efa#'):
+    all_groups.append(data['group'])
+
+
 print(group_rasp)
+
+print( hashlib.md5('М3О-221Б-20'.encode(encoding='utf_8')).hexdigest())
+
+#  по преподу - берем uid с сайта

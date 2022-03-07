@@ -1,7 +1,5 @@
 import asyncio
 from asyncio import get_event_loop
-from asyncore import poll
-from email import message
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
@@ -11,12 +9,12 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 
-import prep_text_pars
 import sys
 
 import time
 
-
+import full_pars_2
+import prep_text_pars
 # sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
 
 # import tg_connect_db as tg_db
@@ -38,6 +36,8 @@ polls_dispcatcher = []
 all_groups = []
 for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/schedule/ppc.php?guid=d0c04806-1d99-11e0-9baf-1c6f65450efa#'):
     all_groups.append(data['group'])
+
+rasp = full_pars_2.parse_group_today('М3О-221Б-20')
 
 # ############### poll + (optional) dispatcher #################
 
@@ -320,9 +320,16 @@ async def polls_dispatcher():
 
 async def rasp_notification():
     while True:
-        await asyncio.sleep(1)
-        
 
+        #  rasp = full_pars_2.parse_group_today('М3О-221Б-20') - ЗАПИХНИ ЭТО В САМОЕ НАЯАЛО ПЕРЕД ВСЕМИ ФУНКЦИЯМИ
+
+        await asyncio.sleep(1)
+        for data in rasp:
+            if -(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes']) <= 15:
+                for user in data['notify']:
+                    if int(user['notify_status']) != 1:
+                        await bot.send_message(user['user'], str(data['name']) + ' через 15 минут')
+            print(-(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes']))
 
 if __name__ == '__main__':
 
