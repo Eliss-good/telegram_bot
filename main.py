@@ -325,12 +325,13 @@ async def rasp_notification():
 
         await asyncio.sleep(1)
         for data in rasp:
-            if -(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes']) <= 15:
+            time_diff = -(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes'])
+            if time_diff <= 15 and time_diff > 0:
                 for user in data['notify']:
                     if int(user['notify_status']) != 1:
-                        await bot.send_message(user['user'], str(data['name']) + ' через 15 минут')
+                        await bot.send_message(user['user'], str(data['name']) + ' через {0} минут'.format(time_diff))
                         user['notify_status'] = 1
-            print(-(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes']))
+            print(time_diff, data['name'])
 
 if __name__ == '__main__':
 

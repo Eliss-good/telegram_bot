@@ -7,6 +7,11 @@ from dateutil import parser
 
 from full_pars import prep_text_pars
 
+
+
+def get_group_rasp
+
+
 link = "https://public.mai.ru/schedule/data/bdc71a9a967c1e24f6e55a208f452202.json"
 rasp = urllib.request.urlopen(link).read()
 rasp = json.loads(rasp)
