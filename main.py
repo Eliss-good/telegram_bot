@@ -329,6 +329,7 @@ async def rasp_notification():
                 for user in data['notify']:
                     if int(user['notify_status']) != 1:
                         await bot.send_message(user['user'], str(data['name']) + ' через 15 минут')
+                        user['notify_status'] = 1
             print(-(int(time.localtime().tm_hour) * 60 + int(time.localtime().tm_min)) + int(data['time_start_hour']) * 60 + int(data['time_start_minutes']))
 
 if __name__ == '__main__':
