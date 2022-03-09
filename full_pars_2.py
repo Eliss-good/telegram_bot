@@ -26,13 +26,13 @@ def parse_group_today(group):
 
     for day in rasp.items():
         date = datetime.fromisoformat(str(parser.parse(day[0], dayfirst=True)))
-        print(date)
+        # print(date)
         # print(date.date())
         # print(day[0])
         pary = day[1]["pairs"]
         # print(pary)
         for _para in pary.items():
-            print(_para)
+            # print(_para)
             para = _para[1]
 
             time_start = datetime.fromisoformat(
@@ -92,8 +92,8 @@ def parse_prepod(md5):
                 str(parser.parse(para["time_end"])))
             time_end = datetime.combine(date.date(), time_end.time())
 
-            print(time_start, time_end,
-                  para['name'], para['types'], para['rooms'], para['groups'])
+            # print(time_start, time_end,
+            #       para['name'], para['types'], para['rooms'], para['groups'])
 
 
 # parse_prepod('d72d63e7-1d99-11e0-9baf-1c6f65450efa')

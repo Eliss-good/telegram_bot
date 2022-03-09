@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import get_event_loop
+
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
@@ -31,6 +32,9 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage(), loop=get_event_loop())
 polls_dispcatcher = []
 
+temp_mem_for_multiple_poll = []
+
+multiple_polls_dispatcher = []
 
 # example
 all_groups = []
@@ -294,9 +298,175 @@ async def get_time(message: types.Message, state: FSMContext):
 # ################# creatr end #########
 
 
+
+# states test
+
+
+class statesTest(StatesGroup):
+    state_middle = State()
+    state_end = State()
+
+
+@dp.message_handler( commands=['test'])
+async def choose_group(message: types.Message, state: FSMContext):
+    await message.answer('first steg')
+    await statesTest.next()
+
+
+@dp.message_handler(state=statesTest.state_middle)
+async def choose_group(message: types.Message, state: FSMContext):
+    await message.answer('midle steg')
+    await statesTest.next()
+
+
+@dp.message_handler(state=statesTest.state_end)
+async def choose_group(message: types.Message, state: FSMContext):
+    
+    await message.answer('las steg')
+    # state=statesTest.state_middle
+    await state.reset_state()
+    await state.finish()
+    await message.answer('finishd')
+
+
+
+# new vopros type ##########
+
+
+# ############## poll creator ###########
+
+
+async def make_poll(chat_id, end_time, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
+
+    for recipient in chat_id:
+        poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
+        splited_close_time = end_time.split(':')
+
+        close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(
+            splited_close_time[1]) * 60 + int(splited_close_time[2])
+
+    # send chat id and poll id
+        temp_mem_for_multiple_poll.append(
+            {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
+
+
+class createPoll(StatesGroup):
+    waiting_for_question = State()
+    waiting_for_options = State()
+    waiting_for_next_state = State()
+    waiting_for_recipient = State()
+    waiting_for_time = State()
+
+
+@dp.message_handler(commands='create_poll')
+async def choose_question(message: types.Message):
+    await createPoll.next()
+    await message.reply("Введите вопрос")
+
+
+@dp.message_handler(state=createPoll.waiting_for_question)
+async def get_question(message: types.Message, state: FSMContext):
+
+    question = message.text
+
+    await state.update_data(question=question)
+    await message.reply('Пришлите варианты ответов через запятую')
+    await createPoll.next()
+
+
+@dp.message_handler(state=createPoll.waiting_for_options)
+async def get_options(message: types.Message, state: FSMContext):
+
+    options = message.text.split(',')
+    await state.update_data(options=options)
+
+    user_data = await state.get_data()
+    print(user_data['question'], user_data['options'])
+
+    buttons = [
+        types.InlineKeyboardButton(text="Да", callback_data="add_poll_true"),
+        types.InlineKeyboardButton(
+            text="Нет", callback_data="add_poll_false")
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+    
+
+    await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
+
+    await createPoll.next()
+
+
+@dp.message_handler(state=createPoll.waiting_for_next_state)
+async def get_options(message: types.Message, state: FSMContext):
+
+    options = message.text.split(',')
+    await state.update_data(options=options)
+    marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
+
+    for data in all_groups:
+        marakap.add(KeyboardButton(data))
+
+    
+
+    await message.reply('Выберите какой группе отправить', reply_markup=marakap)
+
+    await createPoll.next()
+
+
+@dp.message_handler(lambda message: message.text not in all_groups, state=createPoll.waiting_for_recipient)
+async def wrong_group(message: types.Message, state: FSMContext):
+    return await message.reply('Выберите группу из списка')
+
+
+@dp.message_handler(state=createPoll.waiting_for_recipient)
+async def get_recipient(message: types.Message, state: FSMContext):
+    group = message.text
+    await state.update_data(group=group)
+    await message.reply('Сколько времени будет открыто голосование (Пишите в формате часы:минуты:секунды)', reply_markup=types.ReplyKeyboardRemove())
+    await createPoll.next()
+
+
+@dp.message_handler(state=createPoll.waiting_for_time)
+async def get_time(message: types.Message, state: FSMContext):
+    select_time = message.text
+    await state.update_data(time=select_time)
+    user_data = await state.get_data()
+
+    users_id_list = [506629389]
+
+# ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
+    # выбранная группа = user_data['group']
+
+# ############### # ############### # ############### # ###############
+
+    user_data = await state.get_data()
+    await message.answer('ГОТОВО')
+    await state.finish()
+    await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'], end_time=user_data['time'])
+    # await make_poll(chat_id=find_teleg_group(group), question=user_data['question'], options=user_data['options'])
+
+
+
+@dp.callback_query_handler(text="add_poll_true")
+async def is_prep(call: types.CallbackQuery):
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+    await call.message.answer('Окес')
+
+
+@dp.callback_query_handler(text="add_poll_false")
+async def is_prep(call: types.CallbackQuery):
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+    await call.message.answer('Окес')
+
+# ################# creatr end #########
+
+# new vopros end #######
+
 async def set_commands():
 
     commands = [
+        BotCommand(command="/multi_poll", description="Создать мульти опрос"),
         BotCommand(command="/create_poll", description="Создать опрос"),
         BotCommand(command="/poll", description="Опрос"),
         BotCommand(command="/register", description="Регистрация"),
@@ -316,7 +486,7 @@ async def polls_dispatcher():
                 # print(closed_poll)
                 print(polls_dispcatcher)
                 polls_dispcatcher.remove(
-                    {"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], 'close_time': select_poll['close_time']})
+                    {"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id']})
                 print(polls_dispcatcher)
 
 
@@ -335,7 +505,7 @@ async def rasp_notification():
                     if int(user['notify_status']) != 1:
                         await bot.send_message(user['user'], str(data['name']) + ' через {0} минут'.format(time_diff))
                         user['notify_status'] = 1
-            print(time_diff, data['name'])
+            # print(time_diff, data['name'])
 
 if __name__ == '__main__':
 
