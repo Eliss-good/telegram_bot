@@ -305,7 +305,7 @@ async def get_time(message: types.Message, state: FSMContext):
 class statesTest(StatesGroup):
     state_middle = State()
     state_end = State()
-
+    eshe = State()
 
 @dp.message_handler( commands=['test'])
 async def choose_group(message: types.Message, state: FSMContext):
@@ -321,13 +321,21 @@ async def choose_group(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=statesTest.state_end)
 async def choose_group(message: types.Message, state: FSMContext):
+    # await statesTest
+    await message.answer('end steg')
     
-    await message.answer('las steg')
-    # state=statesTest.state_middle
-    await state.reset_state()
-    await state.finish()
-    await message.answer('finishd')
+    
+    await statesTest.next()
 
+
+@dp.message_handler(state=statesTest.eshe)
+async def choose_group(message: types.Message, state: FSMContext):
+    # await statesTest
+    await message.answer('fin steg')
+    
+    await statesTest.state_middle.set()
+    # await state.finish()
+    await message.answer('finishd')
 
 
 # new vopros type ##########
@@ -336,45 +344,43 @@ async def choose_group(message: types.Message, state: FSMContext):
 # ############## poll creator ###########
 
 
-async def make_poll(chat_id, end_time, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
+async def make_poll(chat_id, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
 
     for recipient in chat_id:
         poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
-        splited_close_time = end_time.split(':')
+        # splited_close_time = end_time.split(':')
 
-        close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(
-            splited_close_time[1]) * 60 + int(splited_close_time[2])
+        # close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(
+        #     splited_close_time[1]) * 60 + int(splited_close_time[2])
 
     # send chat id and poll id
         temp_mem_for_multiple_poll.append(
-            {"chat_id": poll.chat.id, "message_id": poll.message_id, 'close_time': close_time})
+            {"chat_id": poll.chat.id, "message_id": poll.message_id})
 
 
-class createPoll(StatesGroup):
+class poll_t(StatesGroup):
     waiting_for_question = State()
     waiting_for_options = State()
-    waiting_for_next_state = State()
-    waiting_for_recipient = State()
-    waiting_for_time = State()
+    send_state = State()    
 
 
-@dp.message_handler(commands='create_poll')
+@dp.message_handler(commands='test_p')
 async def choose_question(message: types.Message):
-    await createPoll.next()
+    await poll_t.next()
     await message.reply("Введите вопрос")
 
 
-@dp.message_handler(state=createPoll.waiting_for_question)
+@dp.message_handler(state=poll_t.waiting_for_question)
 async def get_question(message: types.Message, state: FSMContext):
 
     question = message.text
 
     await state.update_data(question=question)
+    await poll_t.next()
     await message.reply('Пришлите варианты ответов через запятую')
-    await createPoll.next()
 
 
-@dp.message_handler(state=createPoll.waiting_for_options)
+@dp.message_handler(state=poll_t.waiting_for_options)
 async def get_options(message: types.Message, state: FSMContext):
 
     options = message.text.split(',')
@@ -382,7 +388,7 @@ async def get_options(message: types.Message, state: FSMContext):
 
     user_data = await state.get_data()
     print(user_data['question'], user_data['options'])
-
+    
     buttons = [
         types.InlineKeyboardButton(text="Да", callback_data="add_poll_true"),
         types.InlineKeyboardButton(
@@ -393,71 +399,32 @@ async def get_options(message: types.Message, state: FSMContext):
     
 
     await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
+    await state.finish()
 
-    await createPoll.next()
 
-
-@dp.message_handler(state=createPoll.waiting_for_next_state)
+@dp.message_handler(state=poll_t.send_state)
 async def get_options(message: types.Message, state: FSMContext):
 
-    options = message.text.split(',')
-    await state.update_data(options=options)
-    marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
-
-    for data in all_groups:
-        marakap.add(KeyboardButton(data))
-
-    
-
-    await message.reply('Выберите какой группе отправить', reply_markup=marakap)
-
-    await createPoll.next()
-
-
-@dp.message_handler(lambda message: message.text not in all_groups, state=createPoll.waiting_for_recipient)
-async def wrong_group(message: types.Message, state: FSMContext):
-    return await message.reply('Выберите группу из списка')
-
-
-@dp.message_handler(state=createPoll.waiting_for_recipient)
-async def get_recipient(message: types.Message, state: FSMContext):
-    group = message.text
-    await state.update_data(group=group)
-    await message.reply('Сколько времени будет открыто голосование (Пишите в формате часы:минуты:секунды)', reply_markup=types.ReplyKeyboardRemove())
-    await createPoll.next()
-
-
-@dp.message_handler(state=createPoll.waiting_for_time)
-async def get_time(message: types.Message, state: FSMContext):
-    select_time = message.text
-    await state.update_data(time=select_time)
-    user_data = await state.get_data()
-
-    users_id_list = [506629389]
-
-# ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
-    # выбранная группа = user_data['group']
-
-# ############### # ############### # ############### # ###############
 
     user_data = await state.get_data()
     await message.answer('ГОТОВО')
+    
+    users_id_list = [506629389]
+    await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'])
     await state.finish()
-    await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'], end_time=user_data['time'])
-    # await make_poll(chat_id=find_teleg_group(group), question=user_data['question'], options=user_data['options'])
-
 
 
 @dp.callback_query_handler(text="add_poll_true")
-async def is_prep(call: types.CallbackQuery):
+async def add_poll(call: types.CallbackQuery):
+    await call.message.reply('vevedite vopsorz')
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await call.message.answer('Окес')
+    await poll_t.waiting_for_question.set()
 
 
 @dp.callback_query_handler(text="add_poll_false")
-async def is_prep(call: types.CallbackQuery):
+async def save_poll(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await call.message.answer('Окес')
+    await poll_t.send_state.set()
 
 # ################# creatr end #########
 
