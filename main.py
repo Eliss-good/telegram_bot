@@ -43,6 +43,7 @@ for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/sch
 
 rasp = full_pars_2.parse_group_today('М3О-221Б-20')
 
+
 # ############### poll + (optional) dispatcher #################
 
 
@@ -305,30 +306,38 @@ async def get_time(message: types.Message, state: FSMContext):
 class statesTest(StatesGroup):
     state_middle = State()
     state_end = State()
-
+    eshe = State()
 
 @dp.message_handler( commands=['test'])
 async def choose_group(message: types.Message, state: FSMContext):
     await message.answer('first steg')
-    await statesTest.next()
+    await statesTest.state_middle.set()
 
 
 @dp.message_handler(state=statesTest.state_middle)
 async def choose_group(message: types.Message, state: FSMContext):
     await message.answer('midle steg')
-    await statesTest.next()
+    await statesTest.state_end.set()
 
 
 @dp.message_handler(state=statesTest.state_end)
 async def choose_group(message: types.Message, state: FSMContext):
+    # await statesTest
+    await message.answer('end steg')
+    # await statesTest.state_middle.set()
     
-    await message.answer('las steg')
-    # state=statesTest.state_middle
-    await state.reset_state()
-    await state.finish()
+    await statesTest.eshe.set()
+    
+
+
+@dp.message_handler(state=statesTest.eshe)
+async def choose_group(message: types.Message, state: FSMContext):
+    # await statesTest
+    await message.answer('fin steg')
+    
+    await statesTest.state_middle.set()
+    # await state.finish()
     await message.answer('finishd')
-
-
 
 # new vopros type ##########
 
@@ -466,7 +475,7 @@ async def is_prep(call: types.CallbackQuery):
 async def set_commands():
 
     commands = [
-        BotCommand(command="/multi_poll", description="Создать мульти опрос"),
+        BotCommand(command="/multi_poll", description="Создать мульти опрос (dima idi nahooj)"),
         BotCommand(command="/create_poll", description="Создать опрос"),
         BotCommand(command="/poll", description="Опрос"),
         BotCommand(command="/register", description="Регистрация"),
