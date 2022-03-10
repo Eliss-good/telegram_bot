@@ -10,7 +10,6 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
-
 import sys
 
 import time
@@ -324,8 +323,6 @@ async def choose_group(message: types.Message, state: FSMContext):
 async def choose_group(message: types.Message, state: FSMContext):
     # await statesTest
     await message.answer('end steg')
-    
-    
     await statesTest.next()
 
 
@@ -339,7 +336,8 @@ async def choose_group(message: types.Message, state: FSMContext):
     await message.answer('finishd')
 
 
-# new vopros type ##########
+
+# new opros type ##########
 
 
 # ############## poll creator ###########
@@ -389,7 +387,7 @@ async def get_options(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     print(user_data['question'], user_data['options'])
     users_id_list = [506629389]
-    temp_mem_for_multiple_poll.append({'question': user_data['question'], 'options': user_data['options'], 'users_send': users_id_list})
+    temp_mem_for_multiple_poll.append({'question': user_data['question'], 'options': user_data['options'], 'users_send': users_id_list, 'id': 0})
     
     buttons = [
         types.InlineKeyboardButton(text="Да", callback_data="add_poll_true"),
@@ -401,7 +399,7 @@ async def get_options(message: types.Message, state: FSMContext):
     
 
     await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
-    print(temp_mem_for_multiple_poll)
+    # print(temp_mem_for_multiple_poll)
     await state.finish()
 
 
@@ -418,16 +416,52 @@ async def add_poll(call: types.CallbackQuery):
 async def save_poll(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await call.message.answer('sending')
-    multiple_polls_dispatcher.append(temp_mem_for_multiple_poll)
-    for data in temp_mem_for_multiple_poll:
-        
-        await make_poll(chat_id=data['users_send'], question=data['question'], options=data['options'])
+    multiple_polls_dispatcher.append([*temp_mem_for_multiple_poll])
+    print(multiple_polls_dispatcher)
     temp_mem_for_multiple_poll.clear()
+    
 
 
-@dp.poll_answer_handler()
-async def poll_hanlr(message: types.Message):
-    print('wow')
+@dp.message_handler(commands='send')
+async def start_cycle(message: types.Message):
+    print(multiple_polls_dispatcher)
+    if multiple_polls_dispatcher:
+        if multiple_polls_dispatcher[0]:
+            if multiple_polls_dispatcher[0][0]:
+                curr_poll = multiple_polls_dispatcher[0][0]
+                msg = await bot.send_poll(chat_id=506629389, question=curr_poll['question'], options=curr_poll['options'], is_anonymous=True)
+                curr_poll['id'] = msg.poll.id
+                print(multiple_polls_dispatcher)
+
+
+async def go_cycle():
+    
+    if multiple_polls_dispatcher:
+        if multiple_polls_dispatcher[0]:
+            if multiple_polls_dispatcher[0][0]:
+                curr_poll = multiple_polls_dispatcher[0][0]
+                msg = await bot.send_poll(chat_id=506629389, question=curr_poll['question'], options=curr_poll['options'], is_anonymous=True)
+                curr_poll['id'] = msg.poll.id
+                
+
+
+def lambda_checker(message):
+    for data in multiple_polls_dispatcher:
+        for a in data:
+            if a['id'] == message['id']:
+                multiple_polls_dispatcher[0].remove({'question': a['question'], 'options': a['options'], 'users_send': a['users_send'], 'id': a['id']})
+                print('eh')
+                return True
+    print('folss')
+    return False
+
+@dp.poll_handler(lambda message: lambda_checker(message))
+async def poll_hanlr(poll: types.PollAnswer):
+    if multiple_polls_dispatcher:
+        await go_cycle()
+    # print(poll['id'])
+
+# lambda_checker(message)
 # ################# creatr end #########
 
 # new vopros end #######
@@ -454,10 +488,10 @@ async def polls_dispatcher():
             if select_poll['close_time'] < time.time():
                 closed_poll = await bot.stop_poll(chat_id=select_poll['chat_id'], message_id=select_poll['message_id'])
                 # print(closed_poll)
-                print(polls_dispcatcher)
+                # print(polls_dispcatcher)
                 polls_dispcatcher.remove(
-                    {"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id']})
-                print(polls_dispcatcher)
+                    {"chat_id": select_poll['chat_id'], "message_id": select_poll['message_id'], "close_time": select_poll['close_time']})
+                # print(polls_dispcatcher)
 
 
 async def rasp_notification():
