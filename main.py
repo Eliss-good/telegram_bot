@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import get_event_loop
+from email.message import Message
 
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
@@ -306,7 +307,7 @@ class statesTest(StatesGroup):
     state_middle = State()
     state_end = State()
     eshe = State()
-
+    
 @dp.message_handler( commands=['test'])
 async def choose_group(message: types.Message, state: FSMContext):
     await message.answer('first steg')
@@ -354,8 +355,7 @@ async def make_poll(chat_id, options=['NO OPTIONS'], is_anonymous=True, question
         #     splited_close_time[1]) * 60 + int(splited_close_time[2])
 
     # send chat id and poll id
-        temp_mem_for_multiple_poll.append(
-            {"chat_id": poll.chat.id, "message_id": poll.message_id})
+        
 
 
 class poll_t(StatesGroup):
@@ -388,6 +388,8 @@ async def get_options(message: types.Message, state: FSMContext):
 
     user_data = await state.get_data()
     print(user_data['question'], user_data['options'])
+    users_id_list = [506629389]
+    temp_mem_for_multiple_poll.append({'question': user_data['question'], 'options': user_data['options'], 'users_send': users_id_list})
     
     buttons = [
         types.InlineKeyboardButton(text="Да", callback_data="add_poll_true"),
@@ -399,24 +401,15 @@ async def get_options(message: types.Message, state: FSMContext):
     
 
     await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
+    print(temp_mem_for_multiple_poll)
     await state.finish()
 
 
-@dp.message_handler(state=poll_t.send_state)
-async def get_options(message: types.Message, state: FSMContext):
-
-
-    user_data = await state.get_data()
-    await message.answer('ГОТОВО')
-    
-    users_id_list = [506629389]
-    await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'])
-    await state.finish()
 
 
 @dp.callback_query_handler(text="add_poll_true")
 async def add_poll(call: types.CallbackQuery):
-    await call.message.reply('vevedite vopsorz')
+    await call.message.reply('Введите вопрос')
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await poll_t.waiting_for_question.set()
 
@@ -424,11 +417,21 @@ async def add_poll(call: types.CallbackQuery):
 @dp.callback_query_handler(text="add_poll_false")
 async def save_poll(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await poll_t.send_state.set()
+    await call.message.answer('sending')
+    multiple_polls_dispatcher.append(temp_mem_for_multiple_poll)
+    for data in temp_mem_for_multiple_poll:
+        
+        await make_poll(chat_id=data['users_send'], question=data['question'], options=data['options'])
+    temp_mem_for_multiple_poll.clear()
 
+
+@dp.poll_answer_handler()
+async def poll_hanlr(message: types.Message):
+    print('wow')
 # ################# creatr end #########
 
 # new vopros end #######
+
 
 async def set_commands():
 
