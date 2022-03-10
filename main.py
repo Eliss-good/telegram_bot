@@ -559,7 +559,6 @@ async def poll_hanlr(poll: types.PollAnswer):
         await go_cycle()
     # print(poll['id'])
 
-# i need commit 
 @dp.message_handler(lambda message: lambda_checker_msg(message))
 async def msg_handlr(message: types.Message):
     print(message.message_id)
