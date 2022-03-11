@@ -149,6 +149,8 @@ def start_pr(name_prepod):
 def start_gr(name_group):
     data = fl.parse_group(name_group.upper())
     add_group(name_group, True)
-
+    print(data)
     for item in data:
         data_for_group(name_group, item)
+
+start_gr('М3О-321Б-19')

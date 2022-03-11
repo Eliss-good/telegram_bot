@@ -83,9 +83,9 @@ def ck_data_db(teleg_id):
     id = us_init.find_id_global(teleg_id)
     print(id)
     if id == 0:
-        return False
-    else:
         return True
+    else:
+        return False
 
 if __name__ == '__main__':
     pass
