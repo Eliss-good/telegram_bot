@@ -1,5 +1,6 @@
 import asyncio
 from asyncio import get_event_loop
+from audioop import mul
 from email import message
 from email.message import Message
 
@@ -303,7 +304,7 @@ async def get_time(message: types.Message, state: FSMContext):
     await state.update_data(time=select_time)
     user_data = await state.get_data()
 
-    users_id_list = [506629389]
+    
 
 # ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
     # выбранная группа = user_data['group']
@@ -313,6 +314,7 @@ async def get_time(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     await message.answer('ГОТОВО')
     await state.finish()
+    users_id_list = [506629389]
     await make_poll(chat_id=users_id_list, question=user_data['question'], options=user_data['options'], end_time=user_data['time'])
     # await make_poll(chat_id=find_teleg_group(group), question=user_data['question'], options=user_data['options'])
 
@@ -362,13 +364,10 @@ async def choose_group(message: types.Message, state: FSMContext):
 # new opros type ##########
 
 
-# ############## poll creator ###########
+# async def make_poll(chat_id, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
 
-
-async def make_poll(chat_id, options=['NO OPTIONS'], is_anonymous=True, question='NO QUESTION'):
-
-    for recipient in chat_id:
-        poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
+#     for recipient in chat_id:
+#         poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=recipient)
         # splited_close_time = end_time.split(':')
 
         # close_time = time.time() + int(splited_close_time[0]) * 60 * 60 + int(
@@ -382,8 +381,9 @@ class poll_t(StatesGroup):
     
     waiting_for_question = State()
     waiting_for_options = State()
-    send_state = State()    
 
+class group_chooser(StatesGroup):
+    waiting_for_group = State()
 
 @dp.message_handler(commands='test_p')
 async def choose_question(message: types.Message):
@@ -401,17 +401,20 @@ async def choose_question(message: types.Message):
 
 @dp.message_handler(state=poll_t.waiting_for_question)
 async def get_question(message: types.Message, state: FSMContext):
-    users_id_list = [506629389]
+    
     question = message.text
     await state.update_data(question=question)
     data = await state.get_data()
     if data['type'] == 'msg':
-        temp_mem_for_multiple_poll.append({'question': data['question'], 'users_send': users_id_list, 'id': 0, 'type': 'msg'})
+        temp_mem_for_multiple_poll.append({'question': data['question'], 'id': 0, 'type': 'msg'})
         buttons = [
-        types.InlineKeyboardButton(text="Да", callback_data="add_poll_true"),
+        types.InlineKeyboardButton(text="Да", callback_data="add_quest_true"),
         types.InlineKeyboardButton(
-            text="Нет", callback_data="add_poll_false")
+            text="Нет", callback_data="add_quest_false"),
+        types.InlineKeyboardButton(
+            text="Удалить последний вопрос", callback_data="del_quest_true")
         ]
+        
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         keyboard.add(*buttons)
     
@@ -433,14 +436,17 @@ async def get_options(message: types.Message, state: FSMContext):
 
     user_data = await state.get_data()
     print(user_data['question'], user_data['options'])
-    users_id_list = [506629389]
-    temp_mem_for_multiple_poll.append({'question': user_data['question'], 'options': user_data['options'], 'users_send': users_id_list, 'id': 0, 'type': 'poll'})
+    
+    temp_mem_for_multiple_poll.append({'question': user_data['question'], 'options': user_data['options'], 'id': 0, 'type': 'poll'})
     
     buttons = [
-        types.InlineKeyboardButton(text="Да", callback_data="add_poll_true"),
+        types.InlineKeyboardButton(text="Да", callback_data="add_quest_true"),
         types.InlineKeyboardButton(
-            text="Нет", callback_data="add_poll_false")
-    ]
+            text="Нет", callback_data="add_quest_false"),
+        types.InlineKeyboardButton(
+            text="Удалить последний вопрос", callback_data="del_quest_true")
+        ]
+        
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
     
@@ -450,9 +456,23 @@ async def get_options(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+@dp.message_handler(state=group_chooser.waiting_for_group)
+async def choose_group(message: types.Message, state: FSMContext):
+    
+    group = message.text
+    await message.answer('groop' + ' ' + group)
+    # bd search
+    users_id_list = [506629389]
+    temp_mem_for_multiple_poll.append({'users_id': users_id_list, 'type': 'recipient_info'})
+    multiple_polls_dispatcher.append([*temp_mem_for_multiple_poll])
+
+    print(multiple_polls_dispatcher)
+    temp_mem_for_multiple_poll.clear()
+    await state.finish()
 
 
-@dp.callback_query_handler(text="add_poll_true")
+
+@dp.callback_query_handler(text="add_quest_true")
 async def add_poll_true(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     buttons = [
@@ -468,13 +488,35 @@ async def add_poll_true(call: types.CallbackQuery):
     
 
 
-@dp.callback_query_handler(text="add_poll_false")
+@dp.callback_query_handler(text="add_quest_false")
 async def add_poll_false(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await call.message.answer('sending')
-    multiple_polls_dispatcher.append([*temp_mem_for_multiple_poll])
-    print(multiple_polls_dispatcher)
-    temp_mem_for_multiple_poll.clear()
+    await call.message.answer('gotovo')
+    
+    
+    await group_chooser.waiting_for_group.set()
+    await call.message.answer('choose group')
+
+
+
+@dp.callback_query_handler(text="del_quest_true")
+async def add_poll_false(call: types.CallbackQuery):
+    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
+    temp_mem_for_multiple_poll.pop()
+    await call.message.answer('last quest deleted')
+    print(temp_mem_for_multiple_poll)
+    buttons = [
+        types.InlineKeyboardButton(text="Да", callback_data="add_quest_true"),
+        types.InlineKeyboardButton(
+            text="Нет", callback_data="add_quest_false"),
+        types.InlineKeyboardButton(
+            text="Удалить последний вопрос", callback_data="del_quest_true")
+    ]
+    keyboard = types.InlineKeyboardMarkup(row_width=2)
+    keyboard.add(*buttons)
+
+    await call.message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
+    
     
 
 @dp.callback_query_handler(text="question_type_poll")
@@ -496,21 +538,26 @@ async def question_type_msg(call: types.CallbackQuery, state: FSMContext):
 
 @dp.message_handler(commands='send')
 async def start_cycle(message: types.Message):
-    # print(multiple_polls_dispatcher)
     if multiple_polls_dispatcher:
         if multiple_polls_dispatcher[0]:
             if multiple_polls_dispatcher[0][0]:
-
                 curr_quest = multiple_polls_dispatcher[0][0]
-                if curr_quest['type'] == 'poll':
+                for reciever in multiple_polls_dispatcher[0][-1]['users_id']:
+
+                    print(multiple_polls_dispatcher[0][-1]['users_id'])
+                    if curr_quest['type'] == 'poll':
+                    
+                        msg = await bot.send_poll(chat_id=506629389, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=True)
+                        curr_quest['id'] = msg.poll.id
+
+                    elif curr_quest['type'] == 'msg':
+                        msg = await message.answer(curr_quest['question'])
+                        curr_quest['id'] = msg.message_id
+                        print(curr_quest['id'])
+                    else:
+                        multiple_polls_dispatcher[0].remove({'users_id': curr_quest['users_id'], 'type': 'recipient_info'})
                 
-                    msg = await bot.send_poll(chat_id=506629389, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=True)
-                    curr_quest['id'] = msg.poll.id
-                else:
-                    msg = await message.answer(curr_quest['question'])
-                    curr_quest['id'] = msg.message_id
-                    print(curr_quest['id'])
-                # print(multiple_polls_dispatcher)
+                
 
 
 async def go_cycle():
@@ -522,21 +569,28 @@ async def go_cycle():
             if multiple_polls_dispatcher[0][0]:
                 
                 curr_quest = multiple_polls_dispatcher[0][0]
-                # print(curr_quest)
-                if curr_quest['type'] == 'poll':
-                    msg = await bot.send_poll(chat_id=506629389, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=True)
-                    curr_quest['id'] = msg.poll.id
-                else:
+                for reciever in multiple_polls_dispatcher[0][-1]['users_id']:
+
+                    print(multiple_polls_dispatcher[0][-1]['users_id'])
+                    if curr_quest['type'] == 'poll':
                     
-                    msg = await bot.send_message(chat_id=506629389, text=curr_quest['question'])
-                    curr_quest['id'] = msg.message_id
+                        msg = await bot.send_poll(chat_id=506629389, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=True)
+                        curr_quest['id'] = msg.poll.id
+
+                    elif curr_quest['type'] == 'msg':
+                        msg = await bot.send_message(chat_id=reciever, text=curr_quest['question'])
+                        curr_quest['id'] = msg.message_id
+                        print(curr_quest['id'])
+                    else:
+                        multiple_polls_dispatcher[0].remove({'users_id': curr_quest['users_id'], 'type': 'recipient_info'})
+                
 
 def lambda_checker_poll(message):
     for data in multiple_polls_dispatcher:
         for a in data:
             # print(a)
             if a['id'] == message['id']:
-                multiple_polls_dispatcher[0].remove({'question': a['question'], 'options': a['options'], 'users_send': a['users_send'], 'id': a['id'], 'type': 'poll'})
+                multiple_polls_dispatcher[0].remove({'question': a['question'], 'options': a['options'], 'id': a['id'], 'type': 'poll'})
                 print('eh')
                 return True
     print('folss')
@@ -546,7 +600,7 @@ def lambda_checker_msg(message: types.Message):
     for data in multiple_polls_dispatcher:
         for a in data:
             if a['id'] + 1 == message.message_id:
-                multiple_polls_dispatcher[0].remove({'question': a['question'], 'users_send': a['users_send'], 'id': a['id'], 'type': 'msg'})
+                multiple_polls_dispatcher[0].remove({'question': a['question'], 'id': a['id'], 'type': 'msg'})
                 print('eh')
                 print(message.text)
                 return True
@@ -607,10 +661,11 @@ async def rasp_notification():
                 int(data['time_start_hour']) * 60 + \
                 int(data['time_start_minutes'])
             if time_diff <= 15 and time_diff > 0:
-                for user in data['notify']:
-                    if int(user['notify_status']) != 1:
-                        await bot.send_message(user['user'], str(data['name']) + ' через {0} минут'.format(time_diff))
-                        user['notify_status'] = 1
+                pass
+                # for user in data['notify']:
+                #     if int(user['notify_status']) != 1:
+                #         await bot.send_message(user['user'], str(data['name']) + ' через {0} минут'.format(time_diff))
+                #         user['notify_status'] = 1
             # print(time_diff, data['name'])
 
 if __name__ == '__main__':

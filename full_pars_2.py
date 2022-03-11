@@ -129,7 +129,7 @@ def parse_group(group):
                                 "time_end_minutes": time_end.minute, "name": name, "type": type, "lector": lector, "room": room, "group": group, "notify": group_notify_status})
     return group_rasp
 
-print(parse_group('М3О-221Б-20'))
+# print(parse_group('М3О-221Б-20'))
 
 def parse_prepod(md5):
     link = "https://public.mai.ru/schedule/data/{0}.json".format(md5)
