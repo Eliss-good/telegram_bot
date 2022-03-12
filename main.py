@@ -1,8 +1,5 @@
 import asyncio
 from asyncio import get_event_loop
-from audioop import mul
-from email import message
-from email.message import Message
 
 from aiogram import Dispatcher, types, Bot, executor
 import aiogram
