@@ -1,27 +1,57 @@
 """ Система опросов"""
-from email.message import Message
+from select import poll
 from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
 
-
+poll_recipient_data = {}
 temp_mem_for_multiple_poll = []
-
 multiple_polls_dispatcher = []
+
+forms_dispatcher = []
 
 bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
 
+
+async def display_current_temp_mem_status(message: types.Message):
+    mem = temp_mem_for_multiple_poll
+    parsed_msg = "name: " + poll_recipient_data['form_name'] + "\n"
+    if mem:
+        question_number = 0
+        for inside_mem in mem:
+            if inside_mem['type'] == 'poll':
+                parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' ' + '['+', '.join(
+                    str(e) for e in inside_mem['options']) + ']' + ' ' + '/del' + str(question_number) + '\n')
+
+            elif inside_mem['type'] == 'msg':
+                parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] +
+                                  ' ' + '/del' + str(question_number) + '\n')
+
+            question_number += 1
+
+        await message.answer(parsed_msg)
+
+
+class nameAndQuestionType(StatesGroup):
+    waiting_for_name = State()
+
+# poll create fsm
 class form(StatesGroup):
     waiting_for_question = State()
     waiting_for_options = State()
 
 
-class group_chooser(StatesGroup):
-    waiting_for_group = State()
+async def choose_name(message: types.Message, state: FSMContext):
+    await message.reply("Выберите название формы")
+    await nameAndQuestionType.waiting_for_name.set()
 
 
-async def choose_question(message: types.Message):
+async def choose_question(message: types.Message, state: FSMContext):
+    poll_recipient_data["form_name"] = str(message.text)
+    poll_recipient_data["user_id"] = 506629389
+    poll_recipient_data["type"] = "recipient_info"
+
     buttons = [
         types.InlineKeyboardButton(
             text="Опрос", callback_data="question_type_poll"),
@@ -30,8 +60,9 @@ async def choose_question(message: types.Message):
     ]
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
-
+    
     await message.reply("Выберите тип вопроса", reply_markup=keyboard)
+    await state.finish()
 
 
 async def get_question(message: types.Message, state: FSMContext):
@@ -46,13 +77,14 @@ async def get_question(message: types.Message, state: FSMContext):
             types.InlineKeyboardButton(
                 text="Да", callback_data="add_quest_true"),
             types.InlineKeyboardButton(
-                text="Нет", callback_data="add_quest_false"),
-            types.InlineKeyboardButton(
-                text="Удалить последний вопрос", callback_data="del_quest_true")
+                text="Нет", callback_data="add_quest_false")
+
         ]
 
         keyboard = types.InlineKeyboardMarkup(row_width=2)
         keyboard.add(*buttons)
+
+        await display_current_temp_mem_status(message)
 
         await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
         # print(temp_mem_for_multiple_poll)
@@ -78,33 +110,20 @@ async def get_options(message: types.Message, state: FSMContext):
     buttons = [
         types.InlineKeyboardButton(text="Да", callback_data="add_quest_true"),
         types.InlineKeyboardButton(
-            text="Нет", callback_data="add_quest_false"),
-        types.InlineKeyboardButton(
-            text="Удалить последний вопрос", callback_data="del_quest_true")
+            text="Нет", callback_data="add_quest_false")
     ]
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
+
+    await display_current_temp_mem_status(message)
 
     await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
     # print(temp_mem_for_multiple_poll)
     await state.finish()
 
 
-async def choose_group(message: types.Message, state: FSMContext):
-
-    group = message.text
-    await message.answer('groop' + ' ' + group)
-    # bd search
-    users_id_list = [506629389]
-    temp_mem_for_multiple_poll.append(
-        {'users_id': users_id_list, 'type': 'recipient_info'})
-    multiple_polls_dispatcher.append([*temp_mem_for_multiple_poll])
-
-    # print(multiple_polls_dispatcher)
-    temp_mem_for_multiple_poll.clear()
-    await state.finish()
-
+# callback queries handlers
 
 async def add_quest_true(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
@@ -122,72 +141,68 @@ async def add_quest_true(call: types.CallbackQuery):
 
 async def add_quest_false(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await call.message.answer('gotovo')
-
-    await group_chooser.waiting_for_group.set()
-    await call.message.answer('choose group')
-
-
-async def del_quest_true(call: types.CallbackQuery):
-    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    temp_mem_for_multiple_poll.pop()
-    await call.message.answer('last quest deleted')
-    # print(temp_mem_for_multiple_poll)
-    buttons = [
-        types.InlineKeyboardButton(text="Да", callback_data="add_quest_true"),
-        types.InlineKeyboardButton(
-            text="Нет", callback_data="add_quest_false"),
-        types.InlineKeyboardButton(
-            text="Удалить последний вопрос", callback_data="del_quest_true")
-    ]
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-    keyboard.add(*buttons)
-
-    await call.message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
+    await display_current_temp_mem_status(call.message)
+    temp_mem_for_multiple_poll.append(poll_recipient_data.copy())
+    
+    poll_recipient_data.clear()
+    multiple_polls_dispatcher.append(temp_mem_for_multiple_poll.copy())
+    temp_mem_for_multiple_poll.clear()
+    print(multiple_polls_dispatcher)
+    await call.message.answer('Форма создана')
 
 
 async def question_type_poll(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await form.waiting_for_question.set()
     await state.update_data(type='poll')
     await call.message.answer('Введите вопрос')
+    await form.waiting_for_question.set()
 
 
 async def question_type_msg(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await form.waiting_for_question.set()
     await state.update_data(type='msg')
     await call.message.answer('Введите вопрос')
+    await form.waiting_for_question.set()
+
 
 async def activate_cycle(message: types.Message):
+    form_name = str(message.text)[6:]
+    curr_form = {}
+    curr_form['user_id'] = message.from_user.id
+    curr_form['form_name'] = form_name
+    forms_dispatcher.append(curr_form.copy())
+    curr_form.clear()
     await go_cycle()
 
+
+# complete polls
 async def go_cycle():
-    print(multiple_polls_dispatcher)
-    if multiple_polls_dispatcher:
+    print(forms_dispatcher)
+    for curr_started_form in forms_dispatcher:
+        form_name = curr_started_form['form_name']
+        if multiple_polls_dispatcher:
+            for select_form in multiple_polls_dispatcher:
+                if select_form[-1]['form_name'] == form_name:
 
-        if multiple_polls_dispatcher[0]:
+                    curr_quest = select_form[0]
 
-            if multiple_polls_dispatcher[0][0]:
-
-                curr_quest = multiple_polls_dispatcher[0][0]
-                for reciever in multiple_polls_dispatcher[0][-1]['users_id']:
-
-                    # print(multiple_polls_dispatcher[0][-1]['users_id'])
                     if curr_quest['type'] == 'poll':
 
-                        msg = await bot.send_poll(chat_id=506629389, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=True)
+                        msg = await bot.send_poll(chat_id=curr_started_form['user_id'], question=curr_quest['question'], options=curr_quest['options'], is_anonymous=True)
                         curr_quest['id'] = msg.poll.id
 
                     elif curr_quest['type'] == 'msg':
-                        msg = await bot.send_message(chat_id=reciever, text=curr_quest['question'])
+                        msg = await bot.send_message(chat_id=curr_started_form['user_id'], text=curr_quest['question'])
                         curr_quest['id'] = msg.message_id
                         # print(curr_quest['id'])
-                    else:
+                        
+                    elif curr_quest['type'] == 'recipient_info':
                         multiple_polls_dispatcher[0].remove(
-                            {'users_id': curr_quest['users_id'], 'type': 'recipient_info'})
+                            {'form_name': curr_quest['form_name'], 'user_id': curr_quest['user_id'], 'type': 'recipient_info'})
                         multiple_polls_dispatcher.pop(0)
+                        forms_dispatcher.remove({'user_id': curr_started_form['user_id'], 'form_name': form_name})
                         print('theend')
+
 
 def lambda_checker_poll(message):
     for data in multiple_polls_dispatcher:
@@ -203,6 +218,7 @@ def lambda_checker_poll(message):
 
 
 def lambda_checker_msg(message: types.Message):
+    print('im her')
     for data in multiple_polls_dispatcher:
         for a in data:
             if a['id'] + 1 == message.message_id:
@@ -215,9 +231,11 @@ def lambda_checker_msg(message: types.Message):
     return False
 
 
+# handler activates when vote/send answer
 async def poll_handler(poll: types.PollAnswer):
     print(poll)
     if multiple_polls_dispatcher:
+        print('go ahead pol')
         await go_cycle()
     # print(poll['id'])
 
@@ -225,15 +243,23 @@ async def poll_handler(poll: types.PollAnswer):
 async def msg_handlr(message: types.Message):
     print(message)
     if multiple_polls_dispatcher:
+        print('go ahead msg')
         await go_cycle()
 
 
+async def del_handler(message: types.Message):
+    """Удаляет одну запись из списка temp_mem по её идентификатору"""
+    delete_id = int(message.text[4:])
+    temp_mem_for_multiple_poll.pop(delete_id)
+    await message.answer('удалил пункт ' + str(delete_id))
+
+
 def register_handlers_forms(dp: Dispatcher):
-    dp.register_message_handler(
-        choose_question, commands="multi_form", state="*")
+    dp.register_message_handler(choose_name, commands="multi_form", state="*")
+
+    dp.register_message_handler(choose_question, state=nameAndQuestionType.waiting_for_name)
     dp.register_message_handler(get_question, state=form.waiting_for_question)
     dp.register_message_handler(get_options, state=form.waiting_for_options)
-    dp.register_message_handler(choose_group, state=group_chooser.waiting_for_group)
     dp.register_message_handler(activate_cycle, commands='send')
 
     dp.register_callback_query_handler(
@@ -241,13 +267,13 @@ def register_handlers_forms(dp: Dispatcher):
     dp.register_callback_query_handler(
         add_quest_false, text="add_quest_false")
     dp.register_callback_query_handler(
-        del_quest_true, text="del_quest_true")
-    dp.register_callback_query_handler(
         question_type_poll, text="question_type_poll")
     dp.register_callback_query_handler(
         question_type_msg, text="question_type_msg")
 
     dp.register_poll_handler(
         poll_handler, lambda message: lambda_checker_poll(message))
-    dp.register_poll_handler(
+    dp.register_message_handler(
         msg_handlr, lambda message: lambda_checker_msg(message))
+    dp.register_message_handler(
+        del_handler, lambda message: message.text.startswith('/del'))
