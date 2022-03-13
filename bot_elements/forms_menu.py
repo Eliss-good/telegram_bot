@@ -4,6 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
 
+unique_sent_form_id = 0
 
 from bot_elements.forms import mem_for_created_forms, send_forms_mem
 # check forms mass and select user_ids + send forms in forms.py
@@ -51,12 +52,18 @@ async def choose_group(message: types.Message, state: FSMContext):
 
 
 async def sending(message: types.Message, state: FSMContext):
+    global unique_sent_form_id
+
     groups = message.text.split(',')
     final_data = await state.get_data()
     form_creator_user_id = mem_for_created_forms[int(final_data['form_index'])][-1]['creator_id']
     # получить id юзеров по группам
-    send_forms_mem.append({'form_id': int(final_data['form_index']), 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': [506629389]}})
-    # print(send_forms_mem)
+    send_forms_mem.append({'form_id': int(final_data['form_index']), 'sent_form_id': unique_sent_form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': [506629389]}})
+    print(send_forms_mem)
+
+    unique_sent_form_id += 1
+    
+    await message.answer('Отправлено группам' + ''.join(str(groups)))
     await state.finish()
 
 
@@ -159,8 +166,6 @@ async def sending(message: types.Message, state: FSMContext):
 #     if multiple_polls_dispatcher:
 #         # print('go ahead msg')
 #         await go_cycle()
-
-    
 
 
 def register_handlers_forms_menu(dp: Dispatcher):
