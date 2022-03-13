@@ -2,8 +2,6 @@
 
 """ Создается форма, добавляется в хранилище форм"""
 
-# to-do!   multi-user usage
-
 from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -15,7 +13,7 @@ unique_form_id = 0
 temp_form_recipient_data = {} # {'*form_creator_user_id*': {recip data}}
 temp_mem_for_form_creator = {} # {'*form_creator_user_id*': [form data], ...}
 
-mem_for_created_forms = {} # {{'form_creator_user_id': id, 'form_data': [form data], 'create_time': time}, ...}
+mem_for_created_forms = {} # {*form_id*: {'form_data': [form data]}, ...}
 send_forms_mem = [] # ['form_id': {'form_creator_user_id': id,'send_to_users_id': [ids]}, ... ]
 
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem
@@ -70,20 +68,17 @@ async def choose_type(message: types.Message, state: FSMContext):  # name.waitin
     """ Запоминает название и предлагает выбрать тип первого добавляемого вопроса"""
     global unique_form_id
 
-    if message.chat.id in temp_form_recipient_data:
-        temp_form_recipient_data[message.chat.id]["form_name"] = str(message.text)
-        temp_form_recipient_data[message.chat.id]["type"] = "recipient_info"
-        temp_form_recipient_data[message.chat.id]["form_id"] = unique_form_id
-        unique_form_id += 1
-    else:
+    if not message.chat.id in temp_form_recipient_data:
         temp_form_recipient_data[message.chat.id] = {}
-        temp_form_recipient_data[message.chat.id]["form_name"] = str(message.text)
-        temp_form_recipient_data[message.chat.id]["type"] = "recipient_info"
-        temp_form_recipient_data[message.chat.id]["form_id"] = unique_form_id
-        unique_form_id += 1
+
+    temp_form_recipient_data[message.chat.id]["form_name"] = str(message.text)
+    temp_form_recipient_data[message.chat.id]["type"] = "info"
+    temp_form_recipient_data[message.chat.id]["form_id"] = unique_form_id
+    temp_form_recipient_data[message.chat.id]["creator_id"] = message.chat.id
+    unique_form_id += 1
 
     # temp_form_recipient_data["form_name"] = str(message.text)
-    # temp_form_recipient_data["type"] = "recipient_info"
+    # temp_form_recipient_data["type"] = "info"
 
     buttons = [
         types.InlineKeyboardButton(
@@ -109,10 +104,10 @@ async def get_question(message: types.Message, state: FSMContext):
         print('temp_mem_for_form_creator', temp_mem_for_form_creator)
         if message.chat.id in temp_mem_for_form_creator:
             temp_mem_for_form_creator[message.chat.id].append(
-                {'question': data['question'], 'id': 0, 'type': 'msg'})
+                {'question': data['question'], 'message_id': 0, 'type': 'msg'})
         else:
             temp_mem_for_form_creator[message.chat.id] = [
-                {'question': data['question'], 'id': 0, 'type': 'msg'}]
+                {'question': data['question'], 'message_id': 0, 'type': 'msg'}]
         print('temp_mem_for_form_creator', temp_mem_for_form_creator)
         buttons = [
             types.InlineKeyboardButton(
@@ -148,10 +143,10 @@ async def get_options(message: types.Message, state: FSMContext):
     print('temp_mem_for_form_creator', temp_mem_for_form_creator)
     if message.chat.id in temp_mem_for_form_creator:
         temp_mem_for_form_creator[message.chat.id].append(
-            {'question': user_data['question'], 'options': user_data['options'], 'id': 0, 'type': 'poll'})
+            {'question': user_data['question'], 'options': user_data['options'], 'message_id': 0, 'type': 'poll'})
     else:
         temp_mem_for_form_creator[message.chat.id] = [
-            {'question': user_data['question'], 'options': user_data['options'], 'id': 0, 'type': 'poll'}]
+            {'question': user_data['question'], 'options': user_data['options'], 'message_id': 0, 'type': 'poll'}]
     print('temp_mem_for_form_creator', temp_mem_for_form_creator)
 
     buttons = [
@@ -201,9 +196,8 @@ async def add_quest_false(call: types.CallbackQuery):
         temp_mem_for_form_creator[call.message.chat.id] = [
             temp_form_recipient_data[call.message.chat.id].copy()]
 
-
-    mem_for_created_forms[temp_form_recipient_data[call.message.chat.id]['form_id']] = []
-    mem_for_created_forms[temp_form_recipient_data[call.message.chat.id]['form_id']].append(temp_mem_for_form_creator[call.message.chat.id].copy())
+    mem_for_created_forms[temp_form_recipient_data[call.message.chat.id]['form_id']] = (temp_mem_for_form_creator[call.message.chat.id].copy())
+    
     print('mem_for_created_forms ', mem_for_created_forms)
     
     temp_mem_for_form_creator.pop(call.message.chat.id, None)
@@ -268,9 +262,9 @@ async def go_cycle():
                         curr_quest['id'] = msg.message_id
                         # print(curr_quest['id'])
 
-                    elif curr_quest['type'] == 'recipient_info':
+                    elif curr_quest['type'] == 'info':
                         multiple_polls_dispatcher[0].remove(
-                            {'form_name': curr_quest['form_name'], 'user_id': curr_quest['user_id'], 'type': 'recipient_info'})
+                            {'form_name': curr_quest['form_name'], 'user_id': curr_quest['user_id'], 'type': 'info'})
                         multiple_polls_dispatcher.pop(0)
                         forms_dispatcher.remove(
                             {'user_id': curr_started_form['user_id'], 'form_name': form_name})
