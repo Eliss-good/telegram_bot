@@ -54,7 +54,7 @@ async def go_cycle(unique_form_id, unique_sent_form_id):
     elif curr_quest['type'] == 'msg':
         msg = await bot.send_message(chat_id=chat_id, text=curr_quest['question'])
         curr_quest['id'] = msg.message_id
-# ! problem - need to change send forms
+# ! problem - need to change send forms - add curr quest
     elif curr_quest['type'] == 'info':
         completing_forms_dispatcher.remove(
             {'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id})
