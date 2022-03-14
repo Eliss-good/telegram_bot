@@ -23,21 +23,26 @@ async def display_user_status(message: types.Message):
 
 
 async def complete_form(message: types.Message):
+    """ Получает название формы, добавляет данные в forms_dispatcher,
+        запускает отправку вопросов из нужной формы"""
+
     form_indexes = message.text[10:].split('_')
     unique_form_id = int(form_indexes[0])
     unique_sent_form_id = int(form_indexes[1])
     completing_forms_dispatcher[message.chat.id] = {
-        'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id}
+        'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'curr_question_num': 0}
+    
+    go_cycle(unique_form_id, unique_sent_form_id, 0)
 
 
-async def activate_cycle(message: types.Message, unique_form_id, unique_sent_form_id):
-    """ Получает название формы, добавляет данные в forms_dispatcher,
-        запускает отправку вопросов из нужной формы"""
-    await go_cycle()
+# async def activate_cycle(unique_form_id, unique_sent_form_id):
+#     """ Получает название формы, добавляет данные в forms_dispatcher,
+#         запускает отправку вопросов из нужной формы"""
+#     await go_cycle(unique_form_id, unique_sent_form_id)
 
 
 # complete polls
-async def go_cycle(unique_form_id, unique_sent_form_id):
+async def go_cycle(unique_form_id, unique_sent_form_id, curr_question_num):
     """Отсылает вопросы/ опросы из send_forms_mem при вызове"""
 
     select_form = mem_for_created_forms[unique_form_id]['form_data']

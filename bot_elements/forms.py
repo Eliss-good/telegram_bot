@@ -18,7 +18,7 @@ send_forms_mem = [] # [{'form_id': *form_id*, 'sent_form_id': *id*, 'info': {'fo
 
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher
 
-completing_forms_dispatcher = {} # {'user_id': {'form_id': id, 'form_sent_id': id}, ...}
+completing_forms_dispatcher = {} # {'user_id': {'form_id': id, 'form_sent_id': id, 'curr_question_number': num}, ...}
 
 bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
 
