@@ -1,0 +1,13 @@
+{
+    "1": {
+        "survay_code": 2,
+        "survey_name": "\u041a\u0442\u043e \u044f",
+        "from_teleg_id": 1,
+        "questions": [
+            "\u041f\u0443\u0442\u0438\u043d?",
+            "\u041a\u0442\u043e \u043e\u043d?",
+            "\u041a\u0442\u043e \u043e\u043d\u0438?"
+        ],
+        "answer": []
+    }
+}

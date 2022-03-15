@@ -4,7 +4,7 @@ class DataConnect:
     def __init__(self):
         try:
             self.con = ps2.connect(
-                dbname = 'global_con_db',
+                dbname = 'poll_test',
                 user = 'postgres',
                 password = 'admin',
                 host = '127.0.0.1',
@@ -99,16 +99,26 @@ class DataConnect:
         select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + ' where '
         return select_com
 
+
     def __select_count(self, name_tb, name_cl):
         select_com = 'select count'
         select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + ' where '
         return select_com
+
+
+    def __select_max(self, name_tb, name_cl):
+        select_com = 'select max'
+        select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb
+        return select_com
+
 
     def __select_choice(self, name_tb, name_cl, status):
         if status == 'where':
             return self.__select_where(name_tb, name_cl)
         elif status == 'count' or status == 'check':
             return self.__select_count(name_tb, name_cl)
+        elif status == 'max':
+            return self.__select_max(name_tb, name_cl)
 
     def select_db_where(self, name_tb, name_cl, equality_cl, con_data, status):
         if len(equality_cl) != len(con_data):

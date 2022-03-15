@@ -5,13 +5,29 @@ import sys
 sys.path.append('/home/eliss/ptoject/telegram_bot')
 import full_pars as fl
 
-
 db = DataConnect()
 
 
 def correct_str(t_item):
     t_item = "'" + t_item +"'" 
     return t_item 
+
+
+##### add questions in DBase #####
+def add_questions(question_n):
+    ques_ck = db.select_db_where('question_tb', ['id'], ['question_name'], question_n, 'check')
+
+    if ques_ck:
+        db.insert_db('question_tb', ['question_name'], question_n)
+
+
+##### add GROUP questions in DBase #####
+def add_group_questions(question_n, group_id):
+    ques_ck = db.select_db_where('groupquestion_tb', ['id'], ['q_id', 'gp_question_id' ],[find_id_question(question_n), correct_str(group_id)], 'check')
+
+    if ques_ck:
+        db.insert_db('groupquestion_tb', ['q_id', 'gp_question_id' ],[find_id_question(question_n), correct_str(group_id)])
+
 
         ################## insurt_modul ##################
 def add_us(id_us, role):
@@ -26,6 +42,7 @@ def add_us(id_us, role):
         print(id_us, ' уже существует')
         return False
 
+
 def add_lesson(name_lesson):
     name_lesson = correct_str(str(name_lesson))
 
@@ -36,11 +53,21 @@ def add_lesson(name_lesson):
         print(name_lesson, ' уже существует')
 
 
-def add_prepod(name_prepod, id_us_tg = None):
+def _correct_data_prepod(name_prepod, id_us_tg):
+    con_data =[correct_str(str(name_prepod)), find_id_global(1)]
+    prepod_ck = db.select_db_where('prepod_tb', ['id'], ['prepod_name', 'gl_id'], con_data, 'check')
+
+    if not prepod_ck:
+        db.update_db('prepod_tb', ['gl_id'], [correct_str(str(id_us_tg))], ['prepod_name'], [correct_str(str(name_prepod))])
+
+
+def add_prepod(name_prepod, id_us_tg = 1):
     con_data =[correct_str(str(name_prepod)), find_id_global(id_us_tg)]
-    prepod_ck = db.select_db_where('teach_tb', ['id'], ['teach_name', 'gl_id'], con_data, 'check')
+    prepod_ck = db.select_db_where('prepod_tb', ['id'], ['prepod_name', 'gl_id'], con_data, 'check')
+
     if prepod_ck:
-        db.insert_db('teach_tb', ['teach_name', 'gl_id'], con_data)
+        print()
+        db.insert_db('prepod_tb', ['prepod_name', 'gl_id'], con_data)
     else:
         print(name_prepod, ' уже существует')
 
@@ -53,6 +80,7 @@ def add_group(name_group, status):
     else:
         print(name_group, ' уже существует')
 
+
 def add_student(name_student, teleg_id, name_group):
     name_student = correct_str(str(name_student))
     con_data =[name_student, find_id_group(name_group)]
@@ -62,17 +90,6 @@ def add_student(name_student, teleg_id, name_group):
         db.insert_db('student_tb', ['student_name', 'group_id', 'gl_id'], con_data)
     else:
         print(name_student, name_group,' уже существует')
-
-
-"""
-def add_group_from_json():
-    with open('approved_group.json','r', encoding='utf-8') as file:
-        apr_group = json.load(file)
-
-        for item in apr_group:
-            print(item)
-            add_group(correct_str(item), str(apr_group[item]))
-"""
 
 
         ################## select_modul ##################
@@ -86,9 +103,10 @@ def find_id_lesson(name_lesson):
     return str(db.select_db_where('lesson_tb', ['id'], ['lesson_name'], [name_lesson], 'where')[0][0])
 
 
-def find_id_teach(name_teach):
-    name_teach = correct_str(str(name_teach))
-    return str(db.select_db_where('teach_tb', ['id'], ['teach_name'], [name_teach], 'where')[0][0])
+def find_id_prepod(name_prepod):
+    name_prepod = correct_str(str(name_prepod))
+    print(str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')))
+    return str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')[0][0])
 
 
 def find_id_global(teleg_id):
@@ -100,29 +118,46 @@ def find_id_global(teleg_id):
     else:
         return '0'
 
-#для проверки одобренности группы
-"""
-def _group_cheack_approved(name_group):
-    with open('approved_group.json','r', encoding='utf-8') as file:
-        apr_group = json.load(file)
 
-        try:
-            status = apr_group[name_group]
-            return status
-        except KeyError:
-            return False
-"""
+###### select for polls ######
+def find_id_survay(survay_code):
+    try:
+        return db.select_db_where('survay_tb', ['id'], ['survay_code'], [survay_code], 'where')[0][0]
+    except:
+        print('index error')
+
+
+def find_id_question(question_n):
+    question_n = correct_str(question_n)
+    try:
+        return db.select_db_where('question_tb', ['id'], ['question_name'], [question_n], 'where')[0][0]
+    except:
+        print('index error')
+
+
+def max_index_group_question():
+    try:
+        return db.select_db_where('groupquestion_tb', ['gp_question_id'], [], [] ,'max')[0][0]
+    except:
+        print('index error')
+
+
+def max_index_survay():
+    try:
+        return db.select_db_where('survay_tb', ['survay_code'], [], [] ,'max')[0][0]
+    except:
+        print('index error')
 
 def connect_gr_th(name_group, t_item):
-    con_data = [find_id_group(name_group), find_id_teach(t_item['prepod']), find_id_lesson(t_item['lesson']), correct_str(t_item['role'])]
+    con_data = [find_id_group(name_group), find_id_prepod(t_item['prepod']), find_id_lesson(t_item['lesson']), correct_str(t_item['role'])]
     
     name_group = correct_str(str(name_group))
     t_item['role'] = correct_str(str(t_item['role']))
     t_item['lesson'] = correct_str(str(t_item['lesson']))
     t_item['prepod'] = correct_str(str(t_item['prepod']))
 
-    if db.select_db_where('connect_tb', ['id'], ['group_id','teach_id', 'lesson_id', 'teach_role'], con_data, 'check'):
-        db.insert_db('connect_tb', ['group_id','teach_id', 'lesson_id', 'teach_role'], con_data)
+    if db.select_db_where('connect_tb', ['id'], ['group_id','prepod_id', 'lesson_id', 'teach_role'], con_data, 'check'):
+        db.insert_db('connect_tb', ['group_id','prepod_id', 'lesson_id', 'teach_role'], con_data)
     
 
 def data_for_group(name_group,t_item):
@@ -153,4 +188,5 @@ def start_gr(name_group):
     for item in data:
         data_for_group(name_group, item)
 
-start_gr('М3О-321Б-19')
+if __name__ == '__main__':
+    start_gr('М3О-221Б-20')

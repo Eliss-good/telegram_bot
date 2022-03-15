@@ -12,37 +12,28 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import Text
 import sys
-
 import time
 
 import full_pars_2
 import prep_text_pars
-# sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
 
-# import tg_connect_db as tg_db
-# from db_connect import DataConnect
-# from us_init import find_teleg_group
-
-# import sys
-# sys.path.append('/home/gilfoyle/Documents/coding/telegram_bot/db_setting')
-# import tg_connect_db as tg_db
-# from db_connect import DataConnect
+sys.path.append('/home/eliss/ptoject/telegram_bot/db_setting')
+import tg_connect_db as tg_db
 
 API_TOKEN = '5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ'
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage(), loop=get_event_loop())
+
+######## Для чего эти списки ########
 polls_dispcatcher = []
 
 temp_mem_for_multiple_poll = []
 
 multiple_polls_dispatcher = []
+#####################################################
 
-# example
-all_groups = []
-for data in prep_text_pars.get_prepod_page('https://mai.ru/education/studies/schedule/ppc.php?guid=d0c04806-1d99-11e0-9baf-1c6f65450efa#'):
-    all_groups.append(data['group'])
-
-rasp = full_pars_2.parse_group_today('М3О-221Б-20')
+all_groups = tg_db.pars_data_spisok('group')
+#rasp = full_pars_2.parse_group_today('М3О-221Б-20')
 
 # ############### poll + (optional) dispatcher #################
 
@@ -88,7 +79,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 # ######### is registered check ##################
 
-@dp.message_handler(lambda message: True, commands='register')
+
+@dp.message_handler(lambda message: tg_db.ck_data_db(message.from_user.id), commands='register')
 async def wrong_group(message: types.Message, state: FSMContext):
     await message.answer('вы уже зареганы')
     buttons = [
@@ -131,7 +123,8 @@ async def fio_choosen(message: types.Message, state: FSMContext):
 
     else:
 
-        # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
+        # ############### информация о преподе ##########
+        tg_db.reg_us(user_data['chosen_fio'], message.from_user.id ,user_data['chosen_role'])
 
         # await message.reply('вы ' + user_data['chosen_fio'] + ' ' + user_data['chosen_role'])
         await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
@@ -154,7 +147,8 @@ async def choose_group(message: types.Message, state: FSMContext):
 
         await state.update_data(chosen_group=group)
         user_data = await state.get_data()
-# ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ СТУДЕНТА ТУТ ##########
+# ############### данные о студенте ##########
+        tg_db.reg_us(user_data['chosen_fio'], message.from_user.id, user_data['chosen_role'], group_stud = user_data['chosen_group'])
 
         # await message.answer(f"{user_data['chosen_role']} {user_data['chosen_group']} {user_data['chosen_fio']}.\n", reply_markup=types.ReplyKeyboardRemove())
         await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
@@ -167,7 +161,8 @@ async def choose_group(message: types.Message, state: FSMContext):
 async def is_stud(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
 
-# ДОБАВИТЬ ПРОВЕРКУ НА ПРЕПА/СТУДЕНТА
+    #role_user
+    role_user = tg_db.us_init.db.select_db_where('global_tb', ['gl_role'], ['gl_teleg_id'], [str(call.message.from_user.id)], 'where')[0][0]
 
     buttons = [
         types.InlineKeyboardButton(
@@ -303,11 +298,8 @@ async def get_time(message: types.Message, state: FSMContext):
     await state.update_data(time=select_time)
     user_data = await state.get_data()
 
-    users_id_list = [506629389]
-
-# ############### ЗДЕСЬ ДОБАВИТЬ FOR ЧТОБЫ ЗАПОЛНИТЬ СПИСОК USER_ID_LIST АЙДИШНИКАМИ ЮЗЕРОВ СООТВЕТСТВУЮЩЕЙ ГРУППЫ ##########
-    # выбранная группа = user_data['group']
-
+######### Cписок пользователей, которым отправляется опрос ############
+    users_id_list = tg_db.find_teleg_group([user_data['group']])
 # ############### # ############### # ############### # ###############
 
     user_data = await state.get_data()
@@ -433,7 +425,7 @@ async def get_options(message: types.Message, state: FSMContext):
 
     user_data = await state.get_data()
     print(user_data['question'], user_data['options'])
-    users_id_list = [506629389]
+    users_id_list = [506629389] ##### тут наверное нужны другие id
     temp_mem_for_multiple_poll.append({'question': user_data['question'], 'options': user_data['options'], 'users_send': users_id_list, 'id': 0, 'type': 'poll'})
     
     buttons = [
@@ -599,7 +591,7 @@ async def polls_dispatcher():
 async def rasp_notification():
     while True:
 
-        #  rasp = full_pars_2.parse_group_today('М3О-221Б-20') - ЗАПИХНИ ЭТО В САМОЕ НАЯАЛО ПЕРЕД ВСЕМИ ФУНКЦИЯМИ
+        rasp = [] #full_pars_2.parse_group_today('М3О-221Б-20') - ЗАПИХНИ ЭТО В САМОЕ НАЯАЛО ПЕРЕД ВСЕМИ ФУНКЦИЯМИ
 
         await asyncio.sleep(1)
         for data in rasp:
