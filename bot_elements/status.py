@@ -31,9 +31,8 @@ async def complete_form(message: types.Message):
     unique_sent_form_id = int(form_indexes[1])
     completing_forms_dispatcher[message.chat.id] = {
         'chat_id': message.chat.id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'form_copy': mem_for_created_forms[unique_form_id]}
-    print('completing_forms_dispatcher',completing_forms_dispatcher)
+    print('completing_forms_dispatcher', completing_forms_dispatcher)
     await go_cycle(message=message, type='launch_from_message_handler')
-    
 
 
 # async def activate_cycle(unique_form_id, unique_sent_form_id):
@@ -49,7 +48,7 @@ async def go_cycle(message, type):
     # select_form = completing_forms_dispatcher[message.chat.id]['form_copy']
 
     curr_question_num = 0
-    
+
     user_id = 0
     if type == 'launch_from_poll_handler':
         print('i am nigger')
@@ -64,7 +63,6 @@ async def go_cycle(message, type):
 
     curr_quest = select_form[curr_question_num]
 
-
     if curr_quest['type'] == 'poll':
 
         msg = await bot.send_poll(chat_id=user_id, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=False)
@@ -75,15 +73,9 @@ async def go_cycle(message, type):
         curr_quest['message_id'] = msg.message_id
 
     elif curr_quest['type'] == 'info':
-        unique_form_id = completing_forms_dispatcher[user_id]['unique_form_id']
-        unique_sent_form_id = completing_forms_dispatcher[user_id]['unique_sent_form_id']
-
         completing_forms_dispatcher.pop(user_id)
         print('theend')
         print(completing_forms_dispatcher)
-    
-
-
 
 
 def lambda_checker_poll(pollAnswer: types.PollAnswer):
@@ -93,11 +85,11 @@ def lambda_checker_poll(pollAnswer: types.PollAnswer):
     selected_form = completing_forms_dispatcher[pollAnswer.user.id]['form_copy']
     print(selected_form)
     print(selected_form[curr_question_num])
-    
+
     if selected_form[curr_question_num]['message_id'] == pollAnswer['poll_id']:
         selected_form.remove(
             {'question': selected_form[curr_question_num]['question'], 'options': selected_form[curr_question_num]['options'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'poll'})
-        
+
         return True
     # print('folss')
     return False
@@ -108,7 +100,7 @@ def lambda_checker_msg(message: types.Message):
 
     curr_question_num = 0
     selected_form = completing_forms_dispatcher[message.chat.id]['form_copy']
-    
+
     if selected_form[curr_question_num]['message_id'] + 1 == message.message_id:
         selected_form.remove(
             {'question': selected_form[curr_question_num]['question'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'msg'})
@@ -144,5 +136,7 @@ def register_handlers_status(dp: Dispatcher):
         display_user_status, commands="status", state="*")
     dp.register_message_handler(
         complete_form, lambda message: message.text.startswith('/complete'))
-    dp.register_poll_answer_handler(poll_handler, lambda message: lambda_checker_poll(message))
-    dp.register_message_handler(msg_handlr, lambda message: lambda_checker_msg(message))
+    dp.register_poll_answer_handler(
+        poll_handler, lambda message: lambda_checker_poll(message))
+    dp.register_message_handler(
+        msg_handlr, lambda message: lambda_checker_msg(message))
