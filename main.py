@@ -55,7 +55,7 @@ async def cmd_poll(message: types.message):
     # open_period = 10
     question = 'you are'
 
-    poll = await bot.send_poll(options=options, is_anonymous=is_anonymous, question=question, chat_id=chat_id)
+    poll = await bot.send_poll(options=options, is_anonymous=False, question=question, chat_id=chat_id)
     close_time = time.time() + 5
     # send chat id and poll id
     polls_dispcatcher.append(
@@ -367,6 +367,7 @@ async def choose_group(message: types.Message, state: FSMContext):
 
 
 
+
 # new opros type ##########
 
 
@@ -622,6 +623,10 @@ async def set_commands():
 
     await bot.set_my_commands(commands)
 
+
+@dp.poll_answer_handler()
+async def lol(poll):
+    print(poll)
 
 async def polls_dispatcher():
     while True:

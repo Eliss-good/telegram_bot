@@ -13,12 +13,12 @@ unique_form_id = 0
 temp_form_recipient_data = {} # {'*form_creator_user_id*': {recip data}}
 temp_mem_for_form_creator = {} # {'*form_creator_user_id*': [form data], ...}
 
-mem_for_created_forms = {} # {*form_id*: {'form_data': [form data]}, ...}
+mem_for_created_forms = {} # {*form_id*: [form data], ...}
 send_forms_mem = [] # [{'form_id': *form_id*, 'sent_form_id': *id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids]}, ... ]
 
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher
 
-completing_forms_dispatcher = {} # {'user_id': {'form_id': id, 'form_sent_id': id, 'curr_question_number': num}, ...}
+completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_sent_form_id': id, 'curr_page': num, 'form_copy': [form_data]}, ...}
 
 bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
 
@@ -75,6 +75,7 @@ async def choose_type(message: types.Message, state: FSMContext):  # name.waitin
     temp_form_recipient_data[message.chat.id]["type"] = "info"
     temp_form_recipient_data[message.chat.id]["form_id"] = unique_form_id
     temp_form_recipient_data[message.chat.id]["creator_id"] = message.chat.id
+
     unique_form_id += 1
 
     # temp_form_recipient_data["form_name"] = str(message.text)
