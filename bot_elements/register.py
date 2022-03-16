@@ -225,7 +225,7 @@ def register_handlers_register(dp: Dispatcher):
     dp.register_message_handler(choose_role, commands="register", state="*")
     dp.register_message_handler(choose_fio, state=registerUser.waiting_for_fio)
     dp.register_message_handler(
-        choose_group, state=registerUser.waiting_for_group)
+        choose_group, lambda message: message.text in all_groups, state=registerUser.waiting_for_group)
 
     dp.register_message_handler(
         wrong_group, lambda message: message.text not in all_groups, state=registerUser.waiting_for_group)
