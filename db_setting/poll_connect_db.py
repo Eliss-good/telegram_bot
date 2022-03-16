@@ -1,4 +1,4 @@
-import us_init
+import back_function_db as bf
 import json
 
 path = '/home/eliss/ptoject/telegram_bot/db_setting/polls_answer'
@@ -86,4 +86,4 @@ def add_survay(from_id, to_group, data_survay):
 
 with open(path + "/tg_result_poll.json", "r", encoding='utf-8') as file:
    data = json.load(file)
-   add_survay(1, "М3О-221Б-20", data)
+   add_survay(3, "М3О-212Б-20", data)
