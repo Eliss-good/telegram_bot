@@ -80,35 +80,36 @@ async def go_cycle(message, type):
 
 def lambda_checker_poll(pollAnswer: types.PollAnswer):
     """Проверяет принадлежит ли опрос выбранной форме"""
+    if completing_forms_dispatcher[pollAnswer.user.id]:
+        curr_question_num = 0
+        selected_form = completing_forms_dispatcher[pollAnswer.user.id]['form_copy']
+        print(selected_form)
+        print(selected_form[curr_question_num])
 
-    curr_question_num = 0
-    selected_form = completing_forms_dispatcher[pollAnswer.user.id]['form_copy']
-    print(selected_form)
-    print(selected_form[curr_question_num])
+        if selected_form[curr_question_num]['message_id'] == pollAnswer['poll_id']:
+            selected_form.remove(
+                {'question': selected_form[curr_question_num]['question'], 'options': selected_form[curr_question_num]['options'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'poll'})
 
-    if selected_form[curr_question_num]['message_id'] == pollAnswer['poll_id']:
-        selected_form.remove(
-            {'question': selected_form[curr_question_num]['question'], 'options': selected_form[curr_question_num]['options'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'poll'})
-
-        return True
-    # print('folss')
-    return False
+            return True
+        # print('folss')
+        return False
 
 
 def lambda_checker_msg(message: types.Message):
     """Проверяет является ли сообщение ответом на вопрос из формы"""
 
-    curr_question_num = 0
-    selected_form = completing_forms_dispatcher[message.chat.id]['form_copy']
-
-    if selected_form[curr_question_num]['message_id'] + 1 == message.message_id:
-        selected_form.remove(
-            {'question': selected_form[curr_question_num]['question'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'msg'})
-        # print('eh')
-        # print(message.text)
-        return True
-    # print('folss')
-    return False
+    if completing_forms_dispatcher[message.chat.id]:
+        curr_question_num = 0
+        selected_form = completing_forms_dispatcher[message.chat.id]['form_copy']
+        
+        if selected_form[curr_question_num]['message_id'] + 1 == message.message_id:
+            selected_form.remove(
+                {'question': selected_form[curr_question_num]['question'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'msg'})
+            # print('eh')
+            # print(message.text)
+            return True
+        # print('folss')
+        return False
 
 
 # handler activates when vote/send answer
