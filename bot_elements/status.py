@@ -101,7 +101,7 @@ def lambda_checker_msg(message: types.Message):
     if completing_forms_dispatcher[message.chat.id]:
         curr_question_num = 0
         selected_form = completing_forms_dispatcher[message.chat.id]['form_copy']
-        
+
         if selected_form[curr_question_num]['message_id'] + 1 == message.message_id:
             selected_form.remove(
                 {'question': selected_form[curr_question_num]['question'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'msg'})
