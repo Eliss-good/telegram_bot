@@ -13,6 +13,7 @@ bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
 
 
 async def display_user_status(message: types.Message):
+    print('xd')
     full_message = "Полученные формы:"
     for select_form in send_forms_mem:
         if message.chat.id in select_form['info']['send_to_users_ids']:
@@ -116,7 +117,7 @@ def lambda_checker_msg(message: types.Message):
 async def poll_handler(pollAnswer: types.PollAnswer):
     """Активируется, когда приходит ответ на опрос/ опрос закрывается"""
 
-    # print(pollAnswer)
+    print(pollAnswer)
     if completing_forms_dispatcher:
         # print('go ahead pol')
         await go_cycle(message=pollAnswer, type='launch_from_poll_handler')

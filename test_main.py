@@ -28,8 +28,9 @@ if __name__ == '__main__':
                     loop=asyncio.get_event_loop())
     dp.loop.create_task(set_commands(bot))
     dp.loop.create_task(raspisanie.rasp_notification('М3О-221Б-20'))
+    
     register_handlers_forms(dp)
     register_handlers_forms_menu(dp)
-    register_handlers_register(dp)
     register_handlers_status(dp)
+    register_handlers_register(dp)
     executor.start_polling(dp)

@@ -240,7 +240,7 @@ def register_handlers_forms(dp: Dispatcher):
     dp.register_message_handler(choose_type, state=name.waiting_for_name)
     dp.register_message_handler(get_question, state=form.waiting_for_question)
     dp.register_message_handler(get_options, state=form.waiting_for_options)
-    # dp.register_message_handler(activate_cycle, commands='send')
+
 
     dp.register_callback_query_handler(
         add_quest_true, text="add_quest_true")
@@ -253,11 +253,3 @@ def register_handlers_forms(dp: Dispatcher):
 
     dp.register_message_handler(
         del_handler, lambda message: message.text.startswith('/del'))
-'''
-    dp.register_poll_handler(
-        poll_handler, lambda message: lambda_checker_poll(message))
-    dp.register_message_handler(
-        msg_handlr, lambda message: lambda_checker_msg(message))
-'''
-    
-

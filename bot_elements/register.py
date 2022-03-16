@@ -243,7 +243,6 @@ def register_handlers_register(dp: Dispatcher):
     dp.register_message_handler(
         register_change_fio_set_fio, state=register_change_fio_fsm.waiting_for_new_fio)
 
-    dp.register_message_handler(msgWithGroupName)
 
     dp.register_message_handler(cancel_handler, commands="cancel", state="*")
 
@@ -259,3 +258,5 @@ def register_handlers_register(dp: Dispatcher):
     dp.register_callback_query_handler(is_student, text="is_student")
     dp.register_callback_query_handler(is_prepod, text="is_prepod")
     dp.register_callback_query_handler(is_admin, text="is_admin")
+
+    dp.register_message_handler(msgWithGroupName)
