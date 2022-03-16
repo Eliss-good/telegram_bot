@@ -15,18 +15,19 @@ def correct_str(t_item):
 
 ##### add questions in DBase #####
 def add_questions(question_n):
-    ques_ck = db.select_db_where('question_tb', ['id'], ['question_name'], question_n, 'check')
+    question_n = correct_str(question_n)
+    ques_ck = db.select_db_where('question_tb', ['id'], ['question_name'], [question_n], 'check')
 
     if ques_ck:
-        db.insert_db('question_tb', ['question_name'], question_n)
+        db.insert_db('question_tb', ['question_name'], [question_n])
 
 
 ##### add GROUP questions in DBase #####
 def add_group_questions(question_n, group_id):
-    ques_ck = db.select_db_where('groupquestion_tb', ['id'], ['q_id', 'gp_question_id' ],[find_id_question(question_n), correct_str(group_id)], 'check')
+    ques_ck = db.select_db_where('groupquestion_tb', ['q_id'], ['q_id', 'gp_question_id' ],[str(find_id_question(question_n)), group_id], 'check')
 
     if ques_ck:
-        db.insert_db('groupquestion_tb', ['q_id', 'gp_question_id' ],[find_id_question(question_n), correct_str(group_id)])
+        db.insert_db('groupquestion_tb', ['q_id', 'gp_question_id' ],[str(find_id_question(question_n)), group_id])
 
 
         ################## insurt_modul ##################
@@ -137,7 +138,12 @@ def find_id_question(question_n):
 
 def max_index_group_question():
     try:
-        return db.select_db_where('groupquestion_tb', ['gp_question_id'], [], [] ,'max')[0][0]
+        max_el = db.select_db_where('groupquestion_tb', ['gp_question_id'], [], [] ,'max')[0][0]
+
+        if max_el == None:
+            return 0
+        else:
+            return max_el
     except:
         print('index error')
 

@@ -37,10 +37,11 @@ def add_answer_for_survay(new_result_answer):
 
 def create_group_question(list_question, survay_code):
    max_index_g = us_init.max_index_group_question()
-   update_group_in_survay(max_index_g, survay_code)
+   max_index_g = str(max_index_g + 1)
 
+   update_group_in_survay(max_index_g, str(survay_code))
    for quest in list_question:
-      us_init.add_group_questions(quest, int(max_index_g) + 1)
+      us_init.add_group_questions(quest, max_index_g)
 
    
 ##### add into json_file new answer  #####
@@ -82,8 +83,7 @@ def add_survay(from_id, to_group, data_survay):
          print("bad insert json")
       write_answer_to_file(all_survay_json)
 
-"""
+
 with open(path + "/tg_result_poll.json", "r", encoding='utf-8') as file:
    data = json.load(file)
    add_survay(1, "М3О-221Б-20", data)
-"""

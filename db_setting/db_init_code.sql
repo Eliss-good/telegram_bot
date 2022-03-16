@@ -70,3 +70,7 @@ drop table lesson_tb;
 drop table student_tb;
 drop table group_tb;
 drop table global_tb;
+
+drop table survay_tb;
+drop table groupquestion_tb;
+drop table question_tb;

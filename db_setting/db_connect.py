@@ -4,7 +4,7 @@ class DataConnect:
     def __init__(self):
         try:
             self.con = ps2.connect(
-                dbname = 'poll_test',
+                dbname = 'global_con_db',
                 user = 'postgres',
                 password = 'admin',
                 host = '127.0.0.1',
@@ -137,7 +137,7 @@ class DataConnect:
         except:
             print('ERROR: select_db_where')
             return
-
+        
         if status == 'check':
             if self.cursor.fetchone() == (0,):
                 return True
