@@ -3,8 +3,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
+from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data
 
 from bot_elements.register import registerData
+from bot_elements.setter.all_setters import send_forms_mem_add_sent_form
 
 unique_sent_form_id = 0
 
@@ -15,8 +17,10 @@ async def display_current_mem_status(message: types.Message):
     full_message = ""
     for index in mem_for_created_forms:
         
-        if mem_for_created_forms[index][-1]['creator_id'] == message.chat.id:
-            selected_form = mem_for_created_forms[index]
+        print(mem_for_created_forms_get_creator_id(form_id=index))
+
+        if mem_for_created_forms_get_creator_id(form_id=index) == message.chat.id:
+            selected_form = mem_for_created_forms_get_data(form_id=index)
             form_mem = selected_form
             print('form_mem ', form_mem)
             info = selected_form[-1]
@@ -34,9 +38,9 @@ async def display_current_mem_status(message: types.Message):
                     elif inside_mem['type'] == 'msg':
                         parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + '\n')
 
-        full_message += parsed_msg
+            full_message += parsed_msg
     
-    await message.answer(full_message)
+    await message.answer(full_message, reply_markup=None)
 
 
 #send fsm
@@ -65,14 +69,15 @@ async def sending(message: types.Message, state: FSMContext):
     print(send_to_user)
     groups = message.text.split(',')
     final_data = await state.get_data()
-    form_creator_user_id = mem_for_created_forms[int(final_data['form_index'])][-1]['creator_id']
+    form_creator_user_id = mem_for_created_forms_get_creator_id(int(final_data['form_index']))
     # получить id юзеров по группам
-    send_forms_mem.append({'form_id': int(final_data['form_index']), 'sent_form_id': unique_sent_form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': [send_to_user]}})
+    send_forms_mem_add_sent_form(form_id=int(final_data['form_index']), sent_form_id=unique_sent_form_id, form_creator_user_id=form_creator_user_id, send_to_users_ids=[send_to_user])
+    
     print(send_forms_mem)
 
     unique_sent_form_id += 1
 
-    await message.answer('Отправлено юзеру ' + ''.join(str(groups)))
+    await message.answer('Отправлено юзеру ' + ''.join(str(groups)), reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
 
 

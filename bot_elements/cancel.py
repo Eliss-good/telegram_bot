@@ -8,7 +8,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     print(current_state)
     if current_state is None:
-        return
+        await message.answer('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
     await message.answer('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
