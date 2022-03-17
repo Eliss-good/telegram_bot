@@ -27,6 +27,7 @@ def get_prepods_text_list_page(url):
 
         for select_prepod in select_div.find_all("a", {"class": "text-body"}):
             if {"prepod": select_prepod.text, "lesson": full_lesson} not in prepod_list:
+                
                 prepod_list.append(
                     {"prepod": select_prepod.text, "lesson": full_lesson, "role": type})
 
@@ -43,14 +44,16 @@ def get_prepod_page(url):
         (soup.find("h1", {"class": "mb-5"}).find(text=True)).split())
     # print(" ".join((soup.find("h3", {"class": "me-5 mb-2 fw-medium"}).find(text=True)).split()))
     for select_div in soup.find_all("div", {"class": "mb-4"}):
-
+        
         for select_group_area in select_div.find_all("ul", {"class": "list-inline list-separator text-body small"}):
+            
             for select_group in select_group_area.find_all("a", {"class": "text-body"}):
-
+                
                 group = " ".join(select_group.find(
                     text=True, recursive=False).split())
 
                 for select_lesson_area in select_div.find_all("div", {"class": "d-flex align-items-center justify-content-between"}):
+                    
                     for select_lesson_area_first_part in select_lesson_area.find_all("p", {"class": "mb-2 fw-semi-bold text-dark"}):
 
                         lesson_part_one = " ".join(select_lesson_area_first_part.find(
@@ -69,6 +72,7 @@ def get_prepod_page(url):
                                 if not {"prepod": prepod_name, "lesson": lesson_part_one + lesson_part_two, "group": group} in lessons_list:
                                     lessons_list.append(
                                         {"prepod": prepod_name, "lesson": lesson_part_one + " " + lesson_part_two, "group": group})
+                                    print(lessons_list)
     return lessons_list
 
 
