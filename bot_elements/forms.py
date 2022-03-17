@@ -2,7 +2,6 @@
 
 """ Создается форма, добавляется в хранилище форм"""
 
-
 from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
@@ -85,7 +84,6 @@ async def choose_type(message: types.Message, state: FSMContext):  # name.waitin
         types.InlineKeyboardButton(
             text="Ввод с клавы", callback_data="question_type_msg")
     ]
-
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
 
@@ -118,7 +116,6 @@ async def get_question(message: types.Message, state: FSMContext):
         await display_current_temp_mem_status(message)
 
         await message.reply('Добавить ещё 1 вопрос?', reply_markup=keyboard)
-
         await state.finish()
 
     else:

@@ -4,9 +4,9 @@ class DataConnect:
     def __init__(self):
         try:
             self.con = ps2.connect(
-                dbname = 'test',
+                dbname = 'global_con_db',
                 user = 'postgres',
-                password = 'admin',
+                password = '752505',
                 host = '127.0.0.1',
                 port = 5432 
                 )
@@ -80,6 +80,7 @@ class DataConnect:
         except:
             "ERROR: insert_db"
     
+
     def custom_insert(self, com = None):
         if com ==  None:
             com = str(input())
@@ -98,43 +99,50 @@ class DataConnect:
         select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + ' where '
         return select_com
 
+
     def __select_count(self, name_tb, name_cl):
         select_com = 'select count'
         select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb + ' where '
         return select_com
+
+
+    def __select_max(self, name_tb, name_cl):
+        select_com = 'select max'
+        select_com = self.par_and_in_tb(select_com, name_cl) + ' from ' + name_tb
+        return select_com
+
 
     def __select_choice(self, name_tb, name_cl, status):
         if status == 'where':
             return self.__select_where(name_tb, name_cl)
         elif status == 'count' or status == 'check':
             return self.__select_count(name_tb, name_cl)
+        elif status == 'max':
+            return self.__select_max(name_tb, name_cl)
 
     def select_db_where(self, name_tb, name_cl, equality_cl, con_data, status):
-
-        select_com = self.__select_choice(name_tb,name_cl, status)
-        print(con_data)
         if len(equality_cl) != len(con_data):
             print("ERROR блять")
             return
-        
+
+        select_com = self.__select_choice(name_tb,name_cl, status)
         for i in range (0, len(equality_cl)):
             select_com += str(equality_cl[i]) + ' = ' + str(con_data[i])  
             if i < len(equality_cl) - 1:
                 select_com +=  ' and '
-        print(select_com)    
 
+        print(select_com)
         try:
             self.cursor.execute(select_com)
         except:
             print('ERROR: select_db_where')
-            return 
+            return
         
         if status == 'check':
             if self.cursor.fetchone() == (0,):
                 return True
             else:
                 return False
-
 
         return self.cursor.fetchall()
     
