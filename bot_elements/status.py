@@ -81,7 +81,7 @@ async def go_cycle(message, type):
 
 def lambda_checker_poll(pollAnswer: types.PollAnswer):
     """Проверяет принадлежит ли опрос выбранной форме"""
-    if completing_forms_dispatcher[pollAnswer.user.id]:
+    if pollAnswer.user.id in completing_forms_dispatcher.keys():
         curr_question_num = 0
         selected_form = completing_forms_dispatcher[pollAnswer.user.id]['form_copy']
         print(selected_form)
@@ -99,7 +99,7 @@ def lambda_checker_poll(pollAnswer: types.PollAnswer):
 def lambda_checker_msg(message: types.Message):
     """Проверяет является ли сообщение ответом на вопрос из формы"""
 
-    if completing_forms_dispatcher[message.chat.id]:
+    if message.chat.id in completing_forms_dispatcher.keys():
         curr_question_num = 0
         selected_form = completing_forms_dispatcher[message.chat.id]['form_copy']
 
