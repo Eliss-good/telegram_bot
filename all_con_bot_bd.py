@@ -10,7 +10,7 @@ import poll_connect_db as poll_db
 
 ####### Добавление препода
 def add_prepod(fio, rg_id , role):
-    us_db.reg_us(fio, id ,role)
+    us_db.reg_us(fio, rg_id ,role)
 
 
 ####### Добавление студента
@@ -30,16 +30,26 @@ def check_valid_us(tg_id):
 
 ####### Возвращает роль пользователя
 def find_role_us(tg_id):
-    return us_db.bf.db.select_db_where('global_tb', ['gl_role'], ['gl_teleg_id'], [str(tg_id)], 'where')[0][0]
+    return us_db.bf.find_role_us(tg_id)
 
 
-####### Проверка на то зарегестрирован ли пользователь
+####### Возвращает группу студента
+def find_group_us(tg_id):
+    return us_db.bf.find_group_us(tg_id)
+
+
+####### Возвращает ФИО пользователя
+def find_fio_us(tg_id):
+    return us_db.bf.find_fio_us(tg_id)
+
+
+####### Возврат id пользователей прикреплённых к группе
 def find_us_for_survay(groups):
-    users_id_list = us_db.find_teleg_group(groups)
+    return us_db.find_teleg_group(groups)
 
 
 #####role: prepod / student; command: group / name
-def update_data user(role ,command, new_data, id_us_tg):
+def update_data_user(role ,command, new_data, id_us_tg):
     us_db.update_data_user(role ,command, new_data, id_us_tg)
 
 

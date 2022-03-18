@@ -1,3 +1,4 @@
+from gettext import find
 from db_connect import DataConnect
 import json
 
@@ -95,22 +96,26 @@ def add_student(name_student, teleg_id, name_group):
 
         ################## select_modul ##################
 def find_id_group(name_group):
+    """Возвращение группы предмета"""
     name_group = correct_str(str(name_group))
     return str(db.select_db_where('group_tb', ['id'], ['group_name'], [name_group], 'where')[0][0])
 
 
 def find_id_lesson(name_lesson):
+    """Возвращение ID предмета"""
     name_lesson = correct_str(str(name_lesson))
     return str(db.select_db_where('lesson_tb', ['id'], ['lesson_name'], [name_lesson], 'where')[0][0])
 
 
 def find_id_prepod(name_prepod):
+    """Возвращение ID препода"""
     name_prepod = correct_str(str(name_prepod))
     print(str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')))
     return str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')[0][0])
 
 
 def find_id_global(teleg_id):
+    """Возвращение ID пользователя из глобальной таблицы"""
     teleg_id = correct_str(str(teleg_id))
     data = db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id],'where')
     print(data)
@@ -118,6 +123,28 @@ def find_id_global(teleg_id):
         return str(db.select_db_where('global_tb', ['id'], ['gl_teleg_id'], [teleg_id], 'where')[0][0])
     else:
         return '0'
+
+
+def find_id_group_student(tg_id):
+    """Возвращение ID группы студента пользователя"""
+    return db.select_db_where('student_tb', ['group_id'], ['gl_id'], [find_id_global(str(tg_id))], 'where')[0][0]
+
+
+def find_role_us(tg_id):
+    """Возвращение роль пользователя"""
+    return db.select_db_where('global_tb', ['gl_role'], ['gl_teleg_id'], [correct_str(str(tg_id))], 'where')[0][0]
+
+
+def find_fio_us(tg_id):
+    """Возвращение фио пользователя"""
+    role = find_role_us(tg_id)
+    return db.select_db_where(role + '_tb', [role  + '_name'], ['gl_id'], [find_id_global(tg_id)], 'where')[0][0]
+
+
+def find_group_us(tg_id):
+    """Возвращение группы пользователя"""
+    print("PIZDECH")
+    return db.select_db_where('group_tb', ['group_name'], ['id'], [find_id_group_student(tg_id)], 'where')[0][0]
 
 
 ###### select for polls ######

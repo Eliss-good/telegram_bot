@@ -1,6 +1,6 @@
-import asyncio, time, full_pars_2
+#import asyncio, time, full_pars_2
 
-
+"""
 async def rasp_notification(group):
     rasp = full_pars_2.parse_group_today(group)
     while True:
@@ -19,3 +19,4 @@ async def rasp_notification(group):
                 #         await bot.send_message(user['user'], str(data['name']) + ' через {0} минут'.format(time_diff))
                 #         user['notify_status'] = 1
             # print(time_diff, data['name'])
+"""

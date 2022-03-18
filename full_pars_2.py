@@ -7,7 +7,7 @@ from datetime import datetime
 #from dateutil import parser
 
 sys.path.append('/home/eliss/ptoject/telegram_bot/db_setting')
-import tg_connect_db as tg_db
+#import tg_connect_db as tg_db
 
 
 """

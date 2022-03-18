@@ -26,8 +26,8 @@ if __name__ == '__main__':
     bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
     dp = Dispatcher(bot, storage=MemoryStorage(),
                     loop=asyncio.get_event_loop())
-    dp.loop.create_task(set_commands(bot))
-    dp.loop.create_task(raspisanie.rasp_notification('М3О-221Б-20'))
+    #dp.loop.create_task(set_commands(bot))
+    #dp.loop.create_task("""raspisanie.rasp_notification('М3О-221Б-20')""" [1])
     register_handlers_forms(dp)
     register_handlers_forms_menu(dp)
     register_handlers_register(dp)
