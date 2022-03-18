@@ -3,9 +3,10 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
+
 from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data
 
-from bot_elements.register import registerData
+from bot_elements.storages.all_storages import registerData
 from bot_elements.setter.all_setters import send_forms_mem_add_sent_form
 
 unique_sent_form_id = 0

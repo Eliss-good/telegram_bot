@@ -5,11 +5,9 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
 from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name
 
-from bot_elements.register import registerData
-
 # нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
-from bot_elements.forms import send_forms_mem, mem_for_created_forms
-from bot_elements.forms import completing_forms_dispatcher
+from bot_elements.storages.all_storages import send_forms_mem, mem_for_created_forms, completing_forms_dispatcher, registerData
+
 from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session
 
 bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')

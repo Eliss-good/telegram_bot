@@ -13,8 +13,7 @@ all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б
 #     all_groups.append(data['group'])
 #     print(data)
 
-
-registerData = {}  # {*user_id*: {'user_role': *role*, 'user_group': *group*}}
+from bot_elements.storages.all_storages import registerData
 
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
 
