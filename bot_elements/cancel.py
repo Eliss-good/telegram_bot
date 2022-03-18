@@ -15,4 +15,3 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 def register_handlers_cancel(dp: Dispatcher):
     dp.register_message_handler(cancel_handler, commands="cancel", state="*")
-

@@ -51,4 +51,3 @@ def registerData_get_group(user_id: int):
 def registerData_get_role(user_id: int):
     """ Возвращает роль юзера из registerData"""
     return registerData[user_id]['chosen_role']
-
