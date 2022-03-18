@@ -30,6 +30,20 @@ def mem_for_created_forms_add_element(user_id: int, data):
     mem_for_created_forms[user_id] = data
 
 
+def mem_for_created_forms_insert_element(form_id: int, inser_after_id: int, data):
+    mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
+
+
+def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
+    """ Изменяет название формы из mem_for_created_forms"""
+    mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
+
+
+def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, new_question_name: str):
+    """ Изменяет название вопроса формы из mem_for_created_forms"""
+    mem_for_created_forms[form_id][question_id]['question'] = new_question_name
+
+
 def send_forms_mem_add_sent_form(form_id: int, sent_form_id: int, form_creator_user_id: int, send_to_users_ids: list):
     """Добавляет 1 форму в список с отправленными формами"""
     send_forms_mem.append({'form_id': form_id, 'sent_form_id': sent_form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids}})

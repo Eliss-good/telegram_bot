@@ -32,7 +32,7 @@ class register_change_fio_fsm(StatesGroup):
     waiting_for_new_fio = State()
 
 
-async def strangeMessagesHandler(message: types.Message):
+async def strangeMessagesHandler(message: types.Message): # !
     if message.text in all_groups or '; id ' in message.text:
         await message.answer('reply keyboard removed', reply_markup=types.ReplyKeyboardRemove())
 

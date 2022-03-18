@@ -8,46 +8,19 @@ from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id
 
 from bot_elements.setter.all_setters import send_forms_mem_add_sent_form
 
-from bot_elements.storages.all_storages import mem_for_created_forms, send_forms_mem, registerData, unique_sent_form_id
+from bot_elements.storages.all_storages import send_forms_mem, registerData, unique_sent_form_id
+
+from bot_elements.forms.form_display import display_current_mem_status
 # check forms mass and select user_ids + send forms in forms.py
 
-async def display_current_mem_status(message: types.Message):
-    full_message = ""
-    for index in mem_for_created_forms:
-        
-        print(mem_for_created_forms_get_creator_id(form_id=index))
-
-        if mem_for_created_forms_get_creator_id(form_id=index) == message.chat.id:
-            selected_form = mem_for_created_forms_get_data(form_id=index)
-            form_mem = selected_form
-            print('form_mem ', form_mem)
-            info = selected_form[-1]
-            print('recip_mem ', info)
-            
-            parsed_msg = "\n ----- \nname: " + info['form_name'] + ' '+ 'form_id: ' + str(info['form_id']) + ' /send' + '_' + str(index) + "\n"
-
-            if form_mem:
-                
-                for inside_mem in form_mem:
-                    if inside_mem['type'] == 'poll':
-                        parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' ' + '['+', '.join(
-                            str(e) for e in inside_mem['options']) + ']' + '\n')
-
-                    elif inside_mem['type'] == 'msg':
-                        parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + '\n')
-
-            full_message += parsed_msg
-    
-    await message.answer(full_message, reply_markup=None)
-
-
-#send fsm
 
 class sender(StatesGroup):
+    """FSM чтобы получать список групп"""
     waiting_for_groups = State()
 
 
 async def choose_group(message: types.Message, state: FSMContext):
+    """ (sender FSM) Спрашивает юзера"""
     form_index = message.text[6:]
 
     await state.update_data(form_index=form_index)
@@ -61,7 +34,8 @@ async def choose_group(message: types.Message, state: FSMContext):
     await sender.waiting_for_groups.set()
 
 
-async def sending(message: types.Message, state: FSMContext):
+async def sending(message: types.Message, state: FSMContext): # sender.waiting_for_groups
+    """ (sender FSM) получает список групп и отправляет в send_forms_mem"""
     global unique_sent_form_id
     send_to_user = int(message.text[(message.text.find('id ') + 3):])
     print(send_to_user)
