@@ -2,7 +2,7 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_group, registerData_get_role
 
 import prep_text_pars

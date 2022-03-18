@@ -1,17 +1,14 @@
 """ Меню для системы опросов"""
-from aiogram import Bot, Dispatcher, types
+from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, registerData_get_fio
 
-from bot_elements.storages.all_storages import registerData
 from bot_elements.setter.all_setters import send_forms_mem_add_sent_form
 
-unique_sent_form_id = 0
-
-from bot_elements.forms import mem_for_created_forms, send_forms_mem
+from bot_elements.storages.all_storages import mem_for_created_forms, send_forms_mem, registerData, unique_sent_form_id
 # check forms mass and select user_ids + send forms in forms.py
 
 async def display_current_mem_status(message: types.Message):
