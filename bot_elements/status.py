@@ -4,9 +4,10 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
 from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name
+from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
 
 # нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
-from bot_elements.storages.all_storages import send_forms_mem, mem_for_created_forms, completing_forms_dispatcher, registerData
+from bot_elements.storages.all_storages import send_forms_mem, completing_forms_dispatcher
 
 from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session
 
@@ -75,7 +76,7 @@ async def go_cycle(message, type):
         curr_quest['message_id'] = msg.message_id
 
     elif curr_quest['type'] == 'info':
-        completing_forms_dispatcher.pop(user_id)
+        completing_forms_dispatcher_remove_session(user_id=user_id)
         print('theend')
         print(completing_forms_dispatcher)
 

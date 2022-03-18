@@ -6,10 +6,11 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
+from bot_elements.remover.all_removers import temp_form_recipient_data_remove_element, temp_mem_for_form_creator_remove_form, temp_mem_for_form_creator_remove_form_element
 
 unique_form_id = 0
 
-from bot_elements.storages.all_storages import temp_form_recipient_data, temp_mem_for_form_creator, mem_for_created_forms, send_forms_mem, completing_forms_dispatcher
+from bot_elements.storages.all_storages import temp_form_recipient_data, temp_mem_for_form_creator, mem_for_created_forms
 
 from bot_elements.getter.all_getters import temp_form_recipient_data_get_data, temp_mem_for_form_creator_get_data
 from bot_elements.setter import all_setters
@@ -165,7 +166,7 @@ async def add_quest_false(call: types.CallbackQuery):
     """ Заканчивает создание формы"""
 
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await display_current_temp_mem_status(call.message)
+    await display_current_temp_mem_status(message=call.message)
 
 
     all_setters.temp_mem_for_form_creator_add_element(user_id=call.message.chat.id, data=temp_form_recipient_data[call.message.chat.id].copy())
@@ -174,8 +175,8 @@ async def add_quest_false(call: types.CallbackQuery):
 
     print('mem_for_created_forms ', mem_for_created_forms)
 
-    temp_mem_for_form_creator.pop(call.message.chat.id, None)
-    temp_form_recipient_data.pop(call.message.chat.id, None)
+    temp_mem_for_form_creator_remove_form(user_id=call.message.chat.id)
+    temp_form_recipient_data_remove_element(user_id=call.message.chat.id)
 
     print('temp_form_recipient_data ', temp_form_recipient_data)
 
@@ -203,7 +204,8 @@ async def del_handler(message: types.Message):
     """Удаляет одну запись из списка temp_mem по её идентификатору"""
 
     delete_id = int(message.text[4:])
-    temp_mem_for_form_creator[message.chat.id].pop(delete_id)
+    temp_mem_for_form_creator_remove_form_element(user_id=message.chat.id, delete_id=delete_id)
+
     await message.answer('удалил пункт ' + str(delete_id), reply_markup=types.ReplyKeyboardRemove())
     await display_current_temp_mem_status(message)
 

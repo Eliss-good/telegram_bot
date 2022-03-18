@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, BotCommand
 
-from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data
+from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, registerData_get_fio
 
 from bot_elements.storages.all_storages import registerData
 from bot_elements.setter.all_setters import send_forms_mem_add_sent_form
@@ -58,7 +58,7 @@ async def choose_group(message: types.Message, state: FSMContext):
     
     marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
     for key in registerData:
-        marakap.add(KeyboardButton(registerData[key]['chosen_fio'] + '; id ' + str(key)))
+        marakap.add(KeyboardButton(registerData_get_fio(user_id=key) + '; id ' + str(key)))
 
     await message.reply('Выберите получателя', reply_markup=marakap)
     await sender.waiting_for_groups.set()
