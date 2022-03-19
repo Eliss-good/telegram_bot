@@ -1,19 +1,20 @@
-# from saved_forms
-# select form by id -> display -> add actiions
+# 
+#                                       add actions inside form
 #                                  |   |         |       |
 #                            rename  append_q   del  edit_poll_options
-# + handler
-# add after = choose menu + insert aft id (fsm) 
-#
+# 
+#                                form actions
+#                                |          |
+#                              edit_name   del   
 # end => display
-#
-# input: form_id, user_id
+
+
 
 from aiogram import types, Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
-from bot_elements.forms.form_display import display_form
-from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_question, mem_for_created_forms_edit_poll_options
+from bot_elements.forms.form_display import display_form, display_current_mem_status
+from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_question, mem_for_created_forms_edit_poll_options, mem_for_created_forms_set_new_form_name
 from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
 from bot_elements.remover.all_removers import mem_for_created_forms_delete_question, temp_mem_for_form_creator_remove_form
 
@@ -33,6 +34,11 @@ class appendQuestion(StatesGroup):
 class editPollOtions(StatesGroup):
     """ FSM для изменения опций опроса"""
     waiting_for_options = State()
+
+
+class renameForm(StatesGroup):
+    """ FSM для изменения названия формы"""
+    waiting_for_name = State()
 
 
 async def edit_form_menu(message: types.Message):
@@ -178,16 +184,35 @@ async def editPollOtions_set_data(message: types.Message, state: FSMContext): # 
     data = await state.get_data()
 
     mem_for_created_forms_edit_poll_options(form_id=data['form_id'], question_id=data['question_id'], new_poll_options=data['options'])
-     
+    
     await display_form(form_id=data['form_id'], message=message)
     await state.finish()
 
 
+async def edit_form_name_start(message: types.Message, state: FSMContext):
+    form_id = message.text[7:]
+    await state.update_data(form_id=form_id)
+    await message.answer('Введите новое название формы')
+    await renameForm.waiting_for_name.set()
+
+
+async def edit_form_name_finish(message: types.Message, state: FSMContext): # renameForm.waiting_for_name
+    new_name = message.text
+    data = await state.get_data()
+    mem_for_created_forms_set_new_form_name(form_id=data['form_id'], new_form_name=new_name)
+
+    await display_current_mem_status(message=message)
+    await state.finish()
 
 
 def register_handlers_forms_editor(dp: Dispatcher):
     dp.register_message_handler(
         edit_form_menu, lambda message: message.text.startswith('/edit_'))
+    dp.register_message_handler(
+        edit_form_name_start, lambda message: message.text.startswith('/rename_'))
+    dp.register_message_handler(
+        edit_form_name_finish, state=renameForm.waiting_for_name)
+
     dp.register_message_handler(rename_question_begin, lambda message: message.text.startswith('/rename'))
     dp.register_message_handler(editPollOtions_get_data, lambda message: message.text.startswith('/edit'))
     dp.register_message_handler(choose_type, lambda message: message.text.startswith('/add_after'))

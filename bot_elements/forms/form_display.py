@@ -43,7 +43,7 @@ async def display_current_mem_status(message: types.Message):
             info = selected_form[-1]
             print('recip_mem ', info)
             
-            parsed_msg = "\n ----- \nname: " + info['form_name'] + ' '+ 'form_id: ' + str(info['form_id']) + ' /send_' + str(index) + ' /edit_'+ str(index)+ ' /del_' + str(index) +"\n"
+            parsed_msg = "\n ----- \nname: " + info['form_name'] + ' '+ 'form_id: ' + str(info['form_id']) + ' /send_' + str(index) + ' /rename_' + str(index) + ' /edit_'+ str(index)+ ' /del_' + str(index) +"\n"
 
             if form_mem:
                 
