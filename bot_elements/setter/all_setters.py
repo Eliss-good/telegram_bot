@@ -30,7 +30,7 @@ def mem_for_created_forms_add_element(user_id: int, data):
     mem_for_created_forms[user_id] = data
 
 
-def mem_for_created_forms_insert_element(form_id: int, inser_after_id: int, data):
+def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, data):
     mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
 
 

@@ -8,7 +8,7 @@ from bot_elements.register.register import register_handlers_register
 from bot_elements.forms.forms import register_handlers_forms
 from bot_elements.forms.forms_menu import register_handlers_forms_menu
 from bot_elements.status.status import register_handlers_status
-from bot_elements.forms.forms_editor import register_handlers_editor
+from bot_elements.forms.forms_editor import register_handlers_forms_editor
 from bot_elements.cancel import register_handlers_cancel
 
 
@@ -33,10 +33,11 @@ if __name__ == '__main__':
     
     register_handlers_cancel(dp)
     
+    register_handlers_forms_editor(dp)
     register_handlers_forms(dp)
     register_handlers_forms_menu(dp)
     
     register_handlers_status(dp)
-    register_handlers_editor(dp)
+    
     register_handlers_register(dp)
     executor.start_polling(dp)

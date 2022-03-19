@@ -1,7 +1,7 @@
 # from saved_forms
 # select form by id -> display -> add actiions
 #                                  |   |         |
-#                            rename  add_after  del
+#                            rename  append_q   del
 # + handler
 # add after = choose menu + insert aft id (fsm) 
 #
@@ -12,21 +12,20 @@
 from aiogram import types, Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
-from bot_elements.storages.all_storages import unique_form_id, temp_mem_for_form_creator
-from bot_elements.forms.form_display import display_form, display_current_temp_mem_status
-from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_element
-from bot_elements.remover.all_removers import temp_mem_for_form_creator_remove_form
+from bot_elements.forms.form_display import display_form
+from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_question
 from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
+from bot_elements.remover.all_removers import mem_for_created_forms_delete_question, temp_mem_for_form_creator_remove_form
 
 
 class newQuestionName(StatesGroup):
-    """ FSM для изменения текста 1 вопроса формы"""
+    """ (rename) FSM для изменения текста 1 вопроса формы"""
     # waiting_for_data = State()
     waiting_for_new_question_name = State()
 
 
 class appendQuestion(StatesGroup):
-    """ FSM для добавления одного вопроса/ опроса в форму"""
+    """ (append_quest) FSM для добавления одного вопроса/ опроса в форму"""
 
     waiting_for_question = State()
     waiting_for_options = State()
@@ -39,7 +38,7 @@ async def edit_form_menu(message: types.Message):
 
 
 async def rename_question_begin(message: types.Message, state: FSMContext):
-    """ (newQuestionName FSM) Берет индексы формы и вопроса из команды и спрашивает новый текст вопроса"""
+    """ (rename)(newQuestionName FSM) Берет индексы формы и вопроса из команды и спрашивает новый текст вопроса"""
     form_ids = message.text[7:].split('_')
     form_id = int(form_ids[0])
     question_id = int(form_ids[1])
@@ -51,7 +50,7 @@ async def rename_question_begin(message: types.Message, state: FSMContext):
 
 
 async def rename_question_end(message: types.Message, state: FSMContext): # newQuestionName.waiting_for_new_question_name
-    """ (newQuestionName FSM) Меняет на новый текст вопроса"""
+    """ (rename)(newQuestionName FSM) Меняет на новый текст вопроса"""
     new_question_name = message.text
     data = await state.get_data()
     mem_for_created_forms_set_new_question_name(form_id=data['form_id'], question_id=data['question_id'], new_question_name=new_question_name)
@@ -60,7 +59,7 @@ async def rename_question_end(message: types.Message, state: FSMContext): # newQ
 
 
 async def choose_type(message: types.Message, state: FSMContext):  
-    """ (form FSM) Предлагает выбрать тип добавляемого вопроса"""
+    """ (append_quest)(form FSM) Предлагает выбрать тип добавляемого вопроса"""
     form_ids = message.text[10:].split('_')
 
     form_id = int(form_ids[0])
@@ -82,7 +81,7 @@ async def choose_type(message: types.Message, state: FSMContext):
 
 
 async def get_question(message: types.Message, state: FSMContext): # form.waiting_for_question
-    """ (form FSM) Получает текст вопроса и тип, затем ЗАПОМИНАЕТ (и предлагает ввести варианты ответов)
+    """ (append_quest)(form FSM) Получает текст вопроса и тип, затем ЗАПОМИНАЕТ (и предлагает ввести варианты ответов)
         и предлагает добавить вопрос"""
     
     question = message.text
@@ -92,7 +91,7 @@ async def get_question(message: types.Message, state: FSMContext): # form.waitin
 
         temp_mem_for_form_creator_add_element(user_id=message.chat.id, data={'question': data['question'], 'message_id': 0, 'type': 'msg'})
         
-        mem_for_created_forms_insert_element(form_id=data['form_id'], inser_after_id=data['question_id'], data=temp_mem_for_form_creator_get_data(message.chat.id).copy())
+        mem_for_created_forms_insert_question(form_id=data['form_id'], inser_after_id=data['question_id'], data=temp_mem_for_form_creator_get_data(message.chat.id).copy())
 
         temp_mem_for_form_creator_remove_form(user_id=message.chat.id)
         # await display_current_temp_mem_status(message)
@@ -107,7 +106,7 @@ async def get_question(message: types.Message, state: FSMContext): # form.waitin
 
 
 async def get_options(message: types.Message, state: FSMContext): # form.waiting_for_options
-    """ (form FSM) Получает варианты ответов, ЗАПОМИНАЕТ и предлагает добавить вопрос"""
+    """ (append_quest)(form FSM) Получает варианты ответов, ЗАПОМИНАЕТ и предлагает добавить вопрос"""
 
     options = message.text.split(',')
     await state.update_data(options=options)
@@ -117,7 +116,7 @@ async def get_options(message: types.Message, state: FSMContext): # form.waiting
 
     temp_mem_for_form_creator_add_element(user_id=message.chat.id, data={'question': data['question'], 'options': data['options'], 'message_id': 0, 'type': 'poll'})
     
-    mem_for_created_forms_insert_element(form_id=data['form_id'], inser_after_id=data['question_id'], data=temp_mem_for_form_creator_get_data(message.chat.id).copy())
+    mem_for_created_forms_insert_question(form_id=data['form_id'], inser_after_id=data['question_id'], data=temp_mem_for_form_creator_get_data(message.chat.id).copy())
 
     temp_mem_for_form_creator_remove_form(user_id=message.chat.id)
     
@@ -126,7 +125,7 @@ async def get_options(message: types.Message, state: FSMContext): # form.waiting
 
 
 async def question_type_poll(call: types.CallbackQuery, state: FSMContext):
-    """ Начало создания опроса"""
+    """ (append_quest) Начало создания опроса"""
 
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await state.update_data(type='poll')
@@ -135,7 +134,7 @@ async def question_type_poll(call: types.CallbackQuery, state: FSMContext):
 
 
 async def question_type_msg(call: types.CallbackQuery, state: FSMContext):
-    """ Начало создания обычного вопроса"""
+    """ (append_quest) Начало создания обычного вопроса"""
 
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await state.update_data(type='msg')
@@ -143,11 +142,23 @@ async def question_type_msg(call: types.CallbackQuery, state: FSMContext):
     await appendQuestion.waiting_for_question.set()
 
 
-def register_handlers_editor(dp: Dispatcher):
+async def remove_question_by_id(message: types.Message):
+    """ (delete_quest) Удаляет вопрос по его id"""
+    form_ids = message.text[4:].split('_')
+
+    form_id = int(form_ids[0])
+    question_id = int(form_ids[1])
+
+    mem_for_created_forms_delete_question(form_id=form_id, question_id=question_id)
+    await display_form(message=message, form_id=form_id)
+    
+
+def register_handlers_forms_editor(dp: Dispatcher):
     dp.register_message_handler(
         edit_form_menu, lambda message: message.text.startswith('/edit_'))
     dp.register_message_handler(rename_question_begin, lambda message: message.text.startswith('/rename'))
     dp.register_message_handler(choose_type, lambda message: message.text.startswith('/add_after'))
+    dp.register_message_handler(remove_question_by_id, lambda message: message.text.startswith('/del'))
     dp.register_message_handler(rename_question_end, state=newQuestionName.waiting_for_new_question_name)
 
     dp.register_message_handler(get_question, state=appendQuestion.waiting_for_question)

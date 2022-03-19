@@ -22,6 +22,11 @@ def temp_mem_for_form_creator_remove_form_element(user_id: int, delete_id: int):
     temp_mem_for_form_creator[user_id].pop(delete_id)
 
 
+def mem_for_created_forms_delete_question(form_id: int, question_id: int):
+    """ Убирает 1 элемент формы по delete_id из mem_for_created_forms"""
+    mem_for_created_forms[form_id].pop(question_id)
+
+
 def completing_forms_dispatcher_remove_session(user_id: int):
     """ Убирает 1 активную сессию  из completing_forms_dispatcher"""
     completing_forms_dispatcher.pop(user_id)
