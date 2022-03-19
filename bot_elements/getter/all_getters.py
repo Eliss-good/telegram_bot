@@ -16,6 +16,11 @@ def temp_mem_for_form_creator_get_data(user_id: int):
     return temp_mem_for_form_creator[user_id]
 
 
+def mem_for_created_forms_get_full():
+    """ Возвращает mem_for_created_forms"""
+    return mem_for_created_forms
+
+
 def mem_for_created_forms_get_data(form_id: int):
     """ Возвращает ячейку памяти хранящую данные созданной формы (mem_for_created_forms)"""
     return mem_for_created_forms[form_id]

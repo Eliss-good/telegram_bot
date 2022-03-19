@@ -23,8 +23,13 @@ def temp_mem_for_form_creator_remove_form_element(user_id: int, delete_id: int):
 
 
 def mem_for_created_forms_delete_question(form_id: int, question_id: int):
-    """ Убирает 1 элемент формы по delete_id из mem_for_created_forms"""
+    """ Убирает 1 элемент формы по question_id из mem_for_created_forms"""
     mem_for_created_forms[form_id].pop(question_id)
+
+
+def mem_for_created_forms_delete_question(form_id: int):
+    """ Убирает 1 форму из mem_for_created_forms"""
+    mem_for_created_forms.pop(form_id, None)
 
 
 def completing_forms_dispatcher_remove_session(user_id: int):

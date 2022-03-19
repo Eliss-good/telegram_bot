@@ -1,4 +1,3 @@
-# 
 #                                       add actions inside form
 #                                  |   |         |       |
 #                            rename  append_q   del  edit_poll_options
@@ -9,14 +8,13 @@
 # end => display
 
 
-
 from aiogram import types, Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from bot_elements.forms.form_display import display_form, display_current_mem_status
 from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_question, mem_for_created_forms_edit_poll_options, mem_for_created_forms_set_new_form_name
 from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
-from bot_elements.remover.all_removers import mem_for_created_forms_delete_question, temp_mem_for_form_creator_remove_form
+from bot_elements.remover.all_removers import mem_for_created_forms_delete_question, temp_mem_for_form_creator_remove_form, mem_for_created_forms_delete_question
 
 
 class newQuestionName(StatesGroup):
@@ -190,6 +188,7 @@ async def editPollOtions_set_data(message: types.Message, state: FSMContext): # 
 
 
 async def edit_form_name_start(message: types.Message, state: FSMContext):
+    """ (edit)(renameForm FSM) Получает новое название формы"""
     form_id = int(message.text[8:])
     await state.update_data(form_id=form_id)
     await message.answer('Введите новое название формы')
@@ -197,6 +196,7 @@ async def edit_form_name_start(message: types.Message, state: FSMContext):
 
 
 async def edit_form_name_finish(message: types.Message, state: FSMContext): # renameForm.waiting_for_name
+    """ (edit)(renameForm FSM) Изменяет название формы"""
     new_name = message.text
     data = await state.get_data()
     mem_for_created_forms_set_new_form_name(form_id=data['form_id'], new_form_name=new_name)
@@ -205,7 +205,16 @@ async def edit_form_name_finish(message: types.Message, state: FSMContext): # re
     await state.finish()
 
 
+async def delete_form(message: types.Message):
+    """ Удаляет форму"""
+    delete_id = int(message.text[5:])
+    mem_for_created_forms_delete_question(form_id=delete_id)
+    await display_current_mem_status(message=message)
+
+
 def register_handlers_forms_editor(dp: Dispatcher):
+    dp.register_message_handler(
+        delete_form, lambda message: message.text.startswith('/del_'))
     dp.register_message_handler(
         edit_form_menu, lambda message: message.text.startswith('/edit_'))
     dp.register_message_handler(
