@@ -190,7 +190,7 @@ async def editPollOtions_set_data(message: types.Message, state: FSMContext): # 
 
 
 async def edit_form_name_start(message: types.Message, state: FSMContext):
-    form_id = message.text[7:]
+    form_id = int(message.text[8:])
     await state.update_data(form_id=form_id)
     await message.answer('Введите новое название формы')
     await renameForm.waiting_for_name.set()
