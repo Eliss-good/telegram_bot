@@ -74,7 +74,7 @@ async def display_form(message: types.Message, form_id: int):
             for inside_mem in form_mem:
                 if inside_mem['type'] == 'poll':
                     parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' ' + '['+', '.join(
-                        str(e) for e in inside_mem['options']) + ']' + ' /rename' + str(form_id) + '_' + str(question_number) + ' /add_after' +  str(form_id) + '_' + str(question_number) + ' /del' +  str(form_id) + '_' + str(question_number) + '\n')
+                        str(e) for e in inside_mem['options']) + ']' + ' /rename' + str(form_id) + '_' + str(question_number) + ' /add_after' +  str(form_id) + '_' + str(question_number) + ' /edit' +  str(form_id) + '_' + str(question_number) + ' /del' +  str(form_id) + '_' + str(question_number) + '\n')
 
                 elif inside_mem['type'] == 'msg':
                     parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' /rename' + str(form_id) + '_' + str(question_number) + ' /add_after' +  str(form_id) + '_' + str(question_number) + ' /del' +  str(form_id) + '_' + str(question_number) + '\n')

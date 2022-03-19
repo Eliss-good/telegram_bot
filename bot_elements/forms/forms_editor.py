@@ -1,7 +1,7 @@
 # from saved_forms
 # select form by id -> display -> add actiions
-#                                  |   |         |
-#                            rename  append_q   del
+#                                  |   |         |       |
+#                            rename  append_q   del  edit_poll_options
 # + handler
 # add after = choose menu + insert aft id (fsm) 
 #
@@ -13,14 +13,13 @@ from aiogram import types, Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from bot_elements.forms.form_display import display_form
-from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_question
+from bot_elements.setter.all_setters import mem_for_created_forms_set_new_question_name, temp_mem_for_form_creator_add_element, mem_for_created_forms_insert_question, mem_for_created_forms_edit_poll_options
 from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
 from bot_elements.remover.all_removers import mem_for_created_forms_delete_question, temp_mem_for_form_creator_remove_form
 
 
 class newQuestionName(StatesGroup):
     """ (rename) FSM для изменения текста 1 вопроса формы"""
-    # waiting_for_data = State()
     waiting_for_new_question_name = State()
 
 
@@ -28,6 +27,11 @@ class appendQuestion(StatesGroup):
     """ (append_quest) FSM для добавления одного вопроса/ опроса в форму"""
 
     waiting_for_question = State()
+    waiting_for_options = State()
+
+
+class editPollOtions(StatesGroup):
+    """ FSM для изменения опций опроса"""
     waiting_for_options = State()
 
 
@@ -151,18 +155,49 @@ async def remove_question_by_id(message: types.Message):
 
     mem_for_created_forms_delete_question(form_id=form_id, question_id=question_id)
     await display_form(message=message, form_id=form_id)
-    
+
+
+async def editPollOtions_get_data(message: types.Message, state: FSMContext):
+    """ (edit)(editPollOtions FSM) Получает id опроса для изменеия опций"""
+    form_ids = message.text[5:].split('_')
+
+    form_id = int(form_ids[0])
+    question_id = int(form_ids[1])
+    await state.update_data(form_id=form_id)
+    await state.update_data(question_id=question_id)
+
+    await message.answer(' Введите новые варианты ответов через запятую')
+    await editPollOtions.waiting_for_options.set()
+
+
+async def editPollOtions_set_data(message: types.Message, state: FSMContext): # editPollOtions.waiting_for_options
+    """ (edit)(editPollOtions FSM) Получает id опроса для изменеия опций"""
+    options = message.text.split(',')
+    await state.update_data(options=options)
+
+    data = await state.get_data()
+
+    mem_for_created_forms_edit_poll_options(form_id=data['form_id'], question_id=data['question_id'], new_poll_options=data['options'])
+     
+    await display_form(form_id=data['form_id'], message=message)
+    await state.finish()
+
+
+
 
 def register_handlers_forms_editor(dp: Dispatcher):
     dp.register_message_handler(
         edit_form_menu, lambda message: message.text.startswith('/edit_'))
     dp.register_message_handler(rename_question_begin, lambda message: message.text.startswith('/rename'))
+    dp.register_message_handler(editPollOtions_get_data, lambda message: message.text.startswith('/edit'))
     dp.register_message_handler(choose_type, lambda message: message.text.startswith('/add_after'))
     dp.register_message_handler(remove_question_by_id, lambda message: message.text.startswith('/del'))
     dp.register_message_handler(rename_question_end, state=newQuestionName.waiting_for_new_question_name)
 
     dp.register_message_handler(get_question, state=appendQuestion.waiting_for_question)
     dp.register_message_handler(get_options, state=appendQuestion.waiting_for_options)
+    dp.register_message_handler(editPollOtions_set_data, state=editPollOtions.waiting_for_options)
+
 
     dp.register_callback_query_handler(
         question_type_poll, text="question_type_poll_single")
