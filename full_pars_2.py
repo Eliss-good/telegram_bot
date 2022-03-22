@@ -2,15 +2,10 @@ import time
 import hashlib
 import urllib.request
 import json
-import sys
-from datetime import datetime
-#from dateutil import parser
-
-sys.path.append('/home/eliss/ptoject/telegram_bot/db_setting')
-#import tg_connect_db as tg_db
+"""from datetime import datetime
+from dateutil import parser
 
 
-"""
 def parse_group_today(group):
     group_md5 = hashlib.md5(group.encode(encoding='utf_8')).hexdigest()
     link = "https://public.mai.ru/schedule/data/{0}.json".format(group_md5)
@@ -21,7 +16,8 @@ def parse_group_today(group):
 
     group_rasp = []
 
-    group_id_list = [] #tg_db.find_teleg_group([group])
+# В ЭТОТ МАССИВ НУЖНО ЗАПИХНУТЬ АЙДИШНИКИ ПОЛЬЗОВАТЕЛЕН ИЗ ГРУППЫ group ИЗ БД
+    group_id_list = [1, 2, 3]
 
     group_notify_status = []
 
@@ -71,7 +67,7 @@ def parse_group_today(group):
                                   "time_end_minutes": time_end.minute, "name": name, "type": type, "lector": lector, "room": room, "group": group, "notify": group_notify_status})
     return group_rasp
 
-#parse_group_today('М3О-221Б-20'))
+# parse_group_today('М3О-221Б-20')
 
 
 def parse_group(group):
@@ -84,12 +80,13 @@ def parse_group(group):
 
     group_rasp = []
 
-    group_id_list = [] #tg_db.find_teleg_group([group])
+# В ЭТОТ МАССИВ НУЖНО ЗАПИХНУТЬ АЙДИШНИКИ ПОЛЬЗОВАТЕЛЕН ИЗ ГРУППЫ group ИЗ БД
+    group_id_list = [1, 2, 3]
 
     group_notify_status = []
 
-    #for data in group_id_list:
-    #    group_notify_status.append({'user': data, 'notify_status': 0})
+    for data in group_id_list:
+        group_notify_status.append({'user': data, 'notify_status': 0})
 
     for day in rasp.items():
         date = datetime.fromisoformat(str(parser.parse(day[0], dayfirst=True)))
@@ -132,7 +129,7 @@ def parse_group(group):
                                 "time_end_minutes": time_end.minute, "name": name, "type": type, "lector": lector, "room": room, "group": group, "notify": group_notify_status})
     return group_rasp
 
-print(parse_group('М3О-221Б-20'))
+# print(parse_group('М3О-221Б-20'))
 
 def parse_prepod(md5):
     link = "https://public.mai.ru/schedule/data/{0}.json".format(md5)

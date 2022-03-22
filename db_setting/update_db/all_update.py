@@ -1,0 +1,17 @@
+from .. import back_function_db as bf
+
+def update_sub_news(id_us_tg, status):
+    """механизм для редактирования подписки на рассылку"""
+    bf.db.update_db('global_tb', ['sub_newslet'], [str(status)], ['gl_teleg_id'], [bf.correct_str(str(id_us_tg))])
+
+
+#####role: prepod / student; command: group / name 
+def update_data_user(role ,command, new_data, id_us_tg):
+    id_global = bf.find_id_global(id_us_tg)
+
+    if command == 'name':
+        bf.db.update_db(role + '_tb', [role + '_' + command], [bf.correct_str(new_data)], ['gl_id'], [str(id_global)])
+
+    elif command == 'group' and role == 'student':
+        id_group = bf.find_id_group(new_data)
+        bf.db.update_db(role + '_tb', [command + '_id'], [id_group], ['gl_id'], [str(id_global)])

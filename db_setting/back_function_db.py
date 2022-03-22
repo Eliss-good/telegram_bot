@@ -110,7 +110,6 @@ def find_id_lesson(name_lesson):
 def find_id_prepod(name_prepod):
     """Возвращение ID препода"""
     name_prepod = correct_str(str(name_prepod))
-    print(str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')))
     return str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')[0][0])
 
 
@@ -181,6 +180,8 @@ def max_index_survay():
     except:
         print('index error')
 
+
+def 
 def connect_gr_th(name_group, t_item):
     con_data = [find_id_group(name_group), find_id_prepod(t_item['prepod']), find_id_lesson(t_item['lesson']), correct_str(t_item['role'])]
     
