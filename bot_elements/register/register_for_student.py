@@ -20,7 +20,7 @@ from bot_elements.setter.all_setters import registerData_add_user, registerData_
 
 class registerUser(StatesGroup):
     " FSM для регистрации пользователя"
-    waiting_for_role = State()
+    input_fio = State()
     waiting_for_fio = State()
     waiting_for_group = State()
 
@@ -43,11 +43,9 @@ async def strangeMessagesHandler(message: types.Message): # !
 
 async def already_registered(message: types.Message, state: FSMContext):
     " Проверяет, зарегистрирован ли пользователь"
-    if registerData[message.chat.id]['chosen_role'] == 'student':
-        await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша группа: ' + str(registerData_get_group(user_id=message.chat.id) +' Ваша роль: ' + str(registerData_get_role(message.chat.id))), reply_markup=types.ReplyKeyboardRemove())
+    
+    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша группа: ' + str(registerData_get_group(user_id=message.chat.id) +' Ваша роль: ' + str(registerData_get_role(message.chat.id))), reply_markup=types.ReplyKeyboardRemove())
 
-    elif registerData[message.chat.id]['chosen_role'] == 'prepod':
-        await message.answer('Вы уже зарегистрированы' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша роль: ' + str(registerData_get_role(message.chat.id)), reply_markup=types.ReplyKeyboardRemove())
 
     buttons = [
         types.InlineKeyboardButton(
@@ -60,46 +58,27 @@ async def already_registered(message: types.Message, state: FSMContext):
     await message.answer('Хотите изменить рег. данные?', reply_markup=keyboard)
 
 
-async def choose_role(message: types.Message):
+async def get_fio(message: types.Message, state: FSMContext):
     " (registerUser FSM) Выбираем роль при помощи inline кнопок"
-    buttons = [
-        types.InlineKeyboardButton(text="Студент", callback_data="is_student"),
-        types.InlineKeyboardButton(
-            text="Преподаватель", callback_data="is_prepod"),
-        types.InlineKeyboardButton(
-            text="Админ", callback_data="is_admin")
-    ]
-    keyboard = types.InlineKeyboardMarkup(row_width=2)
-    keyboard.add(*buttons)
-    await message.answer("Выберите роль      ", reply_markup=keyboard)
+    
+    await state.update_data(chosen_role="student")
+    await message.answer("Введите ФИО")
+    await registerUser.waiting_for_fio.set()
 
 
 async def choose_fio(message: types.Message, state: FSMContext):
     " (registerUser FSM) Получаем ФИО и (для студентов) предлагаем выбрать группу"
     fio = message.text
     await state.update_data(chosen_fio=fio)
-    user_data = await state.get_data()
-    if user_data['chosen_role'] == 'student':
-        marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
+    
+    marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
 
-        for data in all_groups:
-            marakap.add(KeyboardButton(data))
+    for data in all_groups:
+        marakap.add(KeyboardButton(data))
 
-        await message.reply('Выберите группу', reply_markup=marakap)
-        await registerUser.waiting_for_group.set()
+    await message.reply('Выберите группу', reply_markup=marakap)
+    await registerUser.waiting_for_group.set()
 
-    else:
-
-        # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
-
-        await message.reply('Ваше ФИО: ' + user_data['chosen_fio'] + '; Ваша роль: ' + user_data['chosen_role'])
-
-        registerData_add_user(user_id=message.chat.id, chosen_fio=user_data['chosen_fio'], chosen_group='prepod', chosen_role=user_data['chosen_role'])
-
-        await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
-
-        # ######################### ############### ##########
-        await state.finish()
 
 
 async def wrong_group(message: types.Message):
@@ -110,17 +89,16 @@ async def wrong_group(message: types.Message):
 async def choose_group(message: types.Message, state: FSMContext):
     " (registerUser FSM) Получаем группу и добавляем пользователя в хранилище"
     user_data = await state.get_data()
-    if user_data['chosen_role'] == "student":
+    
+    group = message.text
 
-        group = message.text
+    await state.update_data(chosen_group=group)
+    user_data = await state.get_data()
+    await message.answer('Ваше ФИО: ' + user_data['chosen_fio'] + '; Ваша группа: ' + user_data['chosen_group'] + '; Ваша роль: ' + user_data['chosen_role'], reply_markup=types.ReplyKeyboardRemove())
 
-        await state.update_data(chosen_group=group)
-        user_data = await state.get_data()
-        await message.answer('Ваше ФИО: ' + user_data['chosen_fio'] + '; Ваша группа: ' + user_data['chosen_group'] + '; Ваша роль: ' + user_data['chosen_role'], reply_markup=types.ReplyKeyboardRemove())
+    registerData_add_user(user_id=message.chat.id, chosen_fio=user_data['chosen_fio'], chosen_group=user_data['chosen_group'], chosen_role=user_data['chosen_role'])
 
-        registerData_add_user(user_id=message.chat.id, chosen_fio=user_data['chosen_fio'], chosen_group=user_data['chosen_group'], chosen_role=user_data['chosen_role'])
-
-        await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
     await state.finish()
 
 
@@ -129,21 +107,13 @@ async def register_change_true(call: types.CallbackQuery, state: FSMContext):
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
 
-# ДОБАВИТЬ ПРОВЕРКУ НА ПРЕПА/СТУДЕНТА
+    buttons = [
+        types.InlineKeyboardButton(
+            text="ФИО", callback_data="register_change_fio"),
+        types.InlineKeyboardButton(
+            text="Группу", callback_data="register_change_group")
+    ]
 
-    if registerData[call.message.chat.id]['chosen_role'] == 'student':
-        buttons = [
-            types.InlineKeyboardButton(
-                text="ФИО", callback_data="register_change_fio"),
-            types.InlineKeyboardButton(
-                text="Группу", callback_data="register_change_group")
-        ]
-
-    elif registerData[call.message.chat.id]['chosen_role'] == 'prepod':
-        buttons = [
-            types.InlineKeyboardButton(
-                text="ФИО", callback_data="register_change_fio"),
-        ]
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -163,13 +133,10 @@ async def register_change_fio_set_fio(message: types.Message, state: FSMContext)
     new_fio = message.text
     registerData_change_fio_data(user_id=message.chat.id, new_fio=new_fio)
     await state.finish()
-    if registerData[message.chat.id]['chosen_role'] == 'student':
-        await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша группа: ' + str(registerData[message.chat.id]['chosen_group']+' Ваша роль: ' + str(registerData[message.chat.id]['chosen_role'])), reply_markup=types.ReplyKeyboardRemove())
+    
+    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша группа: ' + str(registerData[message.chat.id]['chosen_group']+' Ваша роль: ' + str(registerData[message.chat.id]['chosen_role'])), reply_markup=types.ReplyKeyboardRemove())
 
-    elif registerData[message.chat.id]['chosen_role'] == 'prepod':
-        await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша роль: ' + str(registerData[message.chat.id]['chosen_role']), reply_markup=types.ReplyKeyboardRemove())
-
-
+   
 # register_change_group_fsm.waiting_for_new_group
 async def register_change_group_set_group(message: types.Message, state: FSMContext):
     " (register_change_group_fsm FSM) Получаем новую группу и обновляем данные"
@@ -177,8 +144,8 @@ async def register_change_group_set_group(message: types.Message, state: FSMCont
     registerData_change_group_data(user_id=message.chat.id, new_group=new_group)
 
     await state.finish()
-    if registerData[message.chat.id]['chosen_role'] == 'student':
-        await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша группа: ' + str(registerData[message.chat.id]['chosen_group']+' Ваша роль: ' + str(registerData[message.chat.id]['chosen_role'])), reply_markup=types.ReplyKeyboardRemove())
+    
+    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша группа: ' + str(registerData[message.chat.id]['chosen_group']+' Ваша роль: ' + str(registerData[message.chat.id]['chosen_role'])), reply_markup=types.ReplyKeyboardRemove())
 
 
 async def register_change_fio(call: types.CallbackQuery, state: FSMContext):
@@ -202,35 +169,6 @@ async def register_change_group(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer('Выберите группу', reply_markup=marakap)
 
 
-async def is_student(call: types.CallbackQuery, state: FSMContext):
-    """ (choose_role Func) Получаем роль юзера и предлагаем ввести ФИО"""
-    await call.answer()
-    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await registerUser.waiting_for_role.set()
-    await state.update_data(chosen_role="student")
-    await call.message.answer('Введите ФИО')
-    await registerUser.waiting_for_fio.set()
-
-
-async def is_prepod(call: types.CallbackQuery, state: FSMContext):
-    """ (choose_role Func) Получаем роль юзера и предлагаем ввести ФИО"""
-    await call.answer()
-    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    await registerUser.waiting_for_role.set()
-    await state.update_data(chosen_role="prepod")
-
-    await call.message.answer('Введите ФИО')
-    await registerUser.waiting_for_fio.set()
-
-
-async def is_admin(call: types.CallbackQuery):
-    """ (choose_role Func) Юзер пытается стать админом"""
-    await call.answer()
-    await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
-    print(call.from_user)
-    await call.message.answer('user ' + str(call.from_user.id) + ' tryin 2 becum admin')
-
-
 async def cancel_handler(message: types.Message, state: FSMContext):
     """ Отменяет действия в FSM"""
     current_state = await state.get_state()
@@ -241,10 +179,10 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await message.answer('Cancelled.', reply_markup=types.ReplyKeyboardRemove())
 
 
-def register_handlers_register(dp: Dispatcher):
+def register_handlers_register_student(dp: Dispatcher):
     dp.register_message_handler(
         already_registered, lambda message: message.chat.id in registerData.keys(), commands='register')
-    dp.register_message_handler(choose_role, commands="register", state="*")
+    dp.register_message_handler(get_fio, commands="register", state="*")
     dp.register_message_handler(choose_fio, state=registerUser.waiting_for_fio)
     dp.register_message_handler(
         choose_group, lambda message: message.text in all_groups, state=registerUser.waiting_for_group)
@@ -272,9 +210,5 @@ def register_handlers_register(dp: Dispatcher):
         register_change_fio, text="register_change_fio")
     dp.register_callback_query_handler(
         register_change_group, text="register_change_group")
-
-    dp.register_callback_query_handler(is_student, text="is_student")
-    dp.register_callback_query_handler(is_prepod, text="is_prepod")
-    dp.register_callback_query_handler(is_admin, text="is_admin")
 
     dp.register_message_handler(strangeMessagesHandler)

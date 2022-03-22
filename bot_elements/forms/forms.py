@@ -14,7 +14,7 @@ from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
 from bot_elements.setter import all_setters
 from bot_elements.forms.form_display import display_current_temp_mem_status
 
-bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
+bot = Bot(token='')
 
 
 class name(StatesGroup):
