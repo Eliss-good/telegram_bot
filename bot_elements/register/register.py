@@ -19,26 +19,30 @@ from bot_elements.storages.all_storages import registerData
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
 
 class registerUser(StatesGroup):
+    " FSM для регистрации пользователя"
     waiting_for_role = State()
     waiting_for_fio = State()
     waiting_for_group = State()
 
 
 class register_change_group_fsm(StatesGroup):
+    " FSM для смены группы пользователя"
     waiting_for_new_group = State()
 
 
 class register_change_fio_fsm(StatesGroup):
+    " FSM для смены ФИО пользователя"
     waiting_for_new_fio = State()
 
 
 async def strangeMessagesHandler(message: types.Message): # !
+    " Фиксит кое какие сообщения"
     if message.text in all_groups or '; id ' in message.text:
         await message.answer('reply keyboard removed', reply_markup=types.ReplyKeyboardRemove())
 
 
 async def already_registered(message: types.Message, state: FSMContext):
-
+    " Проверяет, зарегистрирован ли пользователь"
     if registerData[message.chat.id]['chosen_role'] == 'student':
         await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша группа: ' + str(registerData_get_group(user_id=message.chat.id) +' Ваша роль: ' + str(registerData_get_role(message.chat.id))), reply_markup=types.ReplyKeyboardRemove())
 
@@ -57,7 +61,7 @@ async def already_registered(message: types.Message, state: FSMContext):
 
 
 async def choose_role(message: types.Message):
-
+    " (registerUser FSM) Выбираем роль при помощи inline кнопок"
     buttons = [
         types.InlineKeyboardButton(text="Студент", callback_data="is_student"),
         types.InlineKeyboardButton(
@@ -71,6 +75,7 @@ async def choose_role(message: types.Message):
 
 
 async def choose_fio(message: types.Message, state: FSMContext):
+    " (registerUser FSM) Получаем ФИО и (для студентов) предлагаем выбрать группу"
     fio = message.text
     await state.update_data(chosen_fio=fio)
     user_data = await state.get_data()
@@ -98,10 +103,12 @@ async def choose_fio(message: types.Message, state: FSMContext):
 
 
 async def wrong_group(message: types.Message):
+    " (registerUser FSM) Срабатывает, если выбрана неверная группа"
     return await message.reply('Выберите группу из списка')
 
 
 async def choose_group(message: types.Message, state: FSMContext):
+    " (registerUser FSM) Получаем группу и добавляем пользователя в хранилище"
     user_data = await state.get_data()
     if user_data['chosen_role'] == "student":
 
@@ -118,6 +125,7 @@ async def choose_group(message: types.Message, state: FSMContext):
 
 
 async def register_change_true(call: types.CallbackQuery, state: FSMContext):
+    " (already_registered Func) Выбираем какие рег. данные изменить"
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
 
@@ -143,6 +151,7 @@ async def register_change_true(call: types.CallbackQuery, state: FSMContext):
 
 
 async def register_change_false(call: types.CallbackQuery, state: FSMContext):
+    " (already_registered Func) Не меняем рег. данные"
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await call.message.answer('Окес, ничего не меняем')
@@ -150,6 +159,7 @@ async def register_change_false(call: types.CallbackQuery, state: FSMContext):
 
 # register_change_fio_fsm.waiting_for_new_fio
 async def register_change_fio_set_fio(message: types.Message, state: FSMContext):
+    " (register_change_fio_fsm FSM) Получаем новую фамилию и обновляем данные"
     new_fio = message.text
     registerData_change_fio_data(user_id=message.chat.id, new_fio=new_fio)
     await state.finish()
@@ -162,6 +172,7 @@ async def register_change_fio_set_fio(message: types.Message, state: FSMContext)
 
 # register_change_group_fsm.waiting_for_new_group
 async def register_change_group_set_group(message: types.Message, state: FSMContext):
+    " (register_change_group_fsm FSM) Получаем новую группу и обновляем данные"
     new_group = message.text
     registerData_change_group_data(user_id=message.chat.id, new_group=new_group)
 
@@ -171,6 +182,7 @@ async def register_change_group_set_group(message: types.Message, state: FSMCont
 
 
 async def register_change_fio(call: types.CallbackQuery, state: FSMContext):
+    " (register_change_true Func) Предлагаем ввести новую фамилию"
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await register_change_fio_fsm.waiting_for_new_fio.set()
@@ -178,6 +190,7 @@ async def register_change_fio(call: types.CallbackQuery, state: FSMContext):
 
 
 async def register_change_group(call: types.CallbackQuery, state: FSMContext):
+    " (register_change_true Func) Предлагаем ввести новую группу"
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     # сделать изменения в бд и проверку, есть ли уже такое
@@ -190,6 +203,7 @@ async def register_change_group(call: types.CallbackQuery, state: FSMContext):
 
 
 async def is_student(call: types.CallbackQuery, state: FSMContext):
+    """ (choose_role Func) Получаем роль юзера и предлагаем ввести ФИО"""
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await registerUser.waiting_for_role.set()
@@ -199,6 +213,7 @@ async def is_student(call: types.CallbackQuery, state: FSMContext):
 
 
 async def is_prepod(call: types.CallbackQuery, state: FSMContext):
+    """ (choose_role Func) Получаем роль юзера и предлагаем ввести ФИО"""
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await registerUser.waiting_for_role.set()
@@ -209,6 +224,7 @@ async def is_prepod(call: types.CallbackQuery, state: FSMContext):
 
 
 async def is_admin(call: types.CallbackQuery):
+    """ (choose_role Func) Юзер пытается стать админом"""
     await call.answer()
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     print(call.from_user)
@@ -216,6 +232,7 @@ async def is_admin(call: types.CallbackQuery):
 
 
 async def cancel_handler(message: types.Message, state: FSMContext):
+    """ Отменяет действия в FSM"""
     current_state = await state.get_state()
     print(current_state)
     if current_state is None:
