@@ -58,8 +58,19 @@ def send_forms_mem_add_sent_form(form_id: int, sent_form_id: int, form_creator_u
 def completing_forms_dispatcher_add_session(chat_id: int, unique_form_id: int, unique_sent_form_id: int):
     """Добавляет 1 сессию в список активных сессий"""
     completing_forms_dispatcher[chat_id] = {
-        'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'form_copy': mem_for_created_forms[unique_form_id]}
+        'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'current_question_num': 0,'form_copy': mem_for_created_forms[unique_form_id]}
     
+
+def completing_forms_dispatcher_add_1_to_question_num(user_id: int):
+    """Увеличивает на 1 номер вопроса"""
+    completing_forms_dispatcher[user_id]['current_question_num'] += 1
+
+
+def completing_forms_dispatcher_set_question_id(user_id: int, question_num: int, question_id: int):
+    """ Задает id для сообщения формы"""
+    completing_forms_dispatcher[user_id]['form_copy'][question_num]['message_id'] = question_id
+    print(completing_forms_dispatcher[user_id]['form_copy'][question_num])    
+
 
 def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
     """Добавляет рег. данные пользователя"""

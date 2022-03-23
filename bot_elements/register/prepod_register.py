@@ -3,13 +3,16 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_group, registerData_get_role
+from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_group, registerData_get_role, registerData_check_is_registered
 
 
 from bot_elements.storages.all_storages import registerData
 
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
 
+
+all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21', 'М3О-118М-21',
+              'М3О-111М-21', 'М3О-111М-21', 'М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19']
 
 class registerUser(StatesGroup):
     " FSM для регистрации пользователя"
@@ -30,11 +33,11 @@ async def strangeMessagesHandler(message: types.Message): # !
 
 async def already_registered(message: types.Message, state: FSMContext):
     " Проверяет, зарегистрирован ли пользователь"
-    if registerData[message.chat.id]['chosen_role'] == 'student':
-        await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша группа: ' + str(registerData_get_group(user_id=message.chat.id) +' Ваша роль: ' + str(registerData_get_role(message.chat.id))), reply_markup=types.ReplyKeyboardRemove())
-
-    elif registerData[message.chat.id]['chosen_role'] == 'prepod':
-        await message.answer('Вы уже зарегистрированы' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша роль: ' + str(registerData_get_role(message.chat.id)), reply_markup=types.ReplyKeyboardRemove())
+    if registerData_get_role(user_id=message.chat.id) == 'student':
+        await message.answer('Студент, топай регаться в свой бот, понятно да')
+        return
+  
+    await message.answer('Вы уже зарегистрированы' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша роль: ' + str(registerData_get_role(message.chat.id)), reply_markup=types.ReplyKeyboardRemove())
 
     buttons = [
         types.InlineKeyboardButton(
@@ -126,7 +129,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 def register_handlers_register_prepod(dp: Dispatcher):
     dp.register_message_handler(
-        already_registered, lambda message: message.chat.id in registerData.keys(), commands='register')
+        already_registered, lambda message: registerData_check_is_registered(message.chat.id), commands='register')
     dp.register_message_handler(ask_fio, commands="register", state="*")
     dp.register_message_handler(choose_fio, state=registerUser.waiting_for_fio)
 
@@ -141,6 +144,5 @@ def register_handlers_register_prepod(dp: Dispatcher):
         register_change_false, text="register_change_false")
     dp.register_callback_query_handler(
         register_change_fio, text="register_change_fio")
-
 
     dp.register_message_handler(strangeMessagesHandler)

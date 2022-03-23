@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, registerData_get_fio
+from bot_elements.getter.all_getters import mem_for_created_forms_get_creator_id, registerData_get_fio
 
 from bot_elements.setter.all_setters import send_forms_mem_add_sent_form
 
@@ -23,15 +23,20 @@ async def choose_group(message: types.Message, state: FSMContext):
     """ (sender FSM) Спрашивает юзера"""
     form_index = message.text[6:]
 
-    await state.update_data(form_index=form_index)
-    # await message.reply('Напишите через запятую группы-получатели')
+    if message.chat.id == mem_for_created_forms_get_creator_id(form_id=int(form_index)):
     
-    marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
-    for key in registerData:
-        marakap.add(KeyboardButton(registerData_get_fio(user_id=key) + '; id ' + str(key)))
+        await state.update_data(form_index=form_index)
+        # await message.reply('Напишите через запятую группы-получатели')
+        
+        marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
+        for key in registerData:
+            marakap.add(KeyboardButton(registerData_get_fio(user_id=key) + '; id ' + str(key)))
 
-    await message.reply('Выберите получателя', reply_markup=marakap)
-    await sender.waiting_for_groups.set()
+        await message.reply('Выберите получателя', reply_markup=marakap)
+        await sender.waiting_for_groups.set()
+
+    else:
+        message.answer('Вы не являетесь создателем формы')
 
 
 async def sending(message: types.Message, state: FSMContext): # sender.waiting_for_groups

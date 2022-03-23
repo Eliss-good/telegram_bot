@@ -41,6 +41,26 @@ def completing_forms_dispatcher_get_form_copy(user_id: int):
     return completing_forms_dispatcher[user_id]['form_copy']
 
 
+def completing_forms_dispatcher_get_form_question_message_id(user_id: int, question_num: int):
+    """ Возвращает копию формы из completing_forms_dispatcher"""
+    return completing_forms_dispatcher[user_id]['form_copy'][question_num]['message_id']
+
+
+def completing_forms_dispatcher_get_current_question_num(user_id: int):
+    """ Возвращает номер текущего вопроса из completing_forms_dispatcher"""
+    return completing_forms_dispatcher[user_id]['current_question_num']
+
+
+def completing_forms_dispatcher_get_question_by_num(user_id: int, question_num: int):
+    """ Возвращает номер текущего вопроса из completing_forms_dispatcher"""
+    return completing_forms_dispatcher[user_id]['form_copy'][question_num]
+
+
+def completing_forms_dispatcher_get_question_id(user_id: int, question_num: int):
+    """ Возвращает номер текущего вопроса из completing_forms_dispatcher"""
+    return completing_forms_dispatcher[user_id]['form_copy'][question_num]['message_id']
+
+
 def registerData_get_fio(user_id: int):
     """ Возвращает ФИО юзера из registerData"""
     return registerData[user_id]['chosen_fio']
@@ -54,3 +74,11 @@ def registerData_get_group(user_id: int):
 def registerData_get_role(user_id: int):
     """ Возвращает роль юзера из registerData"""
     return registerData[user_id]['chosen_role']
+
+
+def registerData_check_is_registered(user_id: int):
+    """ Возвращает роль юзера из registerData"""
+    return user_id in registerData.keys()
+
+def send_forms_mem_get():
+    return send_forms_mem

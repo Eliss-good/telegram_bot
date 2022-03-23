@@ -8,7 +8,7 @@ mem_for_created_forms = {}  # {*form_id*: [form data], ...}
 
 send_forms_mem = [] # [{'form_id': *form_id*, 'sent_form_id': *id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids]}, ... ]
 
-completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_sent_form_id': id, 'curr_page': num, 'form_copy': [form_data]}, ...}
+completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_sent_form_id': id, 'current_question': num, 'form_copy': [form_data]}, ...}
 
 unique_form_id = 0
 unique_sent_form_id = 0

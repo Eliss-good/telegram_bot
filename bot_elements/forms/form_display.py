@@ -2,8 +2,6 @@ from aiogram import types, Bot
 from bot_elements.getter.all_getters import temp_form_recipient_data_get_data, temp_mem_for_form_creator_get_data, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, mem_for_created_forms_get_form_name, mem_for_created_forms_get_full
 
 
-bot = Bot(token='')
-
 async def display_current_temp_mem_status(message: types.Message):
     """ Выводит сообщением содержимое создаваемого опроса"""
     form_mem = temp_mem_for_form_creator_get_data(user_id=message.chat.id)
@@ -26,13 +24,17 @@ async def display_current_temp_mem_status(message: types.Message):
             question_number += 1
 
         await message.answer(parsed_msg, reply_markup=types.ReplyKeyboardRemove())
+    
+    else:
+        message.answer('Все плохо')
 
 
 async def display_current_mem_status(message: types.Message):
     """ Выводит сообщением меню для работы с сохраненными опросами (id клиента определяет по message)"""
     full_message = ""
-    if mem_for_created_forms_get_full():
-        for index in mem_for_created_forms_get_full():
+    memory = mem_for_created_forms_get_full()
+    if memory:
+        for index in memory:
             
             print(mem_for_created_forms_get_creator_id(form_id=index))
 
@@ -67,9 +69,9 @@ async def display_form(message: types.Message, form_id: int):
     """ Выводит в чат инфу о форме"""
 
     if message.chat.id == mem_for_created_forms_get_creator_id(form_id=form_id):
-
-        if mem_for_created_forms_get_data(form_id=form_id):
-            form_mem = mem_for_created_forms_get_data(form_id=form_id)
+        memory = mem_for_created_forms_get_data(form_id=form_id)
+        if memory:
+            form_mem = memory
 
             parsed_msg = "name: " + mem_for_created_forms_get_form_name(form_id=form_id) + \
                 ' ' + 'form_id: ' + str(form_id) + "\n"

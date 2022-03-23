@@ -14,7 +14,7 @@ from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
 from bot_elements.setter import all_setters
 from bot_elements.forms.form_display import display_current_temp_mem_status
 
-bot = Bot(token='')
+
 
 
 class name(StatesGroup):
@@ -178,7 +178,7 @@ async def question_type_msg(call: types.CallbackQuery, state: FSMContext):
 
 async def del_handler(message: types.Message):
     """Удаляет одну запись из списка temp_mem по её идентификатору (из сообщения)"""
-
+    
     delete_id = int(message.text[4:])
     temp_mem_for_form_creator_remove_form_element(user_id=message.chat.id, delete_id=delete_id)
 
