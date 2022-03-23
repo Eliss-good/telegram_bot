@@ -132,12 +132,12 @@ class DataConnect:
                 select_com +=  ' and '
 
         print(select_com)
-        try:
-            self.cursor.execute(select_com)
-        except:
+        #try:
+        self.cursor.execute(select_com)
+        """except:
             print('ERROR: select_db_where')
             return
-        
+        """
         if status == 'check':
             if self.cursor.fetchone() == (0,):
                 return True

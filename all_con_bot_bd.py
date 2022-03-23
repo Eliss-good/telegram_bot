@@ -1,9 +1,5 @@
-import sys
-
-sys.path.append('/home/eliss/ptoject/telegram_bot/db_setting')
-import us_connect_db as us_db
-import poll_connect_db as poll_db
-
+import db_setting.us_connect_db as us_db
+import db_setting.poll_connect_db as poll_db
 
 
 ###########################  БЛОК ДЛЯ РАБОТЫ С ПОЛЬЗОВАТЕЛЯМИ ################
@@ -75,3 +71,5 @@ def create_new_form(from_id, to_group, data_survay):
 ####### Добавление нового результата опроса
 def add_new_answer(new_answer):
     poll_db.add_answer_for_survay(new_answer)
+
+

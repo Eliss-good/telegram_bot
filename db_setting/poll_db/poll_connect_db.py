@@ -44,8 +44,8 @@ def create_group_question(list_question, survay_code):
       bf.add_group_questions(quest, max_index_g)
 
    
-##### add into json_file new answer  #####
 def _start_answer(data_survay, from_id):
+   """Адаптирование новой формы из ТГ к форме json файла"""
    print(list(data_survay.keys())[0])
    from_tg_data = data_survay[list(data_survay.keys())[0]]
    
@@ -69,6 +69,8 @@ def _start_answer(data_survay, from_id):
 
 ##### add into DBase new survay #####
 def add_survay(from_id, to_group, data_survay):
+   """Добавление новой формы"""
+
    from_tg_data = data_survay[list(data_survay.keys())[0]]
    poll_ck  = bf.db.select_db_where('survay_tb', ['id'], ['survay_code'], [int(list(data_survay.keys())[0])], 'check')
 

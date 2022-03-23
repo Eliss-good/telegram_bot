@@ -1,4 +1,4 @@
-import db_setting.back_function_db as bf
+import back_function_db as bf
 
 def __del_prepod(tg_id):
     """Удаление преподавателя"""
