@@ -177,10 +177,10 @@ def add_group_questions(question_n, group_id):
         db.insert_db('groupquestion_tb', ['q_id', 'gp_question_id' ],[str(find_id_question(question_n)), group_id])
 
 
-def find_id_survay(survay_code):
+def find_id_survay(form_id):
     """Возвращение id формы"""
     try:
-        return db.select_db_where('survay_tb', ['id'], ['survay_code'], [survay_code], 'where')[0][0]
+        return db.select_db_where('survay_tb', ['id'], ['form_id'], [form_id], 'where')[0][0]
     except IndexError:
         print('index error fun', find_id_survay.__name__)
 
@@ -192,6 +192,15 @@ def find_id_question(question_n):
         return db.select_db_where('question_tb', ['id'], ['question_name'], [question_n], 'where')[0][0]
     except IndexError:
         print('index error fun', find_id_question.__name__)
+
+
+def find_one_form(data, form_id):
+    data = data.get(str(find_id_survay(form_id)))
+    if data != None:
+        return data
+    else:
+        print('Erorrchik')
+
 
 def max_index_group_question():
     """Поиск максимального ID группы вопросов"""
@@ -209,7 +218,7 @@ def max_index_group_question():
 def max_code_survay():
     """Возвращение максимального кода формы"""
     try:
-        return db.select_db_where('survay_tb', ['survay_code'], [], [] ,'max')[0][0]
+        return db.select_db_where('survay_tb', ['form_id'], [], [] ,'max')[0][0]
     except IndexError:
         print('index error fun', max_code_survay.__name__)
 

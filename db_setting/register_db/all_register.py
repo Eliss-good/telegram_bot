@@ -9,7 +9,7 @@ def __prepod_start(name_user, id_us_tg):
     
     bf._correct_data_prepod(name_user, id_us_tg)
     bf.add_prepod(name_user, id_us_tg  = id_us_tg)
-    bf.start_pr(input("введите ссылку на препода: "))
+    #bf.start_pr(input("введите ссылку на препода: "))
 
 
 def reg_us(name_user, id_us_tg, role, group_stud = None):

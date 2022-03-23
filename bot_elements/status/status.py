@@ -86,6 +86,8 @@ def lambda_checker_poll(pollAnswer: types.PollAnswer):
         print(selected_form)
         print(selected_form[curr_question_num])
 
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", pollAnswer)
+
         if selected_form[curr_question_num]['message_id'] == pollAnswer['poll_id']:
             selected_form.remove(
                 {'question': selected_form[curr_question_num]['question'], 'options': selected_form[curr_question_num]['options'], 'message_id': selected_form[curr_question_num]['message_id'], 'type': 'poll'})
@@ -101,6 +103,8 @@ def lambda_checker_msg(message: types.Message):
     if message.chat.id in completing_forms_dispatcher.keys():
         curr_question_num = 0
         selected_form = completing_forms_dispatcher_get_form_copy(message.chat.id)
+
+        print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" , message)
 
         if selected_form[curr_question_num]['message_id'] + 1 == message.message_id:
             selected_form.remove(

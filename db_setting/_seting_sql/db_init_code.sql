@@ -57,8 +57,8 @@ CREATE TABLE groupquestion_tb(
 
 CREATE TABLE survay_tb(
     id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    survay_code int DEFAULT NULL,
-    survay_name varchar(128),
+    form_id int DEFAULT NULL,
+    form_name varchar(128),
     from_id varchar(32),
     to_group varchar(32),
     groupquestion_id int

@@ -1,4 +1,5 @@
-from .. import back_function_db as bf
+import db_setting.back_function_db as bf
+
 
 def update_sub_news(id_us_tg, status):
     """механизм для редактирования подписки на рассылку"""
@@ -7,6 +8,7 @@ def update_sub_news(id_us_tg, status):
 
 #####role: prepod / student; command: group / name 
 def update_data_user(role ,command, new_data, id_us_tg):
+    """Обновление данных о пользователей"""
     id_global = bf.find_id_global(id_us_tg)
 
     if command == 'name':

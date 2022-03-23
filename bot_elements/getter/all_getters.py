@@ -5,7 +5,7 @@ from bot_elements.storages.all_storages  import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
 
-from  ... import all_con_bot_bd as con_db
+#from  ... import all_con_bot_bd as con_db
 
 
 def temp_form_recipient_data_get_data(user_id: int):

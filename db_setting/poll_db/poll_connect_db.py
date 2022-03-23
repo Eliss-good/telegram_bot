@@ -1,7 +1,6 @@
 import db_setting.back_function_db as bf
 import json
 
-path = '/home/eliss/ptoject/telegram_bot/db_setting/polls_answer'
 
 def read_answer_to_file():
    """Чтение файла с ответами"""
@@ -20,7 +19,7 @@ def write_answer_to_file(all_survay_json):
 
 
 def update_group_in_survay(max_index_g, survay_code):
-   bf.db.update_db('survay_tb', ['groupquestion_id'], [max_index_g], ['survay_code'], [survay_code])
+   bf.db.update_db('survay_tb', ['groupquestion_id'], [max_index_g], ['form_id'], [survay_code])
    
 
 def add_answer_for_survay(new_result_answer):
@@ -54,8 +53,8 @@ def _start_answer(data_survay, from_id):
    
    ########## create form answer ###########
    new_file = {}
-   new_file['survay_code'] = int(list(data_survay.keys())[0])
-   new_file['survey_name'] = from_tg_data[-1]['form_name']
+   new_file['form_id'] = int(list(data_survay.keys())[0])
+   new_file['form_name'] = from_tg_data[-1]['form_name']
    new_file['from_teleg_id'] = from_id
    new_file['questions'] = []
    new_file['answer'] = []
@@ -70,16 +69,14 @@ def _start_answer(data_survay, from_id):
    return new_file
 
 
-##### add into DBase new survay #####
 def add_survay(from_id, to_group, data_survay):
    """Добавление новой формы"""
-
    from_tg_data = data_survay[list(data_survay.keys())[0]]
-   poll_ck  = bf.db.select_db_where('survay_tb', ['id'], ['survay_code'], [int(list(data_survay.keys())[0])], 'check')
+   poll_ck  = bf.db.select_db_where('survay_tb', ['id'], ['from_id'], [int(list(data_survay.keys())[0])], 'check')
 
    if poll_ck:
       new_data = [(list(data_survay.keys())[0]), bf.correct_str(from_tg_data[-1]['form_name']), bf.correct_str(str(from_id)), bf.correct_str(str(to_group))]
-      bf.db.insert_db('survay_tb', ['survay_code','survay_name', 'from_id', 'to_group'], new_data)
+      bf.db.insert_db('survay_tb', ['form_id','form_name', 'from_id', 'to_group'], new_data)
 
       all_survay_json = read_answer_to_file() 
       try:
@@ -87,9 +84,3 @@ def add_survay(from_id, to_group, data_survay):
       except IndexError:
          print("bad insert json")
       write_answer_to_file(all_survay_json)
-
-"""
-with open(path + "/tg_result_poll.json", "r", encoding='utf-8') as file:
-   data = json.load(file)
-   add_survay(3, "М3О-212Б-20", data)
-"""
