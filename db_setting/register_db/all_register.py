@@ -1,4 +1,4 @@
-from .. import back_function_db as bf
+import db_setting.back_function_db as bf
 
 def __student_start(name_user, id_us_tg,name_group):
     bf.add_group(name_group, True)

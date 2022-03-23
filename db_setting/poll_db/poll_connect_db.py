@@ -1,9 +1,10 @@
-import back_function_db as bf
+import db_setting.back_function_db as bf
 import json
 
 path = '/home/eliss/ptoject/telegram_bot/db_setting/polls_answer'
 
 def read_answer_to_file():
+   """Чтение файла с ответами"""
    all_ansver_json = []
 
    with open( "all_answer.json", "r", encoding='utf-8') as data_file:
@@ -13,6 +14,7 @@ def read_answer_to_file():
 
 
 def write_answer_to_file(all_survay_json):
+   """Запись в файл"""
    with open("all_answer.json", "w", encoding='utf-8') as data_file:
       json.dump(all_survay_json, data_file, indent=4)
 
@@ -36,6 +38,7 @@ def add_answer_for_survay(new_result_answer):
 
 
 def create_group_question(list_question, survay_code):
+   """Создание новой группы вопросов для формы"""
    max_index_g = bf.max_index_group_question()
    max_index_g = str(max_index_g + 1)
 

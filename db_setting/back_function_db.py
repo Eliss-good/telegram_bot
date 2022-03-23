@@ -1,4 +1,4 @@
-from db_connect import DataConnect
+from .db_connect import DataConnect
 
 db = DataConnect()
 

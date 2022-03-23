@@ -28,5 +28,3 @@ def del_us(tg_id):
             __del_student(tg_id)
     else:
         print(tg_id, ' ещё не существует, зарегистрируйтесь')
-
-del_us(1337)

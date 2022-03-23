@@ -1,4 +1,4 @@
-from .. import back_function_db as bf
+import db_setting.back_function_db as bf
 
 def set_id_users(list_name_group):
     group_us = []
