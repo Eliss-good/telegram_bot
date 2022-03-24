@@ -120,3 +120,8 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
         temp_mem_for_answers[messageAnswer.chat.id] = []
     
     temp_mem_for_answers[messageAnswer.chat.id].append({'messageAnswer': messageAnswer, 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'messageCopy': messageCopy})
+
+
+def sendFormAnswer(formAnswer: dict):
+    """ Сюда приходит форма со всеми ответами на форму"""
+    pass

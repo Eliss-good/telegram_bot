@@ -5,7 +5,7 @@ from bot_elements.remover.all_removers import completing_forms_dispatcher_remove
 
 # нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
 
-from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, sendMsgAnswer, sendPollAnswer
+from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, sendMsgAnswer, sendPollAnswer, sendFormAnswer
 
 import configparser
 
@@ -77,6 +77,7 @@ async def go_cycle(message, type):
     elif curr_quest['type'] == 'info':
         completing_forms_dispatcher_remove_session(user_id=user_id)
         print('theend')
+        sendFormAnswer(temp_mem_for_answers_get())
         print('\n', temp_mem_for_answers_get())
         print(completing_forms_dispatcher_get())
 
