@@ -1,6 +1,6 @@
 """ Статус пользователя"""
 from aiogram import Bot, Dispatcher, types
-from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy
+from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy, temp_mem_for_answers_get
 from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
 
 # нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
@@ -77,6 +77,7 @@ async def go_cycle(message, type):
     elif curr_quest['type'] == 'info':
         completing_forms_dispatcher_remove_session(user_id=user_id)
         print('theend')
+        print('\n', temp_mem_for_answers_get())
         print(completing_forms_dispatcher_get())
 
 

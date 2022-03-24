@@ -5,7 +5,9 @@ from bot_elements.storages.all_storages import mem_for_created_forms
 from bot_elements.storages.all_storages import send_forms_mem 
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData 
-import bot_elements.storages.all_storages 
+from bot_elements.storages.all_storages import temp_mem_for_answers
+import bot_elements.storages.all_storages
+
 
 def temp_form_recipient_data_add_user_data(chat_id: int, form_name: str, type: str, form_id: int, creator_id: int):
     """Добавляет даныне пользователя во временный словарь со служебными данными формы"""
@@ -103,11 +105,18 @@ def unique_sent_form_id_plus_one():
 
 def sendPollAnswer(pollAnswer: types.PollAnswer, question_number: int, unique_form_id: int, unique_sent_form_id: int, pollCopy):
     """ Получает ответ на опрос"""
-    print('\n',pollAnswer, question_number, unique_form_id, unique_sent_form_id,pollCopy)
-    pass
+    # print('\n',pollAnswer, question_number, unique_form_id, unique_sent_form_id, pollCopy)
 
+    if not pollAnswer.user.id in temp_mem_for_answers.keys():
+        temp_mem_for_answers[pollAnswer.user.id] = []
+    
+    temp_mem_for_answers[pollAnswer.user.id].append({'pollAnswer': pollAnswer, 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'pollCopy': pollCopy})
+    
 
-def sendMsgAnswer(messageAnswer: types.message, question_number: int, unique_form_id: int, unique_sent_form_id: int, messageCopy):
+def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_form_id: int, unique_sent_form_id: int, messageCopy):
     """ Получает ответ на текстовый вопрос"""
-    print('\n', messageAnswer, question_number, unique_form_id, unique_sent_form_id, messageCopy)
-    pass
+    # print('\n', messageAnswer, question_number, unique_form_id, unique_sent_form_id, messageCopy)
+    if not messageAnswer.chat.id in temp_mem_for_answers.keys():
+        temp_mem_for_answers[messageAnswer.chat.id] = []
+    
+    temp_mem_for_answers[messageAnswer.chat.id].append({'messageAnswer': messageAnswer, 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'messageCopy': messageCopy})

@@ -4,6 +4,8 @@ temp_form_recipient_data = {}  # {'*form_creator_user_id*': {recip data}}
 
 temp_mem_for_form_creator = {}  # {'*form_creator_user_id*': [form data], ...}
 
+temp_mem_for_answers = {} # {user_id: [{answer1}, {answer2}, ...]}
+
 mem_for_created_forms = {}  # {*form_id*: [form data], ...}
 
 send_forms_mem = [] # [{'form_id': *form_id*, 'sent_form_id': *id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids]}, ... ]

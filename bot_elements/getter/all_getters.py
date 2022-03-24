@@ -4,7 +4,7 @@ from bot_elements.storages.all_storages  import mem_for_created_forms
 from bot_elements.storages.all_storages  import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
-from bot_elements.storages.all_storages import unique_form_id, unique_sent_form_id
+from bot_elements.storages.all_storages import temp_mem_for_answers
 import bot_elements.storages.all_storages
 
 def temp_form_recipient_data_get_data(user_id: int):
@@ -134,3 +134,7 @@ def unique_sent_form_id_get():
     """ Возвращает счетчик отправленных форм"""
     # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
     return bot_elements.storages.all_storages.unique_sent_form_id
+
+
+def temp_mem_for_answers_get():
+    return temp_mem_for_answers
