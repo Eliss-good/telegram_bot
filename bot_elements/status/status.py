@@ -1,20 +1,24 @@
 """ Статус пользователя"""
 from aiogram import Bot, Dispatcher, types
-from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id
+from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list
 from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
 
 # нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
-from bot_elements.storages.all_storages import send_forms_mem, completing_forms_dispatcher
 
 from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id
 
-bot = Bot(token='') #!
+import configparser
+
+config = configparser.ConfigParser()
+config.read('/Users/igormalysh/Documents/codes/work-4-food/config.ini')
+
+bot = Bot(token=config['DEFAULT']['studentBotToken']) #!
 
 
 async def display_user_status(message: types.Message):
 
     full_message = "Полученные формы:"
-    print(send_forms_mem_get())
+    
     for select_form in send_forms_mem_get():
         if message.chat.id in select_form['info']['send_to_users_ids']:
             
@@ -33,7 +37,7 @@ async def complete_form(message: types.Message):
 
     completing_forms_dispatcher_add_session(chat_id=message.chat.id, unique_form_id=unique_form_id, unique_sent_form_id=unique_sent_form_id)
 
-    print('completing_forms_dispatcher', completing_forms_dispatcher)
+    print('completing_forms_dispatcher', completing_forms_dispatcher_get())
     await go_cycle(message=message, type='launch_from_message_handler')
 
 
@@ -73,12 +77,12 @@ async def go_cycle(message, type):
     elif curr_quest['type'] == 'info':
         completing_forms_dispatcher_remove_session(user_id=user_id)
         print('theend')
-        print(completing_forms_dispatcher)
+        print(completing_forms_dispatcher_get())
 
 
 def lambda_checker_poll(pollAnswer: types.PollAnswer):
     """Проверяет принадлежит ли опрос выбранной форме"""
-    if pollAnswer.user.id in completing_forms_dispatcher.keys():
+    if completing_froms_dispatcher_is_user_in_list(user_id=pollAnswer.user.id):
         selected_form = completing_forms_dispatcher_get_form_copy(user_id=pollAnswer.user.id)
 
         curr_question_num = completing_forms_dispatcher_get_current_question_num(user_id=pollAnswer.user.id)
@@ -99,7 +103,7 @@ def lambda_checker_poll(pollAnswer: types.PollAnswer):
 def lambda_checker_msg(message: types.Message):
     """Проверяет является ли сообщение ответом на вопрос из формы"""
 
-    if message.chat.id in completing_forms_dispatcher.keys():
+    if completing_froms_dispatcher_is_user_in_list(user_id=message.chat.id):
         
         ''' send answer data + quest indexes + quest copy'''
 
@@ -117,9 +121,9 @@ def lambda_checker_msg(message: types.Message):
 # handler activates when vote/send answer
 async def poll_handler(pollAnswer: types.PollAnswer):
     """Активируется, когда приходит ответ на опрос/ опрос закрывается"""
-    print('completing_forms_dispatcher ', completing_forms_dispatcher)
+    print('completing_forms_dispatcher ', completing_forms_dispatcher_get())
     # print(pollAnswer)
-    if completing_forms_dispatcher:
+    if completing_forms_dispatcher_get():
         
         await go_cycle(message=pollAnswer, type='launch_from_poll_handler')
     # print(poll['id'])
@@ -127,9 +131,9 @@ async def poll_handler(pollAnswer: types.PollAnswer):
 
 async def msg_handlr(message: types.Message):
     """Активируется, когда приходит сообщение"""
-    print('completing_forms_dispatcher', completing_forms_dispatcher)
+    print('completing_forms_dispatcher', completing_forms_dispatcher_get())
     
-    if completing_forms_dispatcher:
+    if completing_forms_dispatcher_get():
         # print('go ahead msg')
         await go_cycle(message=message, type='launch_from_message_handler')
 

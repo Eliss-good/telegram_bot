@@ -14,6 +14,10 @@ from bot_elements.status.status import register_handlers_status
 from bot_elements.forms.forms_editor import register_handlers_forms_editor
 from bot_elements.cancel import register_handlers_cancel
 
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 async def prepod_commands(bot: Bot):
     prepod_commands = [
@@ -38,9 +42,9 @@ async def student_commands(bot: Bot):
 
 
 async def main():
-    prepod_bot = Bot(token='')
-    student_bot = Bot(token='')
-    admin_bot = Bot(token='')
+    prepod_bot = Bot(token=str(config['DEFAULT']['prepodBotToken']))
+    student_bot = Bot(token=str(config['DEFAULT']['studentBotToken']))
+    admin_bot = Bot(token=str(config['DEFAULT']['adminBotToken']))
     
     prepod_bot_dispatcher = Dispatcher(prepod_bot, storage=MemoryStorage(),
                     loop=asyncio.get_event_loop())

@@ -1,10 +1,11 @@
+import bot_elements
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
 from bot_elements.storages.all_storages import send_forms_mem 
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData 
-
+import bot_elements.storages.all_storages 
 
 def temp_form_recipient_data_add_user_data(chat_id: int, form_name: str, type: str, form_id: int, creator_id: int):
     """Добавляет даныне пользователя во временный словарь со служебными данными формы"""
@@ -25,9 +26,9 @@ def temp_mem_for_form_creator_add_element(user_id: int, data: dict):
         temp_mem_for_form_creator[user_id] = [data]
 
 
-def mem_for_created_forms_add_element(user_id: int, data):
+def mem_for_created_forms_add_element(form_id: int, data):
     """ Добавляет 1 форму в словарь сохраненных форм"""
-    mem_for_created_forms[user_id] = data
+    mem_for_created_forms[form_id] = data
 
 
 def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, data):
@@ -85,3 +86,14 @@ def registerData_change_group_data(user_id: int, new_group: str):
 def registerData_change_fio_data(user_id: int, new_fio: str):
     """ Изменяет ФИО пользователя"""
     registerData[user_id]['chosen_fio'] = new_fio
+
+
+def unique_form_id_plus_one():
+    bot_elements.storages.all_storages.unique_form_id += 1
+    
+    print('\n\ni daaaan ', bot_elements.storages.all_storages.unique_form_id)
+
+
+def unique_sent_form_id_plus_one():
+    bot_elements.storages.all_storages.unique_sent_form_id += 1
+    print(bot_elements.storages.all_storages.unique_sent_form_id)

@@ -1,5 +1,5 @@
-from aiogram import types, Bot
-from bot_elements.getter.all_getters import temp_form_recipient_data_get_data, temp_mem_for_form_creator_get_data, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, mem_for_created_forms_get_form_name, mem_for_created_forms_get_full
+from aiogram import types
+from bot_elements.getter.all_getters import temp_form_recipient_data_get_data, temp_mem_for_form_creator_get_data, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, mem_for_created_forms_get_form_name, mem_for_created_forms_get
 
 
 async def display_current_temp_mem_status(message: types.Message):
@@ -32,7 +32,7 @@ async def display_current_temp_mem_status(message: types.Message):
 async def display_current_mem_status(message: types.Message):
     """ Выводит сообщением меню для работы с сохраненными опросами (id клиента определяет по message)"""
     full_message = ""
-    memory = mem_for_created_forms_get_full()
+    memory = mem_for_created_forms_get()
     if memory:
         for index in memory:
             

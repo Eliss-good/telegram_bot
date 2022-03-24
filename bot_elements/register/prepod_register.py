@@ -5,9 +5,6 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_group, registerData_get_role, registerData_check_is_registered
 
-
-from bot_elements.storages.all_storages import registerData
-
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
 
 
@@ -106,7 +103,7 @@ async def register_change_fio_set_fio(message: types.Message, state: FSMContext)
     registerData_change_fio_data(user_id=message.chat.id, new_fio=new_fio)
     await state.finish()
     
-    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша роль: ' + str(registerData[message.chat.id]['chosen_role']), reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша роль: ' + str(registerData_get_role(user_id=message.chat.id)), reply_markup=types.ReplyKeyboardRemove())
 
 
 async def register_change_fio(call: types.CallbackQuery, state: FSMContext):

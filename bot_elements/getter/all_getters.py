@@ -4,7 +4,8 @@ from bot_elements.storages.all_storages  import mem_for_created_forms
 from bot_elements.storages.all_storages  import send_forms_mem 
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
-
+from bot_elements.storages.all_storages import unique_form_id, unique_sent_form_id
+import bot_elements.storages.all_storages
 
 def temp_form_recipient_data_get_data(user_id: int):
     """ Возвращает временную ячейку памяти хранящую служебные данные (temp_form_recipient_data)"""
@@ -16,7 +17,24 @@ def temp_mem_for_form_creator_get_data(user_id: int):
     return temp_mem_for_form_creator[user_id]
 
 
-def mem_for_created_forms_get_full():
+def temp_mem_for_form_creator_get():
+    """ Возвращает временную ячейку памяти хранящую данные создаваемой формы (temp_mem_for_form_creator)"""
+    return temp_mem_for_form_creator
+
+
+def temp_form_recipient_data_get_form_id(user_id: int):
+    return temp_form_recipient_data[user_id]['form_id']
+
+
+def temp_form_recipient_data_get_recip_data(user_id: int):
+    return temp_form_recipient_data[user_id]
+
+
+def temp_form_recipient_data_get_recip():
+    return temp_form_recipient_data
+
+
+def mem_for_created_forms_get():
     """ Возвращает mem_for_created_forms"""
     return mem_for_created_forms
 
@@ -56,6 +74,17 @@ def completing_forms_dispatcher_get_question_by_num(user_id: int, question_num: 
     return completing_forms_dispatcher[user_id]['form_copy'][question_num]
 
 
+def completing_forms_dispatcher_get_form_id(user_id: int):
+    """ Возвращает вопрос по номеру вопроса из completing_forms_dispatcher"""
+    return completing_forms_dispatcher[user_id]['unique_form_id']
+
+
+def completing_froms_dispatcher_is_user_in_list(user_id: int):
+    return user_id in completing_forms_dispatcher.keys()
+
+def completing_forms_dispatcher_get():
+    return completing_forms_dispatcher
+
 def registerData_get_fio(user_id: int):
     """ Возвращает ФИО юзера из registerData"""
     return registerData[user_id]['chosen_fio']
@@ -78,3 +107,13 @@ def registerData_check_is_registered(user_id: int):
 def send_forms_mem_get():
     """ Возвращает send_forms_mem (память с отправленынми формами)"""
     return send_forms_mem
+
+
+def unique_form_id_get():
+    print(' \n\nloool unique_form_id ', bot_elements.storages.all_storages.unique_form_id)
+    return bot_elements.storages.all_storages.unique_form_id
+
+
+def unique_sent_form_id_get():
+    print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
+    return bot_elements.storages.all_storages.unique_sent_form_id

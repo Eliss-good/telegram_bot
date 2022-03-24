@@ -7,8 +7,6 @@ from bot_elements.getter.all_getters import registerData_get_fio, registerData_g
 
 import parsers.prep_text_pars as prep_text_pars
 
-from bot_elements.storages.all_storages import registerData
-
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
 
 
@@ -135,7 +133,7 @@ async def register_change_fio_set_fio(message: types.Message, state: FSMContext)
     registerData_change_fio_data(user_id=message.chat.id, new_fio=new_fio)
     await state.finish()
     
-    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша группа: ' + str(registerData[message.chat.id]['chosen_group']+' Ваша роль: ' + str(registerData[message.chat.id]['chosen_role'])), reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша группа: ' + str(registerData_get_group(user_id=message.chat.id)+' Ваша роль: ' + str(registerData_get_role(user_id=message.chat.id))), reply_markup=types.ReplyKeyboardRemove())
 
    
 # register_change_group_fsm.waiting_for_new_group
@@ -146,7 +144,7 @@ async def register_change_group_set_group(message: types.Message, state: FSMCont
 
     await state.finish()
     
-    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData[message.chat.id]['chosen_fio']) + '; ' + 'Ваша группа: ' + str(registerData[message.chat.id]['chosen_group']+' Ваша роль: ' + str(registerData[message.chat.id]['chosen_role'])), reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша группа: ' + str(registerData_get_group(user_id=message.chat.id)+' Ваша роль: ' + str(registerData_get_role(user_id=message.chat.id))), reply_markup=types.ReplyKeyboardRemove())
 
 
 async def register_change_fio(call: types.CallbackQuery, state: FSMContext):
