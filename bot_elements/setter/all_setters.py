@@ -89,11 +89,13 @@ def registerData_change_fio_data(user_id: int, new_fio: str):
 
 
 def unique_form_id_plus_one():
+    """ Увеличивает счтчик созданных вопросов на 1"""
     bot_elements.storages.all_storages.unique_form_id += 1
     
     print('\n\ni daaaan ', bot_elements.storages.all_storages.unique_form_id)
 
 
 def unique_sent_form_id_plus_one():
+    """ Увеличивает счтчик отправленных вопросов на 1"""
     bot_elements.storages.all_storages.unique_sent_form_id += 1
     print(bot_elements.storages.all_storages.unique_sent_form_id)

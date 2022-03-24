@@ -18,19 +18,22 @@ def temp_mem_for_form_creator_get_data(user_id: int):
 
 
 def temp_mem_for_form_creator_get():
-    """ Возвращает временную ячейку памяти хранящую данные создаваемой формы (temp_mem_for_form_creator)"""
+    """ Возвращает словарь с инфой о формах которые юзеры создают в наст. момент (temp_mem_for_form_creator)"""
     return temp_mem_for_form_creator
 
 
 def temp_form_recipient_data_get_form_id(user_id: int):
+    """  Возвращает айди формы из временного словаря со служебной инфой"""
     return temp_form_recipient_data[user_id]['form_id']
 
 
 def temp_form_recipient_data_get_recip_data(user_id: int):
+    """  Возвращает временный словарь со служебной инфой"""
     return temp_form_recipient_data[user_id]
 
 
-def temp_form_recipient_data_get_recip():
+def temp_form_recipient_data_get():
+    """  Возвращает temp_form_recipient_data (словарь создаваемых в наст. момент форм)"""
     return temp_form_recipient_data
 
 
@@ -75,14 +78,16 @@ def completing_forms_dispatcher_get_question_by_num(user_id: int, question_num: 
 
 
 def completing_forms_dispatcher_get_form_id(user_id: int):
-    """ Возвращает вопрос по номеру вопроса из completing_forms_dispatcher"""
+    """ Возвращает айди сохраненной формы по юзер айди из completing_forms_dispatcher"""
     return completing_forms_dispatcher[user_id]['unique_form_id']
 
 
 def completing_froms_dispatcher_is_user_in_list(user_id: int):
+    """ Проверяет, заполняет ли сейчас пользователь форму"""
     return user_id in completing_forms_dispatcher.keys()
 
 def completing_forms_dispatcher_get():
+    """ Возвращает completing_forms_dispatcher (список с юзерами и  формами которые они сейчас заполняют)"""
     return completing_forms_dispatcher
 
 def registerData_get_fio(user_id: int):
@@ -110,10 +115,12 @@ def send_forms_mem_get():
 
 
 def unique_form_id_get():
-    print(' \n\nloool unique_form_id ', bot_elements.storages.all_storages.unique_form_id)
+    """ Возвращает счетчик созданных вопросов"""
+    # print(' \n\nloool unique_form_id ', bot_elements.storages.all_storages.unique_form_id)
     return bot_elements.storages.all_storages.unique_form_id
 
 
 def unique_sent_form_id_get():
-    print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
+    """ Возвращает счетчик отправленных вопросов"""
+    # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
     return bot_elements.storages.all_storages.unique_sent_form_id
