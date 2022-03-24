@@ -63,7 +63,7 @@ def completing_forms_dispatcher_get_form_copy(user_id: int):
 
 
 def completing_forms_dispatcher_get_form_question_copy(user_id: int, question_num: int):
-    """ Возвращает копию формы из completing_forms_dispatcher"""
+    """ Возвращает копию вопроса из формы"""
     return completing_forms_dispatcher[user_id]['form_copy'][question_num]
 
 
@@ -119,9 +119,25 @@ def registerData_check_is_registered(user_id: int):
     """ Проверяет есть ли юзер в registerData"""
     return user_id in registerData.keys()
 
+
 def send_forms_mem_get():
     """ Возвращает send_forms_mem (память с отправленынми формами)"""
     return send_forms_mem
+
+
+def send_forms_mem_get_form(sent_form_id: int):
+    """ Возвращает форму из send_forms_mem (память с отправленынми формами)"""
+    return send_forms_mem[sent_form_id]
+
+
+def send_forms_mem_get_form_sent_users(sent_form_id: int):
+    """ Возвращает айди пользователей, которым отослана форма"""
+    return send_forms_mem[sent_form_id]['info']['send_to_users_ids']
+
+
+def send_forms_mem_get_form_completed_users(sent_form_id: int):
+    """ Возвращает айди пользователей, которые прошли форму"""
+    return send_forms_mem[sent_form_id]['info']['got_answers_from']
 
 
 def unique_form_id_get():
@@ -137,4 +153,5 @@ def unique_sent_form_id_get():
 
 
 def temp_mem_for_answers_get():
+    """ Возвращает все ответы на вопросы формы"""
     return temp_mem_for_answers

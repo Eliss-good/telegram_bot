@@ -1,16 +1,14 @@
 """ Статус пользователя"""
 from aiogram import Bot, Dispatcher, types
-from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy, temp_mem_for_answers_get
+from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy, send_forms_mem_get_form_completed_users, send_forms_mem_get_form_sent_users, temp_mem_for_answers_get
 from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
+from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, send_forms_mem_add_completed_user, sendMsgAnswer, sendPollAnswer, sendFormAnswer
 
-# нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
-
-from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, sendMsgAnswer, sendPollAnswer, sendFormAnswer
-
+import collections
 import configparser
 
 config = configparser.ConfigParser()
-config.read('/Users/igormalysh/Documents/codes/work-4-food/config.ini')
+config.read('/home/gilfoyle/Documents/coding/work-4-food/config.ini')
 
 bot = Bot(token=config['DEFAULT']['studentBotToken'])
 
@@ -18,11 +16,13 @@ bot = Bot(token=config['DEFAULT']['studentBotToken'])
 async def display_user_status(message: types.Message):
 
     full_message = "Полученные формы:"
-    
-    for select_form in send_forms_mem_get():
-        if message.chat.id in select_form['info']['send_to_users_ids']:
+    print('\n\n\n',send_forms_mem_get())
+    for selected_form in send_forms_mem_get():
+        form = send_forms_mem_get()
+        select_form = form[selected_form]
+        if message.chat.id in select_form['info']['send_to_users_ids'] and not message.chat.id in select_form['info']['got_answers_from']:
             
-            full_message += '\n' + str(mem_for_created_forms_get_form_name(select_form['form_id'])) + ' от пользователя ' + str(mem_for_created_forms_get_creator_id(select_form['form_id'])) + ' /complete_' + str(select_form['form_id']) + '_' + str(select_form['sent_form_id'])
+            full_message += '\n' + str(mem_for_created_forms_get_form_name(select_form['form_id'])) + ' от пользователя ' + str(mem_for_created_forms_get_creator_id(select_form['form_id'])) + ' /complete_' + str(select_form['form_id']) + '_' + str(selected_form)
 
     await message.answer(full_message)
 
@@ -43,7 +43,7 @@ async def complete_form(message: types.Message):
 
 # complete polls
 async def go_cycle(message, type):
-    """Отсылает вопросы/ опросы из send_forms_mem при вызове"""
+    """Отсылает вопросы/ опросы из completing_forms_dispatcher при вызове"""
 
     
     user_id = 0
@@ -75,11 +75,18 @@ async def go_cycle(message, type):
 
 
     elif curr_quest['type'] == 'info':
+        sent_form_id = completing_forms_dispatcher_get_sent_form_id(user_id=user_id)
+        send_forms_mem_add_completed_user(sent_form_id=sent_form_id, user_id=user_id)
         completing_forms_dispatcher_remove_session(user_id=user_id)
         print('theend')
+        
         sendFormAnswer(temp_mem_for_answers_get())
         print('\n', temp_mem_for_answers_get())
         print(completing_forms_dispatcher_get())
+
+
+        if collections.Counter(send_forms_mem_get_form_completed_users(sent_form_id=sent_form_id)) == collections.Counter(send_forms_mem_get_form_sent_users(sent_form_id=sent_form_id)):
+            print('FORM FULLY COMPLETED')
 
 
 def lambda_checker_poll(pollAnswer: types.PollAnswer):

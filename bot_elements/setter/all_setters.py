@@ -53,9 +53,14 @@ def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_
     mem_for_created_forms[form_id][question_id]['options'] = new_poll_options
 
 
-def send_forms_mem_add_sent_form(form_id: int, sent_form_id: int, form_creator_user_id: int, send_to_users_ids: list):
+def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_user_id: int, send_to_users_ids: list):
     """ Добавляет 1 форму в список с отправленными формами"""
-    send_forms_mem.append({'form_id': form_id, 'sent_form_id': sent_form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids}})
+    send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids, 'got_answers_from': []}}
+
+
+def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
+    """ Добавляет пользователя в список пользователей прошедших форму"""
+    send_forms_mem[sent_form_id]['info']['got_answers_from'].append(user_id)
 
 
 def completing_forms_dispatcher_add_session(chat_id: int, unique_form_id: int, unique_sent_form_id: int):
@@ -91,14 +96,14 @@ def registerData_change_fio_data(user_id: int, new_fio: str):
 
 
 def unique_form_id_plus_one():
-    """ Увеличивает счтчик созданных вопросов на 1"""
+    """ Увеличивает счетчик созданных вопросов на 1"""
     bot_elements.storages.all_storages.unique_form_id += 1
     
     print('\n\ni daaaan ', bot_elements.storages.all_storages.unique_form_id)
 
 
 def unique_sent_form_id_plus_one():
-    """ Увеличивает счтчик отправленных вопросов на 1"""
+    """ Увеличивает счетчик отправленных вопросов на 1"""
     bot_elements.storages.all_storages.unique_sent_form_id += 1
     print(bot_elements.storages.all_storages.unique_sent_form_id)
 
@@ -124,4 +129,5 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит форма со всеми ответами на форму"""
+    print(formAnswer)
     pass
