@@ -1,4 +1,4 @@
-import bot_elements
+from aiogram import types
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
@@ -99,3 +99,15 @@ def unique_sent_form_id_plus_one():
     """ Увеличивает счтчик отправленных вопросов на 1"""
     bot_elements.storages.all_storages.unique_sent_form_id += 1
     print(bot_elements.storages.all_storages.unique_sent_form_id)
+
+
+def sendPollAnswer(pollAnswer: types.PollAnswer, question_number: int, unique_form_id: int, unique_sent_form_id: int, pollCopy):
+    """ Получает ответ на опрос"""
+    print('\n',pollAnswer, question_number, unique_form_id, unique_sent_form_id,pollCopy)
+    pass
+
+
+def sendMsgAnswer(messageAnswer: types.message, question_number: int, unique_form_id: int, unique_sent_form_id: int, messageCopy):
+    """ Получает ответ на текстовый вопрос"""
+    print('\n', messageAnswer, question_number, unique_form_id, unique_sent_form_id, messageCopy)
+    pass

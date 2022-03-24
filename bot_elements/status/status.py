@@ -1,18 +1,18 @@
 """ Статус пользователя"""
 from aiogram import Bot, Dispatcher, types
-from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list
+from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy
 from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
 
 # нужно доставать данные о фио, роли, группе, непройденных опросах, рейтинге из бд
 
-from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id
+from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, sendMsgAnswer, sendPollAnswer
 
 import configparser
 
 config = configparser.ConfigParser()
 config.read('/Users/igormalysh/Documents/codes/work-4-food/config.ini')
 
-bot = Bot(token=config['DEFAULT']['studentBotToken']) #!
+bot = Bot(token=config['DEFAULT']['studentBotToken'])
 
 
 async def display_user_status(message: types.Message):
@@ -45,7 +45,7 @@ async def complete_form(message: types.Message):
 async def go_cycle(message, type):
     """Отсылает вопросы/ опросы из send_forms_mem при вызове"""
 
-
+    
     user_id = 0
     if type == 'launch_from_poll_handler':
         
@@ -62,7 +62,7 @@ async def go_cycle(message, type):
 
     curr_quest = completing_forms_dispatcher_get_question_by_num(user_id=user_id, question_num=curr_question_num)
     
-
+    print('\n IMPORTONT ', curr_question_num, curr_quest)
     if curr_quest['type'] == 'poll':
 
         msg = await bot.send_poll(chat_id=user_id, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=False)
@@ -94,7 +94,13 @@ def lambda_checker_poll(pollAnswer: types.PollAnswer):
         print(selected_form[curr_question_num], pollAnswer['poll_id'])
 
         if completing_forms_dispatcher_get_form_question_message_id(user_id=pollAnswer.user.id, question_num=curr_question_num) == pollAnswer['poll_id']:
-            completing_forms_dispatcher_add_1_to_question_num(user_id=pollAnswer.user.id)
+            question_number = completing_forms_dispatcher_get_current_question_num(user_id=pollAnswer.user.id)
+            unique_form_id = completing_forms_dispatcher_get_form_id(user_id=pollAnswer.user.id)
+            unique_sent_form_id = completing_forms_dispatcher_get_sent_form_id(user_id=pollAnswer.user.id)
+            pollCopy = completing_forms_dispatcher_get_form_question_copy(user_id=pollAnswer.user.id, question_num=question_number)
+
+            sendPollAnswer(pollAnswer=pollAnswer, question_number=question_number, unique_form_id=unique_form_id, unique_sent_form_id=unique_sent_form_id, pollCopy=pollCopy)
+
             return True
         # print('folss')
         return False
@@ -111,6 +117,14 @@ def lambda_checker_msg(message: types.Message):
         
         print(completing_forms_dispatcher_get_form_question_message_id(user_id=message.chat.id, question_num=curr_question_num) + 1, message.message_id)
         if completing_forms_dispatcher_get_form_question_message_id(user_id=message.chat.id, question_num=curr_question_num) + 1 == message.message_id:
+            
+            question_number = completing_forms_dispatcher_get_current_question_num(user_id=message.chat.id)
+            unique_form_id = completing_forms_dispatcher_get_form_id(user_id=message.chat.id)
+            unique_sent_form_id = completing_forms_dispatcher_get_sent_form_id(user_id=message.chat.id)
+            messageCopy = completing_forms_dispatcher_get_form_question_copy(user_id=message.chat.id, question_num=question_number)
+
+            sendMsgAnswer(messageAnswer=message, question_number=question_number, unique_form_id=unique_form_id, unique_sent_form_id=unique_sent_form_id, messageCopy=messageCopy)
+            
             completing_forms_dispatcher_add_1_to_question_num(user_id=message.chat.id)
             # print(message.text)
             return True
@@ -124,7 +138,7 @@ async def poll_handler(pollAnswer: types.PollAnswer):
     print('completing_forms_dispatcher ', completing_forms_dispatcher_get())
     # print(pollAnswer)
     if completing_forms_dispatcher_get():
-        
+        completing_forms_dispatcher_add_1_to_question_num(user_id=pollAnswer.user.id)
         await go_cycle(message=pollAnswer, type='launch_from_poll_handler')
     # print(poll['id'])
 

@@ -42,9 +42,9 @@ async def student_commands(bot: Bot):
 
 
 async def main():
-    prepod_bot = Bot(token=str(config['DEFAULT']['prepodBotToken']))
-    student_bot = Bot(token=str(config['DEFAULT']['studentBotToken']))
-    admin_bot = Bot(token=str(config['DEFAULT']['adminBotToken']))
+    prepod_bot = Bot(token=config['DEFAULT']['prepodBotToken'])
+    student_bot = Bot(token=config['DEFAULT']['studentBotToken'])
+    admin_bot = Bot(token=config['DEFAULT']['adminBotToken'])
     
     prepod_bot_dispatcher = Dispatcher(prepod_bot, storage=MemoryStorage(),
                     loop=asyncio.get_event_loop())
