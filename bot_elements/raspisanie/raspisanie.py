@@ -1,4 +1,4 @@
-import asyncio, time, full_pars_2
+import asyncio, time #full_pars_2
 
 
 async def rasp_notification(group):

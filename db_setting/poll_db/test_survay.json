@@ -1,0 +1,22 @@
+[
+   {
+      "question":"Тут?",
+      "options":[
+         "нет",
+         " да"
+      ],
+      "message_id":0,
+      "type":"poll"
+   },
+   {
+      "question":"Да?",
+      "message_id":0,
+      "type":"msg"
+   },
+   {
+      "form_name":"Хуня",
+      "type":"info",
+      "form_id":5,
+      "creator_id":622867137
+   }
+]

@@ -1,8 +1,8 @@
 import db_setting.back_function_db as bf
 import db_setting.poll_db.poll_connect_db as poll_db
 
-"""Геттер для данных пользователя"""
-def get_id_users(list_name_group):
+"""Cеттер для данных пользователя"""
+def set_id_users(list_name_group):
     """Возвоащается списком  все ID телеги по указанным группам"""
     group_us = []
 
@@ -11,12 +11,12 @@ def get_id_users(list_name_group):
 
         data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group[0])], 'where')
         for i in data:
-            group_us.append(bf.find_id_global(i))
+            group_us.append(int(bf.find_tg_id(i[0])))
 
     return group_us
 
 
-def get_any_data(command):
+def set_any_data(command):
     """Списком возвращается любая информация из таблиц"""
     all_data = bf.db.select_db(command + '_tb', [command + '_name'])
     all_data_norm = []
@@ -26,7 +26,7 @@ def get_any_data(command):
     return all_data_norm 
 
 
-def get_status_us(tg_id):
+def set_status_us(tg_id):
     """Проверка на то зареган ли пользователь"""
     id = bf.find_id_global(tg_id)
 
@@ -36,8 +36,10 @@ def get_status_us(tg_id):
         return True
 
 
-"""Геттер для опросов"""
-def get_form(command, form_id = None):
+"""Cеттер для опросов"""
+
+
+def set_form(command, form_id = None):
     """Отправление уже готовых форм боту"""
     data = poll_db.read_answer_to_file()
 
@@ -53,4 +55,27 @@ def get_form(command, form_id = None):
             all_forms.append(bf.find_one_form(data, item))
         return all_forms
 
-    
+
+def set_start_form_users(form_id, groups):
+    """Отправка телеграм боту новой формы"""
+    bf.db.update_db('survay_tb', ['sending_status'], ['True'], ['form_id'], [bf.correct_str(str(form_id))])
+
+    """Добавление в инфо о форме список групп, которым приходит эта форма"""
+    groups = ["М3О-221Б-20", "М3О-212Б-20", "М3О-214Б-20"]
+    poll_db.add_to_sub_form(form_id, groups)
+    return set_form('one', form_id)
+
+
+def set_form_us(tg_id):
+    """Все формы созданные по tg_id"""
+    tg_id = bf.correct_str(str(tg_id))
+    id_forms = bf.db.select_db_where('survay_tb', ['form_id'], ['from_id'], [tg_id], 'where')
+
+    user_forms = []
+    for item_id in id_forms:
+        try:
+            user_forms.append(set_form('one', form_id=item_id[0]))
+        except IndexError:
+            print('INDEX ERROR fun', set_form_us.__name__)
+
+    return user_forms

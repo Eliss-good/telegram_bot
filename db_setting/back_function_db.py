@@ -40,10 +40,11 @@ def add_prepod(name_prepod, tg_id = 1):
      в tg_id ничего не подаётся в случае если идёт заполение с парсеров """
     con_data =[correct_str(name_prepod), find_id_global(tg_id)]
     prepod_ck = db.select_db_where('prepod_tb', ['id'], ['prepod_name', 'gl_id'], con_data, 'check')
+    prepod_ck_auto_us = db.select_db_where('prepod_tb', ['id'], ['prepod_name', 'gl_id'], [correct_str(name_prepod), find_id_global(1)], 'check')
 
-    if prepod_ck and tg_id != 1:
+    if prepod_ck and tg_id != 1 and not prepod_ck_auto_us:
         db.update_db('prepod_tb', ['gl_id'], [find_id_global(tg_id)], ['prepod_name'], [correct_str(name_prepod)])
-    else:
+    elif prepod_ck and tg_id != 1 and prepod_ck_auto_us:
         db.insert_db('prepod_tb', ['prepod_name', 'gl_id'], con_data)
 
 
@@ -78,7 +79,7 @@ def find_id_group(name_group):
     try:
         return str(db.select_db_where('group_tb', ['id'], ['group_name'], [name_group], 'where')[0][0])
     except IndexError:
-        print('index error fun', find_id_group.__name__)
+        print('INDEX ERROR fun', find_id_group.__name__)
 
 
 def find_id_lesson(name_lesson):
@@ -88,7 +89,7 @@ def find_id_lesson(name_lesson):
     try:
         return str(db.select_db_where('lesson_tb', ['id'], ['lesson_name'], [name_lesson], 'where')[0][0])
     except:
-        print('index error fun', find_id_lesson.__name__)
+        print('INDEX ERROR fun', find_id_lesson.__name__)
 
 
 def find_id_prepod(name_prepod):
@@ -98,7 +99,7 @@ def find_id_prepod(name_prepod):
     try:
         return str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')[0][0])
     except:
-        print('index error fun', find_id_prepod.__name__)
+        print('INDEX ERROR fun', find_id_prepod.__name__)
 
 def find_id_global(tg_id):
     """Возвращение ID пользователя из глобальной таблицы"""
@@ -115,9 +116,9 @@ def find_id_global(tg_id):
 def find_id_group_student(tg_id):
     """Возвращение ID группы студента пользователя"""
     try:
-        return db.select_db_where('global_tb', ['gl_role'], ['gl_tg_id'], [correct_str(str(tg_id))], 'where')[0][0]
+        return db.select_db_where('student_tb', ['group_id'], ['gl_id'], [find_id_global(tg_id)], 'where')[0][0]
     except IndexError:
-        print('index error fun', find_role_us.__name__)
+        print('INDEX ERROR fun', find_role_us.__name__)
 
 def find_role_us(tg_id):
     """Возвращение роли пользователя"""
@@ -126,24 +127,31 @@ def find_role_us(tg_id):
     try:
         return db.select_db_where('global_tb', ['gl_role'], ['gl_teleg_id'], [tg_id], 'where')[0][0]
     except IndexError:
-        print('index error fun', find_fio_us.__name__)
+        print('INDEX ERROR fun', find_fio_us.__name__)
 
 def find_fio_us(tg_id):
     """Возвращение фио пользователя"""
     role = find_role_us(tg_id)
 
     try:
-        return db.select_db_where(role + '_tb', [role  + '_name'], ['gl_id'], [find_id_global(tg_id)], 'where')[0][0]
+        return db.select_db_where(role + '_tb', [role + '_name'], ['gl_id'], [find_id_global(tg_id)], 'where')[0][0]
     except IndexError:
-        print('index error fun', find_fio_us.__name__)
+        print('INDEX ERROR fun', find_fio_us.__name__)
 
 
 def find_group_us(tg_id):
     """Возвращение группы пользователя"""
     try:
-        return db.select_db_where('group_tb', ['group_name'], ['id'], [find_id_group_student(tg_id)], 'where')[0][0]
+        return db.select_db_where('group_tb', ['group_name'], ['id'], [(find_id_group_student(tg_id))], 'where')[0][0]
     except IndexError:
-        print('index error fun', find_group_us.__name__)
+        print('INDEX ERROR fun', find_group_us.__name__)
+
+
+def find_tg_id(gl_id):
+    try:
+        return db.select_db_where('global_tb', ['gl_teleg_id'], ['id'], [gl_id], 'where')[0][0]
+    except IndexError:
+        print('INDEX ERROR fun', find_tg_id.__name__)
 
 
 def connect_gr_th(name_group, t_item):
@@ -179,10 +187,12 @@ def add_group_questions(question_n, group_id):
 
 def find_id_survay(form_id):
     """Возвращение id формы"""
+    form_id = correct_str(str(form_id))
+
     try:
         return db.select_db_where('survay_tb', ['id'], ['form_id'], [form_id], 'where')[0][0]
     except IndexError:
-        print('index error fun', find_id_survay.__name__)
+        print('INDEX ERROR fun', find_id_survay.__name__)
 
 
 def find_id_question(question_n):
@@ -191,13 +201,17 @@ def find_id_question(question_n):
     try:
         return db.select_db_where('question_tb', ['id'], ['question_name'], [question_n], 'where')[0][0]
     except IndexError:
-        print('index error fun', find_id_question.__name__)
+        print('INDEX ERROR fun', find_id_question.__name__)
 
 
 def find_one_form(data, form_id):
     data = data.get(str(find_id_survay(form_id)))
+
     if data != None:
-        return data
+        try:
+            return data['info_form']
+        except KeyError:
+            print('KEY ERROR fun', find_one_form.__name__)
     else:
         print('Erorrchik')
 
@@ -212,7 +226,7 @@ def max_index_group_question():
         else:
             return max_el
     except IndexError:
-        print('index error fun', max_index_group_question.__name__)
+        print('INDEX ERROR fun', max_index_group_question.__name__)
 
 
 def max_code_survay():
@@ -220,7 +234,12 @@ def max_code_survay():
     try:
         return db.select_db_where('survay_tb', ['form_id'], [], [] ,'max')[0][0]
     except IndexError:
-        print('index error fun', max_code_survay.__name__)
+        print('INDEX ERROR fun', max_code_survay.__name__)
 
-#add_us(1337, 'prepod')
-#add_prepod('Сухно Алексей Андреевич', tg_id=1337)
+
+def find_count_send_form():
+    try:
+        return db.select_db_where('survay_tb', ['form_id'], ['sending_status'], ['True'] ,'count')[0][0]
+    except IndexError:
+        print('INDEX ERROR fun', find_count_send_form.__name__)
+

@@ -61,7 +61,8 @@ CREATE TABLE survay_tb(
     form_name varchar(128),
     from_id varchar(32),
     to_group varchar(32),
-    groupquestion_id int
+    groupquestion_id int,
+    sending_status bool DEFAULT False NOT NULL
 );
 
 drop table connect_tb;

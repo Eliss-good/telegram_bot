@@ -2,19 +2,18 @@
 
 """ Создается форма, добавляется в хранилище форм"""
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from bot_elements.remover.all_removers import temp_form_recipient_data_remove_element, temp_mem_for_form_creator_remove_form, temp_mem_for_form_creator_remove_form_element
+from bot_elements.remover.all_removers import temp_form_recipient_data_remove_element, \
+    temp_mem_for_form_creator_remove_form, temp_mem_for_form_creator_remove_form_element
 
-
-
-from bot_elements.storages.all_storages import temp_form_recipient_data, temp_mem_for_form_creator, mem_for_created_forms, unique_form_id
-from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
+from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data, temp_form_recipient_data_get_form_id, \
+    temp_form_recipient_data_get_recip_data, temp_form_recipient_data_get, temp_mem_for_form_creator_get, \
+    mem_for_created_forms_get, unique_form_id_get
 from bot_elements.setter import all_setters
+from bot_elements.setter.all_setters import unique_form_id_plus_one
 from bot_elements.forms.form_display import display_current_temp_mem_status
-
-bot = Bot(token='5110094448:AAGG_IiPPyjvwtROrBqGu0C74EMSjew3NDQ')
 
 
 class name(StatesGroup):
@@ -38,12 +37,12 @@ async def choose_name(message: types.Message, state: FSMContext):
 
 async def choose_type(message: types.Message, state: FSMContext):  # name.waiting_for_name
     """ (name FSM) Запоминает название и предлагает выбрать тип первого добавляемого вопроса"""
-    global unique_form_id
 
-    all_setters.temp_form_recipient_data_add_user_data(chat_id=message.chat.id, 
-    form_name=str(message.text), type="info", form_id=unique_form_id, creator_id=message.chat.id)
+    all_setters.temp_form_recipient_data_add_user_data(chat_id=message.chat.id,
+                                                       form_name=str(message.text), type="info",
+                                                       form_id=unique_form_id_get(), creator_id=message.chat.id)
 
-    unique_form_id += 1
+    unique_form_id_plus_one()
 
     buttons = [
         types.InlineKeyboardButton(
@@ -58,7 +57,7 @@ async def choose_type(message: types.Message, state: FSMContext):  # name.waitin
     await state.finish()
 
 
-async def get_question(message: types.Message, state: FSMContext): # form.waiting_for_question
+async def get_question(message: types.Message, state: FSMContext):  # form.waiting_for_question
     """ (form FSM) Получает текст вопроса и тип, затем ЗАПОМИНАЕТ (и предлагает ввести варианты ответов)
         и предлагает добавить вопрос"""
 
@@ -67,9 +66,11 @@ async def get_question(message: types.Message, state: FSMContext): # form.waitin
     data = await state.get_data()
     if data['type'] == 'msg':
 
-        all_setters.temp_mem_for_form_creator_add_element(user_id=message.chat.id, data={'question': data['question'], 'message_id': 0, 'type': 'msg'})
+        all_setters.temp_mem_for_form_creator_add_element(user_id=message.chat.id,
+                                                          data={'question': data['question'], 'message_id': 0,
+                                                                'type': 'msg'})
 
-        print('temp_mem_for_form_creator', temp_mem_for_form_creator)
+        print('temp_mem_for_form_creator', temp_mem_for_form_creator_get())
         buttons = [
             types.InlineKeyboardButton(
                 text="Да", callback_data="add_quest_true"),
@@ -91,7 +92,7 @@ async def get_question(message: types.Message, state: FSMContext): # form.waitin
         await form.waiting_for_options.set()
 
 
-async def get_options(message: types.Message, state: FSMContext): # form.waiting_for_options
+async def get_options(message: types.Message, state: FSMContext):  # form.waiting_for_options
     """ (form FSM) Получает варианты ответов, ЗАПОМИНАЕТ и предлагает добавить вопрос"""
 
     options = message.text.split(',')
@@ -100,9 +101,11 @@ async def get_options(message: types.Message, state: FSMContext): # form.waiting
     user_data = await state.get_data()
     # print(user_data['question'], user_data['options'])
 
-    all_setters.temp_mem_for_form_creator_add_element(user_id=message.chat.id, data={'question': user_data['question'], 'options': user_data['options'], 'message_id': 0, 'type': 'poll'})
-    
-    print('temp_mem_for_form_creator', temp_mem_for_form_creator)
+    all_setters.temp_mem_for_form_creator_add_element(user_id=message.chat.id, data={'question': user_data['question'],
+                                                                                     'options': user_data['options'],
+                                                                                     'message_id': 0, 'type': 'poll'})
+
+    print('temp_mem_for_form_creator', temp_mem_for_form_creator_get())
 
     buttons = [
         types.InlineKeyboardButton(text="Да", callback_data="add_quest_true"),
@@ -144,17 +147,20 @@ async def add_quest_false(call: types.CallbackQuery):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     await display_current_temp_mem_status(message=call.message)
 
+    all_setters.temp_mem_for_form_creator_add_element(user_id=call.message.chat.id,
+                                                      data=temp_form_recipient_data_get_recip_data(
+                                                          user_id=call.message.chat.id).copy())
 
-    all_setters.temp_mem_for_form_creator_add_element(user_id=call.message.chat.id, data=temp_form_recipient_data[call.message.chat.id].copy())
+    all_setters.mem_for_created_forms_add_element(
+        form_id=temp_form_recipient_data_get_form_id(user_id=call.message.chat.id),
+        data=temp_mem_for_form_creator_get_data(call.message.chat.id).copy())
 
-    all_setters.mem_for_created_forms_add_element(user_id=temp_form_recipient_data[call.message.chat.id]['form_id'], data=temp_mem_for_form_creator_get_data(call.message.chat.id).copy())
-
-    print('mem_for_created_forms ', mem_for_created_forms)
+    print('mem_for_created_forms ', mem_for_created_forms_get())
 
     temp_mem_for_form_creator_remove_form(user_id=call.message.chat.id)
     temp_form_recipient_data_remove_element(user_id=call.message.chat.id)
 
-    print('temp_form_recipient_data ', temp_form_recipient_data)
+    print('temp_form_recipient_data ', temp_form_recipient_data_get())
 
     await call.message.answer('Форма создана', reply_markup=types.ReplyKeyboardRemove())
 

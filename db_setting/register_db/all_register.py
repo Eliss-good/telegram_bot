@@ -6,9 +6,7 @@ def __student_start(name_user, id_us_tg,name_group):
     #bf.start_gr(name_group)
 
 def __prepod_start(name_user, id_us_tg):
-    
-    bf._correct_data_prepod(name_user, id_us_tg)
-    bf.add_prepod(name_user, id_us_tg  = id_us_tg)
+    bf.add_prepod(name_user, tg_id  = id_us_tg)
     #bf.start_pr(input("введите ссылку на препода: "))
 
 

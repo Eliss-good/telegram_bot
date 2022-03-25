@@ -1,5 +1,5 @@
 import back_function_db as bf
-from .. import full_pars as fl
+import parsers.full_pars as fl
 
 #####  pars for  group  #####
 def setter_group_bd(name_group,t_item):
