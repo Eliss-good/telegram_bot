@@ -1,4 +1,5 @@
 import db_setting.back_function_db as bf
+import db_setting.poll_db.pars_answer as prs_an
 import json
 
 
@@ -18,6 +19,7 @@ def write_answer_to_file(all_survay_json):
 
 
 def add_to_sub_form(form_id, groups):
+   """Добавление к form_id список групп"""
    all_form = read_answer_to_file()
 
    try:
@@ -27,22 +29,25 @@ def add_to_sub_form(form_id, groups):
       print('not find this form')
 
 
-
-def add_answer_for_survay(new_result_answer):
-####определить приход хеша
-   form_id = 1
+def add_answer_for_survay(new_answer):
+   """Добавление новых опросов"""
+   form_id = prs_an.search_form_id_json(new_answer)
+   result_answer = prs_an.search_answer_in_json(new_answer)
    data_file = read_answer_to_file()
 
+   survay_id = str(bf.find_id_survay(form_id))
+
    try:
-      data_file[str(bf.find_id_survay(form_id))]['answer'].append(new_result_answer)
+      data_file[survay_id]['all_answer'].append(result_answer)
+      write_answer_to_file(data_file)
+
+      print("Успещно добавлен ответ на опрос id:", form_id)
    except KeyError:
       print('Not find key into json file')
-      return
-   
-   write_answer_to_file(data_file)
 
 
 def update_group_in_survay(max_index_g, form_id):
+   """Прикрепление к форме группу вопросов"""
    bf.db.update_db('survay_tb', ['groupquestion_id'], [max_index_g], ['form_id'], [form_id])
 
 
@@ -94,8 +99,8 @@ def add_survay(data_survay):
          print("bad insert json")
       write_answer_to_file(all_survay_json)
 
-
+"""
 with open("test_survay.json", "r", encoding='utf-8') as file:
    data = json.load(file)
    add_survay(data)
-
+"""

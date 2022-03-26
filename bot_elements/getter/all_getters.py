@@ -127,7 +127,6 @@ def send_forms_mem_get_form_sent_users(sent_form_id: int):
     """ Возвращает айди пользователей, которым отослана форма"""
     return send_forms_mem[sent_form_id]['info']['send_to_users_ids']
 
-
 def send_forms_mem_get_form_completed_users(sent_form_id: int):
     """ Возвращает айди пользователей, которые прошли форму"""
     return send_forms_mem[sent_form_id]['info']['got_answers_from']
@@ -136,13 +135,28 @@ def send_forms_mem_get_form_completed_users(sent_form_id: int):
 def unique_form_id_get():
     """ Возвращает счетчик созданных форм"""
     # print(' \n\nloool unique_form_id ', bot_elements.storages.all_storages.unique_form_id)
-    return con_db.get_max_survay()
+    return con_db.get_max_survay() + 1
 
 
 def unique_sent_form_id_get():
     """ Возвращает счетчик отправленных форм"""
     # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
-    return con_db.get_count_send_survay()
+    return con_db.get_count_send_survay() + 1
+
+
+def completing_forms_dispatcher_get_form_question_copy(user_id: int, question_num: int):
+    """ Возвращает копию вопроса из формы"""
+    return completing_forms_dispatcher[user_id]['form_copy'][question_num]
+
+
+def completing_forms_dispatcher_get_sent_form_id(user_id: int):
+    """ Возвращает айди отправленной формы по юзер айди из completing_forms_dispatcher"""
+    return completing_forms_dispatcher[user_id]['unique_sent_form_id']
+
+
+def temp_mem_for_answers_get():
+    """ Возвращает все ответы на вопросы формы"""
+    return temp_mem_for_answers
 
 
 def get_all_groups():

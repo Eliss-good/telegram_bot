@@ -61,7 +61,6 @@ def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_u
     send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id,
                                                                  'send_to_users_ids': send_to_users_ids,
                                                                  'got_answers_from': []}}
-    print(send_forms_mem)
 
 
 def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
@@ -125,8 +124,8 @@ def sendPollAnswer(pollAnswer: types.PollAnswer, question_number: int, unique_fo
 
     if not pollAnswer.user.id in temp_mem_for_answers.keys():
         temp_mem_for_answers[pollAnswer.user.id] = []
-    
-    temp_mem_for_answers[pollAnswer.user.id].append({'pollAnswer': pollAnswer, 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'pollCopy': pollCopy})
+
+    temp_mem_for_answers[pollAnswer.user.id].append({'pollAnswer': dict(pollAnswer), 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'pollCopy': pollCopy})
     
 
 def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_form_id: int, unique_sent_form_id: int, messageCopy):
@@ -135,10 +134,12 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
     if not messageAnswer.chat.id in temp_mem_for_answers.keys():
         temp_mem_for_answers[messageAnswer.chat.id] = []
     
-    temp_mem_for_answers[messageAnswer.chat.id].append({'messageAnswer': messageAnswer, 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'messageCopy': messageCopy})
+    temp_mem_for_answers[messageAnswer.chat.id].append({'messageAnswer': dict(messageAnswer), 'question_number': question_number, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'messageCopy': messageCopy})
 
 
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит форма со всеми ответами на форму"""
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" , formAnswer)
-    pass
+    print(formAnswer)
+    con_db.add_new_answer(formAnswer)
+
+

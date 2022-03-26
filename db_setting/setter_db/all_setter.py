@@ -68,6 +68,11 @@ def set_start_form_users(form_id, groups):
 
 def set_form_us(tg_id):
     """Все формы созданные по tg_id"""
+
+    if bf.find_role_us(tg_id) == 'student':
+        """Проверка на то преподаватель ли пользователь"""
+        return None
+
     tg_id = bf.correct_str(str(tg_id))
     id_forms = bf.db.select_db_where('survay_tb', ['form_id'], ['from_id'], [tg_id], 'where')
 
