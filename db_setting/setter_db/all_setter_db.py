@@ -84,3 +84,14 @@ def set_form_us(tg_id):
             print('INDEX ERROR fun', set_form_us.__name__)
 
     return user_forms
+
+
+def set_from_id_for_tg_id(tg_id : int):
+    """Возвращеник списком id всех форм созданных по tg_id"""
+    list_forms = bf.db.select_db_where('survay_tb', ['form_id'], ['from_id'], [tg_id], 'where')
+    return bf.correct_list(list_forms)
+
+
+def set_form_name_for_form_id(form_id : int):
+    """Возвращает имя формы по form_id"""
+    return bf.find_name_form(form_id)

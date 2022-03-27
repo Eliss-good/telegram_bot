@@ -139,7 +139,6 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит форма со всеми ответами на форму"""
-    print(formAnswer)
     con_db.add_new_answer(formAnswer)
 
 

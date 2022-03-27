@@ -8,6 +8,13 @@ def correct_str(t_item):
     t_item = "'" + t_item +"'" 
     return t_item 
 
+def correct_list(old_list):
+    new_list = []
+    for one_item in old_list:
+        new_list.append(one_item[0])
+    return new_list
+
+
 
         ################## insurt_modul ##################
 def add_us(tg_id, role):
@@ -204,7 +211,18 @@ def find_id_question(question_n):
         print('INDEX ERROR fun', find_id_question.__name__)
 
 
+def find_name_form(form_id : int):
+    form_id = correct_str(str(form_id))
+
+    try:
+        return db.select_db_where('survay_tb', ['form_name'], ['form_id'], [form_id], 'where')[0][0]
+    except IndexError:
+        print('INDEX ERROR fun', find_name_form.__name__)
+
+
+
 def find_one_form(data, form_id):
+    """Поиск формы в json с ответами"""
     data = data.get(str(find_id_survay(form_id)))
 
     if data != None:

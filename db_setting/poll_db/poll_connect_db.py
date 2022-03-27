@@ -7,7 +7,7 @@ def read_answer_to_file():
    """Чтение файла с ответами"""
    all_ansver_json = []
 
-   with open( "all_answer.json", "r", encoding='utf-8') as data_file:
+   with open("all_answer.json", "r", encoding='utf-8') as data_file:
          all_ansver_json = json.load(data_file)
    return all_ansver_json
 
@@ -15,7 +15,7 @@ def read_answer_to_file():
 def write_answer_to_file(all_survay_json):
    """Запись в файл"""
    with open("all_answer.json", "w", encoding='utf-8') as data_file:
-      json.dump(all_survay_json, data_file, indent=4)
+      json.dump(all_survay_json, data_file, ensure_ascii=False, indent=4)
 
 
 def add_to_sub_form(form_id, groups):
@@ -23,7 +23,8 @@ def add_to_sub_form(form_id, groups):
    all_form = read_answer_to_file()
 
    try:
-      all_form[bf.find_id_survay(form_id)]['send_group'] = groups
+      for one_group in groups:
+         all_form[bf.find_id_survay(form_id)]['send_group'].append(one_group)
       write_answer_to_file(all_form)
    except:
       print('not find this form')
@@ -98,9 +99,3 @@ def add_survay(data_survay):
       except IndexError:
          print("bad insert json")
       write_answer_to_file(all_survay_json)
-
-"""
-with open("test_survay.json", "r", encoding='utf-8') as file:
-   data = json.load(file)
-   add_survay(data)
-"""
