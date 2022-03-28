@@ -1,6 +1,6 @@
 from aiogram import types
 from bot_elements.getter.all_getters import temp_form_recipient_data_get_data, temp_mem_for_form_creator_get_data, \
-    mem_for_created_forms_get_creator_id, mem_for_created_forms_get_data, mem_for_created_forms_get_form_name, \
+    mem_for_created_forms_get_creator_id, mem_for_created_forms_get, mem_for_created_forms_get_form_name, \
     mem_for_created_forms_get
 
 
@@ -31,37 +31,75 @@ async def display_current_temp_mem_status(message: types.Message):
         message.answer('Все плохо')
 
 
+# async def display_current_mem_status(message: types.Message):
+#     """ Выводит сообщением меню для работы с сохраненными опросами (id клиента определяет по message)"""
+#     full_message = ""
+#     memory = mem_for_created_forms_get()
+#     if memory:
+#
+#         for index in memory:
+#
+#             print(mem_for_created_forms_get_creator_id(form_id=int(index)))
+#
+#             if mem_for_created_forms_get_creator_id(form_id=int(index)) == message.chat.id:
+#                 selected_form = mem_for_created_forms_get_data(form_id=int(index))
+#                 form_mem = selected_form
+#                 print('form_mem ', form_mem)
+#                 info = selected_form[-1]
+#                 print('recip_mem ', info)
+#
+#                 parsed_msg = "\n ----- \nname: " + info['form_name'] + ' ' + 'form_id: ' + str(
+#                     info['form_id']) + ' /send_' + str(int(index)) + ' /rename_' + str(int(index)) + ' /edit_' + str(
+#                     int(index)) + ' /del_' + str(int(index)) + "\n"
+#
+#                 if form_mem:
+#
+#                     for inside_mem in form_mem:
+#                         if inside_mem['type'] == 'poll':
+#                             parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' ' + '[' + ', '.join(
+#                                 str(e) for e in inside_mem['options']) + ']' + '\n')
+#
+#                         elif inside_mem['type'] == 'msg':
+#                             parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + '\n')
+#
+#                 full_message += parsed_msg
+#
+#         await message.answer(full_message, reply_markup=None)
+#
+#     else:
+#         await message.answer('Хранилище форм пусто', reply_markup=None)
+
+
 async def display_current_mem_status(message: types.Message):
     """ Выводит сообщением меню для работы с сохраненными опросами (id клиента определяет по message)"""
     full_message = ""
-    memory = mem_for_created_forms_get()
+    memory = mem_for_created_forms_get(message.chat.id)
     if memory:
-        for index in memory:
+        form_mem = memory
+        print('form_mem ', form_mem)
+        for a in form_mem:
+            if a == None:
+                continue
 
-            print(mem_for_created_forms_get_creator_id(form_id=index))
+            info = a[-1]
+            index = info['form_id']
 
-            if mem_for_created_forms_get_creator_id(form_id=index) == message.chat.id:
-                selected_form = mem_for_created_forms_get_data(form_id=index)
-                form_mem = selected_form
-                print('form_mem ', form_mem)
-                info = selected_form[-1]
-                print('recip_mem ', info)
+            parsed_msg = "\n ----- \nname: " + info['form_name'] + ' ' + 'form_id: ' + str(
+                info['form_id']) + ' /send_' + str(index) + ' /rename_' + str(index) + ' /edit_' + str(
+                index) + ' /del_' + str(index) + "\n"
 
-                parsed_msg = "\n ----- \nname: " + info['form_name'] + ' ' + 'form_id: ' + str(
-                    info['form_id']) + ' /send_' + str(index) + ' /rename_' + str(index) + ' /edit_' + str(
-                    index) + ' /del_' + str(index) + "\n"
+            if a:
 
-                if form_mem:
+                for inside_mem in a[:-1]:
 
-                    for inside_mem in form_mem:
-                        if inside_mem['type'] == 'poll':
-                            parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' ' + '[' + ', '.join(
-                                str(e) for e in inside_mem['options']) + ']' + '\n')
+                    if inside_mem['type'] == 'poll':
+                        parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + ' ' + '[' + ', '.join(
+                            str(e) for e in inside_mem['options']) + ']' + '\n')
 
-                        elif inside_mem['type'] == 'msg':
-                            parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + '\n')
+                    elif inside_mem['type'] == 'msg':
+                        parsed_msg += str(inside_mem['type'] + ' ' + inside_mem['question'] + '\n')
 
-                full_message += parsed_msg
+            full_message += parsed_msg
 
         await message.answer(full_message, reply_markup=None)
 

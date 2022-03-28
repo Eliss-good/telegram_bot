@@ -230,6 +230,8 @@ def find_one_form(data, form_id):
             return data['info_form']
         except KeyError:
             print('KEY ERROR fun', find_one_form.__name__)
+        except TypeError:
+            print('TYPE ERROR fun', find_one_form.__name__)
     else:
         print('Erorrchik')
 

@@ -113,5 +113,7 @@ def get_ids_create_form(tg_id: int):
     """Отправляет все id форм созданных по этому tg_id"""
     return set_from_id_for_tg_id(tg_id)
 
+def get_tg_creator_form(form_id: int):
+    return int(bf.db.select_db_where('survay_tb', ['from_id'], ['form_id'], [form_id], 'where')[0][0])
 
 
