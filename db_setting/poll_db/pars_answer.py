@@ -5,7 +5,7 @@ def search_form_id_json(new_answers):
                 print(about_one_answer)
                 return int(about_one_answer["unique_form_id"])
             except KeyError:
-                print("ERORR БЛЯЯТЬ", search_answer_in_json.__name__)
+                print("ERROR fun", search_answer_in_json.__name__)
 
 def search_answer_in_json(new_answers):
    """Форматирование json результатов опроса"""
@@ -19,9 +19,9 @@ def search_answer_in_json(new_answers):
                 res_nums_answer = res["option_ids"]
                 for item in res_nums_answer:
                     res_str_answer = about_one_answer["pollCopy"]["options"][int(item)]
-                    result_answers[res_str_answer] = about_one_answer["pollCopy"]["question"]
+                    result_answers[about_one_answer["pollCopy"]["question"]] = res_str_answer
             elif name_res == "messageAnswer":
                res_str_answer = str(res['text'])
-               result_answers[res_str_answer] = about_one_answer["messageCopy"]["question"]
+               result_answers[about_one_answer["messageCopy"]["question"]] = res_str_answer
 
    return result_answers

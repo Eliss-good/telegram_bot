@@ -117,3 +117,6 @@ def get_tg_creator_form(form_id: int):
     return int(bf.db.select_db_where('survay_tb', ['from_id'], ['form_id'], [form_id], 'where')[0][0])
 
 
+def
+
+

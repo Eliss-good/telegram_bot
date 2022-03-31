@@ -69,15 +69,18 @@ def _start_answer(data_survay):
    new_file = {}
    new_file['info_form'] = data_survay
    new_file['send_group'] = []
-   new_file['questions'] = []
+   new_file['questions'] = {}
    new_file['all_answer'] = []
    #########################################
 
-   print(data_survay[:-1])
-
    for item in data_survay[:-1]:
-      new_file['questions'].append(item['question'])
-      bf.add_questions(item['question'])
+      try:
+         if new_file['questions'].get(item['type']) == None:
+            new_file['questions'][item['type']] = []
+            new_file['questions'][item['type']].append(item['qquestion'])
+         bf.add_questions(item['question'])
+      except:
+         print("ERROR fun", _start_answer.__name__)
    
    create_group_question(new_file['questions'], data_survay[-1]['form_id'])
    return new_file
