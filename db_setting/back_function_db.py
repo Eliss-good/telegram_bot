@@ -3,12 +3,12 @@ from .db_connect import DataConnect
 db = DataConnect()
 
 
-def correct_str(t_item):
+def correct_str(t_item: str):
     """служебная функция"""
     t_item = "'" + t_item +"'" 
     return t_item 
 
-def correct_list(old_list):
+def correct_list(old_list: list):
     new_list = []
     for one_item in old_list:
         new_list.append(one_item[0])
@@ -152,6 +152,24 @@ def find_group_us(tg_id):
         return db.select_db_where('group_tb', ['group_name'], ['id'], [(find_id_group_student(tg_id))], 'where')[0][0]
     except IndexError:
         print('INDEX ERROR fun', find_group_us.__name__)
+
+
+def find_name_group(group_id : int):
+    """Возвращение имя группы"""
+    try:
+        return db.select_db_where('group_tb', ['group_name'], ['id'], [str(group_id)], 'where')[0][0]
+    except IndexError:
+        print('INDEX ERROR fun', find_name_group.__name__)
+
+
+
+def find_id_prepod_for_tg(tg_id : int):
+    """Возвращение ID преподавателя по tg_id"""
+    try:
+        return db.select_db_where('prepod_tb', ['id'], ['gl_id'] ,[bf.find_id_global(tg_id)], 'where')[0][0]
+    except IndexError:
+        print('INDEX ERROR fun', find_name_group.__name__)
+
 
 
 def find_tg_id(gl_id):

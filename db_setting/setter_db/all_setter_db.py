@@ -2,7 +2,7 @@ import db_setting.back_function_db as bf
 import db_setting.poll_db.poll_connect_db as poll_db
 
 """Cеттер для данных пользователя"""
-def set_id_users(list_name_group):
+def set_id_users(list_name_group : list):
     """Возвоащается списком  все ID телеги по указанным группам"""
     group_us = []
 
@@ -95,3 +95,30 @@ def set_from_id_for_tg_id(tg_id : int):
 def set_form_name_for_form_id(form_id : int):
     """Возвращает имя формы по form_id"""
     return bf.find_name_form(form_id)
+
+
+def set_all_groups_for_prepod(tg_id : int):
+    """Вывод всех групп прикреплённых преподавателю"""
+    id_prepod = bf.find_id_prepod_for_tg(tg_id)
+    id_groups = bf.db.select_db_where('connect_tb', ['group_id'], ['prepod_id'], [id_prepod], 'where')
+
+    id_groups = bf.correct_list(id_groups)
+    name_groups = []
+
+    for one in id_groups:
+        name_groups.append(bf.find_name_group(one))
+
+    return name_groups
+
+
+def set_all_groups_from_prepod(tg_id : int):
+    """Вывод всех пользователей прикреплённых преподавателю"""
+    groups_prepod = set_all_groups_for_prepod(tg_id)
+    all_users = {}
+
+    for one_gr in groups_prepod:
+        all_users[one_gr] = set_id_users([one_gr])
+
+    return all_users
+
+

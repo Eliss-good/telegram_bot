@@ -6,6 +6,13 @@ def update_sub_news(id_us_tg, status):
     bf.db.update_db('global_tb', ['sub_newslet'], [str(status)], ['gl_teleg_id'], [bf.correct_str(str(id_us_tg))])
 
 
+def update_aprove(tg_id : int):
+    """Обновление информации о подтверждение препода"""
+    if bf.find_role_us(tg_id) == 'prepod':
+        global_id_pr = bf.find_id_global(tg_id)
+        bf.db.update_db('prepod_tb', ['prepod_approved'], ['True'], ['gl_id'], [tg_id])
+        
+
 #####role: prepod / student; command: group / name 
 def update_data_user(role ,command, new_data, id_us_tg):
     """Обновление данных о пользователей"""

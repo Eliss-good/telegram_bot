@@ -22,3 +22,5 @@ def reg_us(name_user, id_us_tg, role, group_stud = None):
     else:
         #update_us(id_us_tg)
         print(id_us_tg ,' ты уже зареган')
+
+
