@@ -7,6 +7,17 @@ from bot_elements.storages.all_storages import completing_forms_dispatcher
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
 import bot_elements.storages.all_storages
+from bots import admin_bot
+
+
+def unconfirmed_users_plus_one():
+    """ Увеличивает счетчик неподтвержденных пользователей на 1"""
+    bot_elements.storages.all_storages.unconfirmed_users += 1
+
+
+def unconfirmed_users_minus_one():
+    """ Уменьшает счетчик неподтвержденных пользователей на 1"""
+    bot_elements.storages.all_storages.unconfirmed_users -= 1
 
 
 def temp_form_recipient_data_add_user_data(chat_id: int, form_name: str, type: str, form_id: int, creator_id: int):
@@ -122,6 +133,7 @@ def completing_forms_dispatcher_set_question_id(user_id: int, question_num: int,
 
 
 def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
+    # TO DO!
     """ (Для БД) Добавляет рег. данные пользователя"""
     """
         user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
@@ -148,19 +160,16 @@ def registerData_change_fio_data(user_id: int, new_fio: str):
 def unique_form_id_plus_one():
     """ Увеличивает счетчик созданных вопросов на 1"""
     bot_elements.storages.all_storages.unique_form_id += 1
-    
-    # print('\n\ni daaaan ', bot_elements.storages.all_storages.unique_form_id)
 
 
 def unique_sent_form_id_plus_one():
     """ Увеличивает счетчик отправленных вопросов на 1"""
     bot_elements.storages.all_storages.unique_sent_form_id += 1
-    # print(bot_elements.storages.all_storages.unique_sent_form_id)
 
 
 def sendPollAnswer(pollAnswer: types.PollAnswer, question_number: int, unique_form_id: int, unique_sent_form_id: int, pollCopy):
     """ Получает ответ на опрос"""
-    # print('\n',pollAnswer, question_number, unique_form_id, unique_sent_form_id, pollCopy)
+
 
     if not pollAnswer.user.id in temp_mem_for_answers.keys():
         temp_mem_for_answers[pollAnswer.user.id] = []

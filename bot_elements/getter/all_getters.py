@@ -220,6 +220,12 @@ def unique_sent_form_id_get():
     return bot_elements.storages.all_storages.unique_sent_form_id
 
 
+def unconfirmed_users_get():
+    """ (Для БД) Возвращает счетчик отправленных форм"""
+    # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
+    return bot_elements.storages.all_storages.unconfirmed_users
+
+
 def temp_mem_for_answers_get():
     """ Возвращает все ответы на вопросы формы"""
     return temp_mem_for_answers
