@@ -52,14 +52,15 @@ def update_group_in_survay(max_index_g, form_id):
    bf.db.update_db('survay_tb', ['groupquestion_id'], [max_index_g], ['form_id'], [form_id])
 
 
-def create_group_question(list_question, form_id):
+def create_group_question(dict_question : dict, form_id : int):
    """Создание новой группы вопросов для формы"""
    max_index_g = bf.max_index_group_question()
    max_index_g = str(max_index_g + 1)
 
    update_group_in_survay(max_index_g, str(form_id))
-   for quest in list_question:
-      bf.add_group_questions(quest, max_index_g)
+   for type_ques, ques in dict_question.items():
+      for one_ques in ques:
+         bf.add_group_questions(one_ques, max_index_g)
 
 
 def _start_answer(data_survay):
@@ -77,7 +78,9 @@ def _start_answer(data_survay):
       try:
          if new_file['questions'].get(item['type']) == None:
             new_file['questions'][item['type']] = []
-            new_file['questions'][item['type']].append(item['qquestion'])
+
+         new_file['questions'][item['type']].append(item['question'])
+
          bf.add_questions(item['question'])
       except:
          print("ERROR fun", _start_answer.__name__)

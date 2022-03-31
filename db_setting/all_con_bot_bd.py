@@ -1,9 +1,9 @@
 from db_setting.poll_db.poll_connect_db import add_survay, add_answer_for_survay
 from db_setting.register_db.all_register import reg_us
 from db_setting.setter_db.all_setter_db import set_id_users, set_any_data, set_status_us, set_form, set_start_form_users, set_form_us, \
-     set_form_name_for_form_id, set_from_id_for_tg_id
+     set_form_name_for_form_id, set_from_id_for_tg_id, set_tg_user_for_from
 from db_setting.remove_db.all_delete import del_us
-from db_setting.update_db.all_update import update_data_user, update_sub_news 
+from db_setting.update_db.all_update import update_data_user, update_sub_news, update_aprove_prepod, update_name_form
 import db_setting.back_function_db as bf
 
 
@@ -113,10 +113,20 @@ def get_ids_create_form(tg_id: int):
     """Отправляет все id форм созданных по этому tg_id"""
     return set_from_id_for_tg_id(tg_id)
 
+
 def get_tg_creator_form(form_id: int):
-    return int(bf.db.select_db_where('survay_tb', ['from_id'], ['form_id'], [form_id], 'where')[0][0])
+    """Возвращает id автора формы"""
+    return set_tg_user_for_from(form_id)
 
 
-def
+def update_status_prepod(tg_id: int):
+    """Обновляет статус подленности препода"""
+    update_aprove_prepod(tg_id)
+
+
+def update_form_name(form_id : int, new_name : str):
+    """Обновляет название формы"""
+    return update_name_form(form_id, new_name)
+
 
 

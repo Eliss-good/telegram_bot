@@ -8,6 +8,7 @@ from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import temp_mem_for_answers
 import bot_elements.storages.all_storages
 
+from bot_elements.getter.all_getters import mem_for_created_forms_get_data
 import db_setting.all_con_bot_bd as con_db
 
 
@@ -72,7 +73,7 @@ def completing_forms_dispatcher_add_session(chat_id: int, unique_form_id: int, u
     """ Добавляет 1 сессию в список активных сессий"""
     completing_forms_dispatcher[chat_id] = {
         'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id,
-        'current_question_num': 0, 'form_copy': mem_for_created_forms[unique_form_id]}
+        'current_question_num': 0, 'form_copy': mem_for_created_forms_get_data(unique_form_id)}
 
 
 def completing_forms_dispatcher_add_1_to_question_num(user_id: int):

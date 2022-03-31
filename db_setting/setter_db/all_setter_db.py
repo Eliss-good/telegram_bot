@@ -6,14 +6,15 @@ def set_id_users(list_name_group : list):
     """Возвоащается списком  все ID телеги по указанным группам"""
     group_us = []
 
-    for name_group in list_name_group:
-        name_group[0] = name_group[0].upper()
+    if list_name_group :
+        for name_group in list_name_group:
+            name_group[0] = name_group[0].upper()
 
-        data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group[0])], 'where')
-        for i in data:
-            group_us.append(int(bf.find_tg_id(i[0])))
+            data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group[0])], 'where')
+            for i in data:
+                group_us.append(int(bf.find_tg_id(i[0])))
 
-    return group_us
+        return group_us
 
 
 def set_any_data(command):
@@ -111,7 +112,7 @@ def set_all_groups_for_prepod(tg_id : int):
     return name_groups
 
 
-def set_all_groups_from_prepod(tg_id : int):
+def set_all_groups_from_prepod(tg_id: int):
     """Вывод всех пользователей прикреплённых преподавателю"""
     groups_prepod = set_all_groups_for_prepod(tg_id)
     all_users = {}
@@ -122,3 +123,6 @@ def set_all_groups_from_prepod(tg_id : int):
     return all_users
 
 
+def set_tg_user_for_from(form_id: int):
+    """Возвращает id пользователя, который создал форму"""
+    return int(bf.db.select_db_where('survay_tb', ['from_id'], ['form_id'], [str(form_id)], 'where')[0][0])

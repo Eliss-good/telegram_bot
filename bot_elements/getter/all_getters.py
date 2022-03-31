@@ -39,27 +39,22 @@ def temp_form_recipient_data_get():
     return temp_form_recipient_data
 
 
-# def mem_for_created_forms_get():
-#     """ Возвращает mem_for_created_forms"""
-#     print('\n\n', mem_for_created_forms)
-#     return mem_for_created_forms
-
 def mem_for_created_forms_get(user_id: int):
-    print('\n\n ', con_db.get_form_user(user_id))
     return con_db.get_form_user(user_id)
 
-# def mem_for_created_forms_get_data():
-#     """ Возвращает ячейку памяти хранящую данные созданной формы (mem_for_created_forms)"""
-#     return mem_for_created_forms
+
+def mem_for_created_forms_get_data(form_id : int):
+     """ Возвращает ячейку памяти хранящую данные созданной формы (mem_for_created_forms)"""
+     return con_db.get_data_form('one', form_id = form_id)
 
 
 def mem_for_created_forms_get_form_name(form_id: int):
     """ Возвращает название созданной формы из mem_for_created_forms"""
-    #return mem_for_created_forms[form_id][-1]['form_name']
+    #mem_for_created_forms[form_id][-1]['form_name']
     return con_db.get_name_form(form_id)
 
 def mem_for_created_forms_get_creator_id(form_id: int):
-    """ Возвращает айди создателя формы из mem_for_created_forms"""
+    """Возвращает айди создателя формы из mem_for_created_forms"""
     #return mem_for_created_forms[form_id][-1]['creator_id']
     return con_db.get_tg_creator_form(form_id)
 
@@ -124,8 +119,8 @@ def send_forms_mem_get():
 
 def send_forms_mem_get_form(sent_form_id: int):
     """ Возвращает форму из send_forms_mem (память с отправленынми формами)"""
+    #return con_db.get_data_form('one', form_id=send_forms_mem)
     return send_forms_mem[sent_form_id]
-
 
 def send_forms_mem_get_form_sent_users(sent_form_id: int):
     """ Возвращает айди пользователей, которым отослана форма"""

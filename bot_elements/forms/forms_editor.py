@@ -17,7 +17,7 @@ from bot_elements.setter.all_setters import mem_for_created_forms_set_new_questi
     mem_for_created_forms_edit_poll_options, mem_for_created_forms_set_new_form_name
 from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data
 from bot_elements.remover.all_removers import mem_for_created_forms_delete_question, \
-    temp_mem_for_form_creator_remove_form, mem_for_created_forms_delete_question
+    temp_mem_for_form_creator_remove_form, mem_for_created_forms_delete_question, mem_for_created_forms_delete_form
 
 
 class newQuestionName(StatesGroup):
@@ -66,7 +66,7 @@ async def rename_question_end(message: types.Message,
     new_question_name = message.text
     data = await state.get_data()
     mem_for_created_forms_set_new_question_name(form_id=data['form_id'], question_id=data['question_id'],
-                                                new_question_name=new_question_name)
+                                                new_question_name=new_question_name, message=message)
     await display_form(form_id=data['form_id'], message=message)
     await state.finish()
 
@@ -134,7 +134,8 @@ async def get_options(message: types.Message, state: FSMContext):  # form.waitin
                                                 'message_id': 0, 'type': 'poll'})
 
     mem_for_created_forms_insert_question(form_id=data['form_id'], inser_after_id=data['question_id'],
-                                          data=temp_mem_for_form_creator_get_data(message.chat.id).copy())
+                                          data=temp_mem_for_form_creator_get_data(message.chat.id).copy(),
+                                          message=message)
 
     temp_mem_for_form_creator_remove_form(user_id=message.chat.id)
 
@@ -192,7 +193,7 @@ async def editPollOtions_set_data(message: types.Message, state: FSMContext):  #
     data = await state.get_data()
 
     mem_for_created_forms_edit_poll_options(form_id=data['form_id'], question_id=data['question_id'],
-                                            new_poll_options=data['options'])
+                                            new_poll_options=data['options'], message=message)
 
     await display_form(form_id=data['form_id'], message=message)
     await state.finish()
@@ -210,7 +211,7 @@ async def edit_form_name_finish(message: types.Message, state: FSMContext):  # r
     """ (edit)(renameForm FSM) Изменяет название формы"""
     new_name = message.text
     data = await state.get_data()
-    mem_for_created_forms_set_new_form_name(form_id=data['form_id'], new_form_name=new_name)
+    mem_for_created_forms_set_new_form_name(form_id=data['form_id'], new_form_name=new_name, message=message)
 
     await display_current_mem_status(message=message)
     await state.finish()
@@ -219,7 +220,7 @@ async def edit_form_name_finish(message: types.Message, state: FSMContext):  # r
 async def delete_form(message: types.Message):
     """ Удаляет форму"""
     delete_id = int(message.text[5:])
-    mem_for_created_forms_delete_question(form_id=delete_id)
+    mem_for_created_forms_delete_form(form_id=delete_id)
     await display_current_mem_status(message=message)
 
 
