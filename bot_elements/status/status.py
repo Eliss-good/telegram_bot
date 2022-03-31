@@ -1,22 +1,15 @@
 """ Статус пользователя"""
-from aiogram import Bot, Dispatcher, types
+from aiogram import Dispatcher, types
 from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy, send_forms_mem_get_form_completed_users, send_forms_mem_get_form_sent_users, temp_mem_for_answers_get
 from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
 from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, send_forms_mem_add_completed_user, sendMsgAnswer, sendPollAnswer, sendFormAnswer
-
+from bots import student_bot
 import collections
-import configparser
-
-config = configparser.ConfigParser()
-config.read('/home/gilfoyle/Documents/coding/work-4-food/config.ini')
-
-bot = Bot(token=config['DEFAULT']['studentBotToken'])
-
 
 async def display_user_status(message: types.Message):
 
     full_message = "Полученные формы:"
-    print('\n\n\n',send_forms_mem_get())
+    # print('\n\n\n',send_forms_mem_get())
     for selected_form in send_forms_mem_get():
         form = send_forms_mem_get()
         select_form = form[selected_form]
@@ -65,12 +58,12 @@ async def go_cycle(message, type):
     print('\n IMPORTONT ', curr_question_num, curr_quest)
     if curr_quest['type'] == 'poll':
 
-        msg = await bot.send_poll(chat_id=user_id, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=False)
+        msg = await student_bot.send_poll(chat_id=user_id, question=curr_quest['question'], options=curr_quest['options'], is_anonymous=False)
         completing_forms_dispatcher_set_question_id(user_id=user_id, question_num=curr_question_num, question_id=msg.poll.id)
         
 
     elif curr_quest['type'] == 'msg':
-        msg = await bot.send_message(chat_id=user_id, text=curr_quest['question'])
+        msg = await student_bot.send_message(chat_id=user_id, text=curr_quest['question'])
         completing_forms_dispatcher_set_question_id(user_id=user_id, question_num=curr_question_num, question_id=msg.message_id)
 
 
@@ -81,8 +74,8 @@ async def go_cycle(message, type):
         print('theend')
         
         sendFormAnswer(temp_mem_for_answers_get())
-        print('\n', temp_mem_for_answers_get())
-        print(completing_forms_dispatcher_get())
+        # print('\n', temp_mem_for_answers_get())
+        # print(completing_forms_dispatcher_get())
 
 
         if collections.Counter(send_forms_mem_get_form_completed_users(sent_form_id=sent_form_id)) == collections.Counter(send_forms_mem_get_form_sent_users(sent_form_id=sent_form_id)):

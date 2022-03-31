@@ -1,4 +1,4 @@
-registerData = {}  # {*user_id*: {'user_role': *role*, 'user_group': *group*}}
+registerData = {}  # {*user_id*: {'user_role': *role*, 'user_group': *group*, 'confirmed': true/false}}
 
 temp_form_recipient_data = {}  # {'*form_creator_user_id*': {recip data}}
 
@@ -8,7 +8,7 @@ temp_mem_for_answers = {} # {user_id: [{answer1}, {answer2}, ...]}
 
 mem_for_created_forms = {}  # {*form_id*: [form data], ...}
 
-send_forms_mem = {} # {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...}
+send_forms_mem = {} # {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'send_to_groups': [groups],'got_answers_from': [ids]}, ...}
                     
 completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_sent_form_id': id, 'current_question': num, 'form_copy': [form_data]}, ...}
 

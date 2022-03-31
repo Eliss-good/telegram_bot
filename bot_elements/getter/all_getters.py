@@ -121,9 +121,11 @@ def completing_froms_dispatcher_is_user_in_list(user_id: int):
     """ Проверяет, заполняет ли сейчас пользователь форму"""
     return user_id in completing_forms_dispatcher.keys()
 
+
 def completing_forms_dispatcher_get():
     """ Возвращает completing_forms_dispatcher (список с юзерами и  формами которые они сейчас заполняют)"""
     return completing_forms_dispatcher
+
 
 def registerData_get_fio(user_id: int):
     """ (Для БД) Возвращает ФИО юзера из registerData"""

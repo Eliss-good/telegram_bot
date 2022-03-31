@@ -6,7 +6,6 @@ from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
-from bot_elements.storages.all_storages import edit_forms_dispatcher
 import bot_elements.storages.all_storages
 
 
@@ -23,6 +22,13 @@ def temp_form_recipient_data_add_user_data(chat_id: int, form_name: str, type: s
 
 def temp_mem_for_form_creator_add_element(user_id: int, data: dict):
     """ Добавляет 1 элемент формы во временный словарь для создания формы"""
+    """
+        Формат поля data:
+        (для просто вопроса) data={'question':'question', 'message_id': 0, 'type': 'msg'}
+        (для опроса)         data={'question': 'question', 'options': ['options'], 'message_id': 0, 'type': 'poll'}
+        (для служебной инфы) data={'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}
+    """
+
     if user_id in temp_mem_for_form_creator:
             temp_mem_for_form_creator[user_id].append(data)
     else:
@@ -80,12 +86,12 @@ def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_
   
 
 
-def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_user_id: int, send_to_users_ids: list):
+def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_user_id: int, send_to_users_ids: list, groups: list):
     """ (Для БД) Добавляет 1 форму в список с отправленными формами"""
     """
         sent_form_id - айдишник отправленной формы, form_id - айдишник формы, form_creator_user_id - айдишник телеги создателя формы, send_to_users_ids - айдишники тех, кому придет опрос
     """
-    send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids, 'got_answers_from': []}}
+    send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids, 'send_to_groups': groups, 'got_answers_from': []}}
 
 
 def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
@@ -99,6 +105,7 @@ def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
 
 def completing_forms_dispatcher_add_session(chat_id: int, unique_form_id: int, unique_sent_form_id: int):
     """ Добавляет 1 сессию в список активных сессий"""
+    
     completing_forms_dispatcher[chat_id] = {
         'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'current_question_num': 0,'form_copy': mem_for_created_forms[unique_form_id]}
     
@@ -119,7 +126,7 @@ def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chos
     """
         user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
     """
-    registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role}
+    registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'registered': False}
 
 
 def registerData_change_group_data(user_id: int, new_group: str):
