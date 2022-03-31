@@ -37,101 +37,47 @@ def mem_for_created_forms_add_element(form_id: int, data):
     mem_for_created_forms[form_id] = data
 
 
-def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, data, message: types.Message):
+def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, data):
     """ (Для БД) Вставляет вопрос после выбранного id"""
-
-    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
-        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
     """
-
-    """ 
-        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
+        form_id - айди формы, inser_after_id - айдишник вопроса после которого вставить текущий, data[0] - сами данные о вопросе
     """
-
-    if not form_id in edit_forms_dispatcher.keys():
-        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
+   
+    mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
     
-        edit_forms_dispatcher[form_id].insert(inser_after_id + 1, data[0])
-
-        del edit_forms_dispatcher[form_id]
-
-        mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
-    
-    else:
-        message.answer('эта форма уже кем то редактируется')
 
 
-def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str, message: types.Message):
+
+def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
     """ (Для БД) Изменяет название формы из mem_for_created_forms"""
 
-    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
-        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+        form_id - айди формы, new_form_name - новое название формы
     """
 
-    """ 
-        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
-    """
+    mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
 
+  
 
-    if not form_id in edit_forms_dispatcher.keys():
-        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
-
-        edit_forms_dispatcher[form_id][-1]['form_name'] = new_form_name
-
-        del edit_forms_dispatcher[form_id]
-
-        mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
-
-    else:
-        message.answer('эта форма уже кем то редактируется')
-
-def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, new_question_name: str, message: types.Message):
+def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, new_question_name: str):
     """ (Для БД) Изменяет название вопроса формы из mem_for_created_forms"""
-
-    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
-        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+        form_id - айди формы, question_id - айди вопроса, new_question_name - новое название вопроса
     """
 
-    """ 
-        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
-    """
+    mem_for_created_forms[form_id][question_id]['question'] = new_question_name
 
-    if not form_id in edit_forms_dispatcher.keys():
-        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
-
-        edit_forms_dispatcher[form_id][question_id]['question'] = new_question_name
-
-
-        del edit_forms_dispatcher[form_id]
-
-        mem_for_created_forms[form_id][question_id]['question'] = new_question_name
-
-    else:
-        message.answer('эта форма уже кем то редактируется')
-
-
-def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_poll_options: list, message: types.Message):
+  
+def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_poll_options: list):
     """ (Для БД) Изменяет опции опроса формы из mem_for_created_forms"""
-
-    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
-        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+        form_id - айди формы, question_id - айди вопроса, new_poll_options - новые опции опроса
     """
 
-    """ 
-        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
-    """
-
-    if not form_id in edit_forms_dispatcher.keys():
-        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
-
-        edit_forms_dispatcher[form_id][question_id]['options'] = new_poll_options
-
-        del edit_forms_dispatcher[form_id]
-
-        mem_for_created_forms[form_id][question_id]['options'] = new_poll_options
     
-    else:
-        message.answer('эта форма уже кем то редактируется')
+    mem_for_created_forms[form_id][question_id]['options'] = new_poll_options
+    
+  
 
 
 def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_user_id: int, send_to_users_ids: list):
