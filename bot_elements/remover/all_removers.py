@@ -27,7 +27,7 @@ def mem_for_created_forms_delete_question(form_id: int, question_id: int):
     mem_for_created_forms[form_id].pop(question_id)
 
 
-def mem_for_created_forms_delete_question(form_id: int):
+def mem_for_created_forms_delete_form(form_id: int):
     """ Убирает 1 форму из mem_for_created_forms"""
     mem_for_created_forms.pop(form_id, None)
 

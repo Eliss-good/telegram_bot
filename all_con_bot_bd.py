@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('/Users/igormalysh/Documents/codes/telegram_bot/db_setting')
+sys.path.append('/home/gilfoyle/Documents/coding/work-4-food/db_setting')
 import db_setting.us_connect_db as us_db
 import db_setting.poll_connect_db as poll_db
 

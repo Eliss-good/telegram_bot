@@ -6,11 +6,12 @@ from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
+from bot_elements.storages.all_storages import edit_forms_dispatcher
 import bot_elements.storages.all_storages
 
 
 def temp_form_recipient_data_add_user_data(chat_id: int, form_name: str, type: str, form_id: int, creator_id: int):
-    """Добавляет даныне пользователя во временный словарь со служебными данными формы"""
+    """ Добавляет даныне пользователя во временный словарь со служебными данными формы"""
     if not chat_id in temp_form_recipient_data:
         temp_form_recipient_data[chat_id] = {}
 
@@ -29,37 +30,124 @@ def temp_mem_for_form_creator_add_element(user_id: int, data: dict):
 
 
 def mem_for_created_forms_add_element(form_id: int, data):
-    """ Добавляет 1 форму в словарь сохраненных форм"""
+    """ (Для БД) Добавляет 1 форму в словарь сохраненных форм"""
+    """
+        data - данные формы, form_id - айдишник формы
+    """
     mem_for_created_forms[form_id] = data
 
 
-def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, data):
-    """ Вставляет вопрос после выбранного id"""
-    mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
+def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, data, message: types.Message):
+    """ (Для БД) Вставляет вопрос после выбранного id"""
+
+    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
+        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+
+    """ 
+        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
+    """
+
+    if not form_id in edit_forms_dispatcher.keys():
+        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
+    
+        edit_forms_dispatcher[form_id].insert(inser_after_id + 1, data[0])
+
+        del edit_forms_dispatcher[form_id]
+
+        mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
+    
+    else:
+        message.answer('эта форма уже кем то редактируется')
 
 
-def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
-    """ Изменяет название формы из mem_for_created_forms"""
-    mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
+def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str, message: types.Message):
+    """ (Для БД) Изменяет название формы из mem_for_created_forms"""
+
+    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
+        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+
+    """ 
+        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
+    """
 
 
-def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, new_question_name: str):
-    """ Изменяет название вопроса формы из mem_for_created_forms"""
-    mem_for_created_forms[form_id][question_id]['question'] = new_question_name
+    if not form_id in edit_forms_dispatcher.keys():
+        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
+
+        edit_forms_dispatcher[form_id][-1]['form_name'] = new_form_name
+
+        del edit_forms_dispatcher[form_id]
+
+        mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
+
+    else:
+        message.answer('эта форма уже кем то редактируется')
+
+def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, new_question_name: str, message: types.Message):
+    """ (Для БД) Изменяет название вопроса формы из mem_for_created_forms"""
+
+    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
+        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+
+    """ 
+        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
+    """
+
+    if not form_id in edit_forms_dispatcher.keys():
+        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
+
+        edit_forms_dispatcher[form_id][question_id]['question'] = new_question_name
 
 
-def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_poll_options: list):
-    """ Изменяет опции опроса формы из mem_for_created_forms"""
-    mem_for_created_forms[form_id][question_id]['options'] = new_poll_options
+        del edit_forms_dispatcher[form_id]
+
+        mem_for_created_forms[form_id][question_id]['question'] = new_question_name
+
+    else:
+        message.answer('эта форма уже кем то редактируется')
+
+
+def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_poll_options: list, message: types.Message):
+    """ (Для БД) Изменяет опции опроса формы из mem_for_created_forms"""
+
+    """ Передай в переменную mem_for_created_forms форму по ее id в формате:
+        [{'question': 'Опрос', 'options': ['Ладалала', ' двдажузу'], 'message_id': 0, 'type': 'poll'}, {'question': 'Вопрос', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Форма', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}] 
+    """
+
+    """ 
+        Возьми обновленные данные формы из edit_forms_dispatcher и замени ими старые по айди формы
+    """
+
+    if not form_id in edit_forms_dispatcher.keys():
+        edit_forms_dispatcher[form_id] = mem_for_created_forms[form_id].copy()
+
+        edit_forms_dispatcher[form_id][question_id]['options'] = new_poll_options
+
+        del edit_forms_dispatcher[form_id]
+
+        mem_for_created_forms[form_id][question_id]['options'] = new_poll_options
+    
+    else:
+        message.answer('эта форма уже кем то редактируется')
 
 
 def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_user_id: int, send_to_users_ids: list):
-    """ Добавляет 1 форму в список с отправленными формами"""
+    """ (Для БД) Добавляет 1 форму в список с отправленными формами"""
+    """
+        sent_form_id - айдишник отправленной формы, form_id - айдишник формы, form_creator_user_id - айдишник телеги создателя формы, send_to_users_ids - айдишники тех, кому придет опрос
+    """
     send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids, 'got_answers_from': []}}
 
 
 def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
-    """ Добавляет пользователя в список пользователей прошедших форму"""
+    """ (Для БД) Добавляет пользователя в список пользователей прошедших форму"""
+    """
+        sent_form_id - айдишник отправленной формы, , user_id - айди телеги пользователя, который прошел опрос
+    """
+
     send_forms_mem[sent_form_id]['info']['got_answers_from'].append(user_id)
 
 
@@ -77,21 +165,30 @@ def completing_forms_dispatcher_add_1_to_question_num(user_id: int):
 def completing_forms_dispatcher_set_question_id(user_id: int, question_num: int, question_id: int):
     """ Задает id для сообщения формы"""
     completing_forms_dispatcher[user_id]['form_copy'][question_num]['message_id'] = question_id
-    print(completing_forms_dispatcher[user_id]['form_copy'][question_num])    
+    # print(completing_forms_dispatcher[user_id]['form_copy'][question_num])    
 
 
 def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
-    """ Добавляет рег. данные пользователя"""
+    """ (Для БД) Добавляет рег. данные пользователя"""
+    """
+        user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
+    """
     registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role}
 
 
 def registerData_change_group_data(user_id: int, new_group: str):
     """ Изменяет группу пользователя"""
+    """
+        user_id -айди пользователя, new_group - новая группа
+    """
     registerData[user_id]['chosen_group'] = new_group
     
 
 def registerData_change_fio_data(user_id: int, new_fio: str):
     """ Изменяет ФИО пользователя"""
+    """
+        user_id -айди пользователя, new_fio - новые ФИО
+    """
     registerData[user_id]['chosen_fio'] = new_fio
 
 
@@ -99,13 +196,13 @@ def unique_form_id_plus_one():
     """ Увеличивает счетчик созданных вопросов на 1"""
     bot_elements.storages.all_storages.unique_form_id += 1
     
-    print('\n\ni daaaan ', bot_elements.storages.all_storages.unique_form_id)
+    # print('\n\ni daaaan ', bot_elements.storages.all_storages.unique_form_id)
 
 
 def unique_sent_form_id_plus_one():
     """ Увеличивает счетчик отправленных вопросов на 1"""
     bot_elements.storages.all_storages.unique_sent_form_id += 1
-    print(bot_elements.storages.all_storages.unique_sent_form_id)
+    # print(bot_elements.storages.all_storages.unique_sent_form_id)
 
 
 def sendPollAnswer(pollAnswer: types.PollAnswer, question_number: int, unique_form_id: int, unique_sent_form_id: int, pollCopy):
@@ -128,6 +225,6 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 
 
 def sendFormAnswer(formAnswer: dict):
-    """ Сюда приходит форма со всеми ответами на форму"""
+    """ Сюда приходит словарь со всеми ответами на форму"""
     print(formAnswer)
     pass
