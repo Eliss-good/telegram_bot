@@ -1,9 +1,9 @@
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
-from bot_elements.storages.all_storages import send_forms_mem # todo!
+from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
-from bot_elements.storages.all_storages import registerData # хз
+from bot_elements.storages.all_storages import registerData
 
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher
 
@@ -23,12 +23,14 @@ def temp_mem_for_form_creator_remove_form_element(user_id: int, delete_id: int):
 
 
 def mem_for_created_forms_delete_question(form_id: int, question_id: int):
-    """ Убирает 1 элемент формы по question_id из mem_for_created_forms"""
+    """ (Для БД) Убирает 1 элемент формы по question_id из mem_for_created_forms"""
+    """ form_id - айди формы, question_id - айди вопроса"""
     mem_for_created_forms[form_id].pop(question_id)
 
 
 def mem_for_created_forms_delete_form(form_id: int):
-    """ Убирает 1 форму из mem_for_created_forms"""
+    """ (Для БД) Убирает 1 форму из mem_for_created_forms"""
+    """ form_id - айди формы"""
     mem_for_created_forms.pop(form_id, None)
 
 

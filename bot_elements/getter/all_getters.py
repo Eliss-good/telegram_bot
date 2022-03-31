@@ -38,22 +38,47 @@ def temp_form_recipient_data_get():
 
 
 def mem_for_created_forms_get():
-    """ Возвращает mem_for_created_forms"""
+    """ (Для БД) Возвращает mem_for_created_forms"""
+    """
+    Пример mem_for_created_forms:
+    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+    """
     return mem_for_created_forms
 
 
 def mem_for_created_forms_get_data(form_id: int):
-    """ Возвращает ячейку памяти хранящую данные созданной формы (mem_for_created_forms)"""
+    """ (Для БД) Возвращает ячейку памяти хранящую данные созданной формы (mem_for_created_forms)"""
+    
+    """ form_id - айди формы"""
+
+    """
+    Пример mem_for_created_forms:
+    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+    """
     return mem_for_created_forms[form_id]
 
 
 def mem_for_created_forms_get_form_name(form_id: int):
-    """ Возвращает название созданной формы из mem_for_created_forms"""
+    """ (Для БД) Возвращает название созданной формы из mem_for_created_forms"""
+
+    """ form_id - айди формы"""
+
+    """
+    Пример mem_for_created_forms:
+    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+    """
     return mem_for_created_forms[form_id][-1]['form_name']
 
 
 def mem_for_created_forms_get_creator_id(form_id: int):
-    """ Возвращает айди создателя формы из mem_for_created_forms"""
+    """ (Для БД) Возвращает айди создателя формы из mem_for_created_forms"""
+
+    """ form_id - айди формы"""
+
+    """
+    Пример mem_for_created_forms:
+    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+    """
     return mem_for_created_forms[form_id][-1]['creator_id']
 
 
@@ -101,53 +126,94 @@ def completing_forms_dispatcher_get():
     return completing_forms_dispatcher
 
 def registerData_get_fio(user_id: int):
-    """ Возвращает ФИО юзера из registerData"""
+    """ (Для БД) Возвращает ФИО юзера из registerData"""
+
+    """ user_id - айди юзера"""
+    
     return registerData[user_id]['chosen_fio']
 
 
 def registerData_get_group(user_id: int):
-    """ Возвращает группу юзера из registerData"""
+    """ (Для БД) Возвращает группу юзера из registerData"""
+
+    """ user_id - айди юзера"""
+
     return registerData[user_id]['chosen_group']
 
 
 def registerData_get_role(user_id: int):
-    """ Возвращает роль юзера из registerData"""
+    """ (Для БД) Возвращает роль юзера из registerData"""
+
+    """ user_id - айди юзера"""
+
     return registerData[user_id]['chosen_role']
 
 
 def registerData_check_is_registered(user_id: int):
-    """ Проверяет есть ли юзер в registerData"""
+    """ (Для БД) Проверяет есть ли юзер в registerData"""
+
+    """ user_id - айди юзера"""
+
     return user_id in registerData.keys()
 
 
 def send_forms_mem_get():
-    """ Возвращает send_forms_mem (память с отправленынми формами)"""
+    """ (Для БД) Возвращает send_forms_mem (память с отправленынми формами)"""
+    """ 
+    Формат send_forms_mem
+    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
+    
+    """
     return send_forms_mem
 
 
 def send_forms_mem_get_form(sent_form_id: int):
-    """ Возвращает форму из send_forms_mem (память с отправленынми формами)"""
+    """ (Для БД) Возвращает форму из send_forms_mem (память с отправленынми формами)"""
+
+    """ sent_form_id - айди отправленной формы"""
+
+    """ 
+    Формат send_forms_mem
+    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
+
+    """
     return send_forms_mem[sent_form_id]
 
 
 def send_forms_mem_get_form_sent_users(sent_form_id: int):
-    """ Возвращает айди пользователей, которым отослана форма"""
+    """ (Для БД) Возвращает айди пользователей, которым отослана форма"""
+
+    """ sent_form_id - айди отправленной формы"""
+
+    """ 
+    Формат send_forms_mem
+    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
+    
+    """
     return send_forms_mem[sent_form_id]['info']['send_to_users_ids']
 
 
 def send_forms_mem_get_form_completed_users(sent_form_id: int):
-    """ Возвращает айди пользователей, которые прошли форму"""
+    """ (Для БД) Возвращает айди пользователей, которые прошли форму"""
+
+    """ sent_form_id - айди отправленной формы"""
+
+    """ 
+    Формат send_forms_mem
+    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
+    
+    """
     return send_forms_mem[sent_form_id]['info']['got_answers_from']
 
 
 def unique_form_id_get():
-    """ Возвращает счетчик созданных форм"""
+    """ (Для БД) Возвращает счетчик созданных форм"""
     # print(' \n\nloool unique_form_id ', bot_elements.storages.all_storages.unique_form_id)
     return bot_elements.storages.all_storages.unique_form_id
 
 
 def unique_sent_form_id_get():
-    """ Возвращает счетчик отправленных форм"""
+    """ (Для БД) Возвращает счетчик отправленных форм"""
     # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
     return bot_elements.storages.all_storages.unique_sent_form_id
 
@@ -158,7 +224,7 @@ def temp_mem_for_answers_get():
 
 
 def get_all_groups():
-    """ Возвращает список всех групп"""
+    """ (Для БД) Возвращает список всех групп"""
     # all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21', 'М3О-118М-21',
     #           'М3О-111М-21', 'М3О-111М-21', 'М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19']
 
@@ -166,5 +232,6 @@ def get_all_groups():
 
 
 def get_group_users_ids(groups: list):
-    """ Возвращает список айдишников студентов из выбранных групп"""
+    """ (Для БД) Возвращает список айдишников студентов из выбранных групп"""
+    """ groups - список с группами"""
     pass

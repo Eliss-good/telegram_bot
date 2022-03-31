@@ -12,8 +12,6 @@ send_forms_mem = {} # {'sent_form_id': {'form_id': *form_id*, 'info': {'form_cre
                     
 completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_sent_form_id': id, 'current_question': num, 'form_copy': [form_data]}, ...}
 
-edit_forms_dispatcher = {} # {'form_id': {'data':'new_form_data'}}
-
 unique_form_id = 0
 unique_sent_form_id = 0
 
