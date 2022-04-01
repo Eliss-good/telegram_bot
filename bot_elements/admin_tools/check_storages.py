@@ -127,5 +127,5 @@ def register_handlers_forms_check_storages(dp: Dispatcher):
     dp.register_message_handler(
         display_send_forms_mem, commands='check_sent_forms')
     dp.register_message_handler(
-        display_send_forms_mem, commands='check_completing_forms')
+        display_completing_forms_dispatcher, commands='check_completing_forms')
 

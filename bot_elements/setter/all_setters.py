@@ -283,6 +283,7 @@ async def registerData_accept_register(user_id: int, message: types.Message):
         
         confirm_user(user_id)
         unconfirmed_users_minus_one()
+        registerData_remove_user(user_id)
     else:
         await message.answer('Пользователь не зарегистрирован')
 
