@@ -1,9 +1,10 @@
 from aiogram import Bot
-import configparser
+import json
 
-config = configparser.ConfigParser()
-config.read('config.ini')
+with open('config.json') as file:
+    config = json.load(file)
 
-prepod_bot = Bot(token=config['DEFAULT']['prepodBotToken'])
-student_bot = Bot(token=config['DEFAULT']['studentBotToken'])
-admin_bot = Bot(token=config['DEFAULT']['adminBotToken'])
+prepod_bot = Bot(token=config['prepodBotToken'])
+student_bot = Bot(token=config['studentBotToken'])
+admin_bot = Bot(token=config['adminBotToken'])
+adminIds = config['adminIds']

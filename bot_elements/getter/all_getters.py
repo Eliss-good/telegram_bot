@@ -7,6 +7,15 @@ from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import temp_mem_for_answers
 import bot_elements.storages.all_storages
 
+
+def registerData_confirmed_check(user_id: int):
+    """ Проверяет, подтверждена ли регистрация польователя"""
+    if user_id in registerData.keys():
+        return registerData[user_id]['confirmed']
+    else:
+        return False
+
+
 def temp_form_recipient_data_get_data(user_id: int):
     """ Возвращает временную ячейку памяти хранящую служебные данные (temp_form_recipient_data)"""
     return temp_form_recipient_data[user_id]
@@ -127,6 +136,11 @@ def completing_forms_dispatcher_get():
     return completing_forms_dispatcher
 
 
+def registerData_get():
+
+    return registerData
+
+
 def registerData_get_fio(user_id: int):
     """ (Для БД) Возвращает ФИО юзера из registerData"""
 
@@ -155,7 +169,7 @@ def registerData_check_is_registered(user_id: int):
     """ (Для БД) Проверяет есть ли юзер в registerData"""
 
     """ user_id - айди юзера"""
-
+    
     return user_id in registerData.keys()
 
 

@@ -3,7 +3,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
-from bot_elements.getter.all_getters import get_all_groups, get_group_users_ids, mem_for_created_forms_get_creator_id, registerData_get_fio, unique_sent_form_id_get
+from bot_elements.getter.all_getters import get_all_groups, get_group_users_ids, mem_for_created_forms_get_creator_id, registerData_get_fio, unique_sent_form_id_get, registerData_confirmed_check
 
 from bot_elements.setter.all_setters import send_forms_mem_add_sent_form, unique_sent_form_id_plus_one
 
@@ -60,7 +60,12 @@ async def sending(message: types.Message, state: FSMContext): # sender.waiting_f
     await state.finish()
 
 
+async def not_confirmed(message: types.Message):
+    await message.answer('Вы не можете просматривать формы, пока ваша регистрация не подтверждена')
+
+
 def register_handlers_forms_menu(dp: Dispatcher):
+    dp.register_message_handler(not_confirmed, lambda message: registerData_confirmed_check(message.chat.id), commands="saved_forms")
     dp.register_message_handler(display_current_mem_status, commands="saved_forms", state="*")
     dp.register_message_handler(choose_group, lambda message: message.text.startswith('/send'))
     dp.register_message_handler(sending, state=sender.waiting_for_groups)

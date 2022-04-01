@@ -16,6 +16,10 @@ from bot_elements.status.status import register_handlers_status
 from bot_elements.forms.forms_editor import register_handlers_forms_editor
 from bot_elements.cancel import register_handlers_cancel
 from bot_elements.admin_tools.check_storages import register_handlers_forms_check_storages
+from bot_elements.admin_tools.aproove_register import register_handlers_forms_check_register
+
+from bot_elements.register.registerCheck import register_handlers_register_check
+
 from bots import student_bot, prepod_bot, admin_bot
 
 async def prepod_commands(bot: Bot):
@@ -47,7 +51,7 @@ async def admin_commands(bot: Bot):
         BotCommand(command="/check_created_forms", description="Все созданные формы"),
         BotCommand(command="/check_sent_forms", description="Отправленные формы"),
         BotCommand(command="/check_completing_forms", description="Выполняемые формы"),
-        
+        BotCommand(command="/check_unregistered_users", description="Пользователи, ожидающие подтверждения"),
     ]
     await bot.set_my_commands(student_commands)
 
@@ -69,26 +73,37 @@ async def main():
     admin_bot_dispatcher.loop.create_task(admin_commands(admin_bot))
     # dp.loop.create_task(raspisanie.rasp_notification('М3О-221Б-20'))
     
+
+
     register_handlers_cancel(prepod_bot_dispatcher)
+    register_handlers_cancel(student_bot_dispatcher)
+
+
+    register_handlers_register_prepod(prepod_bot_dispatcher)
+    register_handlers_register_student(student_bot_dispatcher)
+
+    
+    register_handlers_register_check(prepod_bot_dispatcher)
+    register_handlers_register_check(student_bot_dispatcher)
+
+
     register_handlers_forms_editor(prepod_bot_dispatcher)
     register_handlers_forms(prepod_bot_dispatcher)
     register_handlers_forms_menu(prepod_bot_dispatcher)
     register_handlers_status(prepod_bot_dispatcher)
-    register_handlers_register_prepod(prepod_bot_dispatcher)
+    
+#     dp.register_message_handler(not_confirmed, lambda message: registerData_confirmed_check(message.chat.id), commands="status")
 
-
-    register_handlers_cancel(student_bot_dispatcher)
-    register_handlers_forms_editor(student_bot_dispatcher)
-    register_handlers_forms(student_bot_dispatcher)
-    register_handlers_forms_menu(student_bot_dispatcher)
+    
+    # register_handlers_forms_editor(student_bot_dispatcher)
+    # register_handlers_forms(student_bot_dispatcher)
+    # register_handlers_forms_menu(student_bot_dispatcher)
     register_handlers_status(student_bot_dispatcher)
-    register_handlers_register_student(student_bot_dispatcher)
 
-    register_handlers_register_admin(admin_bot_dispatcher)
+    # register_handlers_register_admin(admin_bot_dispatcher)
     register_handlers_forms_check_storages(admin_bot_dispatcher)
+    register_handlers_forms_check_register(admin_bot_dispatcher)
     await asyncio.gather(prepod_bot_dispatcher.start_polling(), student_bot_dispatcher.start_polling(), admin_bot_dispatcher.start_polling())
     
-    # executor.start_polling(prepod_bot_dispatcher)
-    # executor.start_polling(student_bot_dispatcher)
 
 asyncio.run(main())

@@ -1,6 +1,6 @@
 """ Статус пользователя"""
 from aiogram import Dispatcher, types
-from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy, send_forms_mem_get_form_completed_users, send_forms_mem_get_form_sent_users, temp_mem_for_answers_get
+from bot_elements.getter.all_getters import completing_forms_dispatcher_get_form_copy, mem_for_created_forms_get_creator_id, mem_for_created_forms_get_form_name, completing_forms_dispatcher_get_current_question_num, completing_forms_dispatcher_get_question_by_num, send_forms_mem_get, completing_forms_dispatcher_get_form_question_message_id, completing_forms_dispatcher_get, completing_froms_dispatcher_is_user_in_list, completing_forms_dispatcher_get_form_id, completing_forms_dispatcher_get_sent_form_id, completing_forms_dispatcher_get_form_question_copy, send_forms_mem_get_form_completed_users, send_forms_mem_get_form_sent_users, temp_mem_for_answers_get, registerData_confirmed_check, registerData_get_role
 from bot_elements.remover.all_removers import completing_forms_dispatcher_remove_session
 from bot_elements.setter.all_setters import completing_forms_dispatcher_add_session, completing_forms_dispatcher_add_1_to_question_num, completing_forms_dispatcher_set_question_id, send_forms_mem_add_completed_user, sendMsgAnswer, sendPollAnswer, sendFormAnswer
 from bots import student_bot
@@ -16,6 +16,9 @@ async def display_user_status(message: types.Message):
         if message.chat.id in select_form['info']['send_to_users_ids'] and not message.chat.id in select_form['info']['got_answers_from']:
             
             full_message += '\n' + str(mem_for_created_forms_get_form_name(select_form['form_id'])) + ' от пользователя ' + str(mem_for_created_forms_get_creator_id(select_form['form_id'])) + ' /complete_' + str(select_form['form_id']) + '_' + str(selected_form)
+    
+    if full_message == "Полученные формы:":
+        full_message = 'Нет полученных форм'
 
     await message.answer(full_message)
 
@@ -155,6 +158,7 @@ async def msg_handlr(message: types.Message):
 
 
 def register_handlers_status(dp: Dispatcher):
+
     dp.register_message_handler(
         display_user_status, commands="status", state="*")
     dp.register_message_handler(

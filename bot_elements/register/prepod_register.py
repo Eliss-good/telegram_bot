@@ -24,8 +24,7 @@ class register_change_fio_fsm(StatesGroup):
 
 async def strangeMessagesHandler(message: types.Message): # !
     " Фиксит кое какие сообщения"
-    if message.text in all_groups or '; id ' in message.text:
-        await message.answer('reply keyboard removed', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('reply keyboard removed', reply_markup=types.ReplyKeyboardRemove())
 
 
 async def already_registered(message: types.Message, state: FSMContext):
@@ -60,15 +59,15 @@ async def choose_fio(message: types.Message, state: FSMContext):
     await state.update_data(chosen_fio=fio)
     user_data = await state.get_data()
 
-    # ############### БРАТЬ ДАННЫЕ О РЕГИСТРАЦИИ ПРЕПОДА ТУТ ##########
+
 
     await message.reply('Ваше ФИО: ' + user_data['chosen_fio'] + '; Ваша роль: ' + user_data['chosen_role'])
 
-    registerData_add_user(user_id=message.chat.id, chosen_fio=user_data['chosen_fio'], chosen_group='prepod', chosen_role=user_data['chosen_role'])
+    await registerData_add_user(user_id=message.chat.id, chosen_fio=user_data['chosen_fio'], chosen_group='prepod', chosen_role=user_data['chosen_role'])
 
-    await message.answer('Регистрация завершена', reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Рег. данные отправлены на проверку', reply_markup=types.ReplyKeyboardRemove())
 
-    # ######################### ############### ##########
+ 
     await state.finish()
 
 
@@ -142,4 +141,4 @@ def register_handlers_register_prepod(dp: Dispatcher):
     dp.register_callback_query_handler(
         register_change_fio, text="register_change_fio")
 
-    dp.register_message_handler(strangeMessagesHandler)
+    dp.register_message_handler(strangeMessagesHandler, lambda message: message.text in all_groups or '; id ' in message.text)

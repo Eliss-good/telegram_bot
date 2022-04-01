@@ -7,7 +7,9 @@ from bot_elements.storages.all_storages import completing_forms_dispatcher
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
 import bot_elements.storages.all_storages
-from bots import admin_bot
+from bots import admin_bot, adminIds, student_bot, prepod_bot
+
+from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_registered
 
 
 def unconfirmed_users_plus_one():
@@ -132,13 +134,19 @@ def completing_forms_dispatcher_set_question_id(user_id: int, question_num: int,
     # print(completing_forms_dispatcher[user_id]['form_copy'][question_num])    
 
 
-def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
-    # TO DO!
+async def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
+    
     """ (Для БД) Добавляет рег. данные пользователя"""
     """
         user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
     """
-    registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'registered': False}
+    
+    unconfirmed_users_plus_one()
+
+    for reciever in adminIds:
+        await admin_bot.send_message(text='у вас ' + str(unconfirmed_users_get()) + ' неподтвержденных пользователей', chat_id=reciever)
+
+    registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': False}
 
 
 def registerData_change_group_data(user_id: int, new_group: str):
@@ -157,6 +165,46 @@ def registerData_change_fio_data(user_id: int, new_fio: str):
     registerData[user_id]['chosen_fio'] = new_fio
 
 
+async def registerData_accept_register(user_id: int, message: types.Message):
+    """ Подтверждает регистрацию пользователя"""
+    """
+        user_id -айди пользователя
+    """
+    if registerData_check_is_registered(user_id):
+        await message.answer('Пользователь ' + str(user_id) + ' подтвержден')
+
+        if registerData_get_role(user_id=user_id) == 'prepod':
+            await prepod_bot.send_message(chat_id=user_id, text='Ваша регистрация подтверждена админом')
+        
+        elif registerData_get_role(user_id=user_id) == 'student':
+            await student_bot.send_message(chat_id=user_id, text='Ваша регистрация подтверждена админом')
+        
+        registerData[user_id]['confirmed'] = True
+        unconfirmed_users_minus_one()
+    else:
+        await message.answer('Пользователь не зарегистрирован')
+
+
+async def registerData_deny_register(user_id: int, message: types.Message):
+    """ Не подтверждает регистрацию пользователя"""
+    """
+        user_id -айди пользователя
+    """
+    if registerData_check_is_registered(user_id): 
+        await message.answer('Пользователь ' + str(user_id) + ' отправлен на повторную регистрацию')
+
+        if registerData_get_role(user_id=user_id) == 'prepod':
+            await prepod_bot.send_message(chat_id=user_id, text='Ваша регистрация не подтверждена админом, пожалуйста, зарегистрируйтесь заново с корректными данными')
+        
+        elif registerData_get_role(user_id=user_id) == 'student':
+            await student_bot.send_message(chat_id=user_id, text='Ваша регистрация не подтверждена админом, пожалуйста, зарегистрируйтесь заново с корректными данными')
+        
+        registerData.pop(user_id, None)
+        unconfirmed_users_minus_one()
+    else:
+        await message.answer('Пользователь не зарегистрирован')
+
+
 def unique_form_id_plus_one():
     """ Увеличивает счетчик созданных вопросов на 1"""
     bot_elements.storages.all_storages.unique_form_id += 1
@@ -169,8 +217,6 @@ def unique_sent_form_id_plus_one():
 
 def sendPollAnswer(pollAnswer: types.PollAnswer, question_number: int, unique_form_id: int, unique_sent_form_id: int, pollCopy):
     """ Получает ответ на опрос"""
-
-
     if not pollAnswer.user.id in temp_mem_for_answers.keys():
         temp_mem_for_answers[pollAnswer.user.id] = []
     

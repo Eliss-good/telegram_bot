@@ -15,4 +15,6 @@ completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_
 unique_form_id = 0
 unique_sent_form_id = 0
 
+unconfirmed_users = 0
+
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher
