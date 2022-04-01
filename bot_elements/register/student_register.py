@@ -82,7 +82,6 @@ async def choose_fio(message: types.Message, state: FSMContext):
     await registerUser.waiting_for_group.set()
 
 
-
 async def wrong_group(message: types.Message):
     " (registerUser FSM) Срабатывает, если выбрана неверная группа"
     return await message.reply('Выберите группу из списка')

@@ -26,6 +26,14 @@ def temp_mem_for_form_creator_remove_form_element(user_id: int, delete_id: int):
 def mem_for_created_forms_delete_question(form_id: int, question_id: int):
     """ (Для БД) Убирает 1 элемент формы по question_id из mem_for_created_forms"""
     """ form_id - айди формы, question_id - айди вопроса"""
+    """ 
+        Пример data:
+    [{'question': 'opros', 'options': ['helicopter ', ' paracopter'], 'message_id': 0, 'type': 'poll'}, {'question': 'klava', 'message_id': 0, 'type': 'msg'}, {'form_name': 'formo', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}]
+        
+        Пример mem_for_created_forms:
+        {*form_id*: [form data], ...}
+    """
+    
     if form_id in mem_for_created_forms.keys():
         mem_for_created_forms[form_id].pop(question_id)
 
@@ -42,8 +50,10 @@ def completing_forms_dispatcher_remove_session(user_id: int):
     
 
 def registerData_remove_user(user_id: int):
+    """ (Для БД) Убирает запись о регистрации пользователя из registerData"""
+    """ user_id - айди пользователя"""
     registerData.pop(user_id, None)
-    
+
 
 def edited_register_data_remove_user(user_id: int):
     edited_register_data.pop(user_id, None)

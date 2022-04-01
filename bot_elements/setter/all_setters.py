@@ -33,7 +33,17 @@ def unconfirmed_edit_users_minus_one():
     bot_elements.storages.all_storages.unconfirmed_edit_users -= 1
 
 
+def confirm_user(user_id: int):
+    """ (Для БД) Подтверждает регистрацию пользователя"""
+    """
+        Пример registerData:
+    {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}, ...}
+    """
+    registerData[user_id]['confirmed'] = True
+
+
 def edited_register_data_set_new_data(new_chosen_fio: str, new_chosen_group: str, new_chosen_role: str, user_id: int):
+    """ Вставляет запись с обновленными данными регистрации в edited_register_data"""
     """ Формат:
     {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
     """
@@ -41,6 +51,7 @@ def edited_register_data_set_new_data(new_chosen_fio: str, new_chosen_group: str
 
 
 def edited_register_data_set_new_fio(new_chosen_fio: str, user_id: int):
+    """ Изменяет ФИО в edited_register_data"""
     """ Формат:
     {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
     """
@@ -48,6 +59,7 @@ def edited_register_data_set_new_fio(new_chosen_fio: str, user_id: int):
 
 
 def edited_register_data_set_new_group(new_chosen_group: str, user_id: int):
+    """ Изменяет группу в edited_register_data"""
     """ Формат:
     {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
     """
@@ -85,6 +97,14 @@ def mem_for_created_forms_add_element(form_id: int, data):
     """
         data - данные формы, form_id - айдишник формы
     """
+    """ 
+        Пример data:
+    [{'question': 'opros', 'options': ['helicopter ', ' paracopter'], 'message_id': 0, 'type': 'poll'}, {'question': 'klava', 'message_id': 0, 'type': 'msg'}, {'form_name': 'formo', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}]
+        
+        Пример mem_for_created_forms:
+        {*form_id*: [form data], ...}
+    """
+    print(data)
     mem_for_created_forms[form_id] = data
 
 
@@ -93,7 +113,9 @@ def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, dat
     """
         form_id - айди формы, inser_after_id - айдишник вопроса после которого вставить текущий, data[0] - сами данные о вопросе
     """
-   
+    """
+    Если надо, могу организовать через создание копии форм и добавляения вопроса в нее, псоле чего старые данные можно перезаписать этими
+    """
     mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
     
 
@@ -103,7 +125,10 @@ def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
     """
         form_id - айди формы, new_form_name - новое название формы
     """
-
+    """ 
+        Пример mem_for_created_forms[form_id][-1]:
+    {'form_name': 'formo', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}
+    """
     mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
 
 
@@ -112,7 +137,11 @@ def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, 
     """
         form_id - айди формы, question_id - айди вопроса, new_question_name - новое название вопроса
     """
-
+    """ 
+        Пример mem_for_created_forms[form_id][question_id]:
+    {'question': 'opros', 'options': ['helicopter ', ' paracopter'], 'message_id': 0, 'type': 'poll'}
+    """
+    
     mem_for_created_forms[form_id][question_id]['question'] = new_question_name
 
   
@@ -121,7 +150,10 @@ def mem_for_created_forms_edit_poll_options(form_id: int, question_id: int, new_
     """
         form_id - айди формы, question_id - айди вопроса, new_poll_options - новые опции опроса
     """
-
+    """ 
+        Пример mem_for_created_forms[form_id][question_id]:
+    {'question': 'opros', 'options': ['helicopter ', ' paracopter'], 'message_id': 0, 'type': 'poll'}
+    """
     
     mem_for_created_forms[form_id][question_id]['options'] = new_poll_options
     
@@ -133,6 +165,10 @@ def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_u
     """
         sent_form_id - айдишник отправленной формы, form_id - айдишник формы, form_creator_user_id - айдишник телеги создателя формы, send_to_users_ids - айдишники тех, кому придет опрос
     """
+    """
+        Пример send_forms_mem:
+    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'send_to_groups': [groups],'got_answers_from': [айдишники]}, ...}
+    """
     send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids, 'send_to_groups': groups, 'got_answers_from': []}}
 
 
@@ -141,7 +177,10 @@ def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
     """
         sent_form_id - айдишник отправленной формы, , user_id - айди телеги пользователя, который прошел опрос
     """
-
+    """
+        Пример send_forms_mem[sent_form_id]['info']:
+    {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'send_to_groups': [groups],'got_answers_from': [айдишники]}
+    """
     send_forms_mem[sent_form_id]['info']['got_answers_from'].append(user_id)
 
 
@@ -165,11 +204,14 @@ def completing_forms_dispatcher_set_question_id(user_id: int, question_num: int,
 
 async def registerData_change_data(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
     
-    """ (Для БД) Добавляет рег. данные пользователя"""
+    """ (Для БД) Изменяет рег. данные пользователя"""
     """
         user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
     """
-
+    """
+        Пример registerData:
+    {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}, ...}
+    """
     registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True}
 
 
@@ -179,7 +221,11 @@ async def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str
     """
         user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
     """
-    
+    """
+        Пример registerData:
+    {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}, ...}
+    """
+
     unconfirmed_users_plus_one()
 
     for reciever in adminIds:
@@ -235,7 +281,7 @@ async def registerData_accept_register(user_id: int, message: types.Message):
         elif registerData_get_role(user_id=user_id) == 'student':
             await student_bot.send_message(chat_id=user_id, text='Ваша регистрация подтверждена админом')
         
-        registerData[user_id]['confirmed'] = True
+        confirm_user(user_id)
         unconfirmed_users_minus_one()
     else:
         await message.answer('Пользователь не зарегистрирован')

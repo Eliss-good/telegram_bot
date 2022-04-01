@@ -1,20 +1,12 @@
 from bot_elements.storages.all_storages import temp_form_recipient_data 
-from bot_elements.storages.all_storages  import temp_mem_for_form_creator
-from bot_elements.storages.all_storages  import mem_for_created_forms
-from bot_elements.storages.all_storages  import send_forms_mem
+from bot_elements.storages.all_storages import temp_mem_for_form_creator
+from bot_elements.storages.all_storages import mem_for_created_forms
+from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import temp_mem_for_answers
 from bot_elements.storages.all_storages import edited_register_data
 import bot_elements.storages.all_storages
-
-
-def registerData_confirmed_check(user_id: int):
-    """ Проверяет, подтверждена ли регистрация польователя"""
-    if user_id in registerData.keys():
-        return registerData[user_id]['confirmed']
-    else:
-        return False
 
 
 def temp_form_recipient_data_get_data(user_id: int):
@@ -50,7 +42,7 @@ def temp_form_recipient_data_get():
 def mem_for_created_forms_get():
     """ (Для БД) Возвращает mem_for_created_forms"""
     """
-    Пример mem_for_created_forms:
+        Пример mem_for_created_forms:
     {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
     """
     return mem_for_created_forms
@@ -58,36 +50,30 @@ def mem_for_created_forms_get():
 
 def mem_for_created_forms_get_data(form_id: int):
     """ (Для БД) Возвращает ячейку памяти хранящую данные созданной формы (mem_for_created_forms)"""
-    
-    """ form_id - айди формы"""
-
     """
-    Пример mem_for_created_forms:
-    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+        form_id - айди формы
+        Пример mem_for_created_forms[form_id]:
+    [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}]
     """
     return mem_for_created_forms[form_id]
 
 
 def mem_for_created_forms_get_form_name(form_id: int):
     """ (Для БД) Возвращает название созданной формы из mem_for_created_forms"""
-
-    """ form_id - айди формы"""
-
     """
-    Пример mem_for_created_forms:
-    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+        form_id - айди формы
+        Пример mem_for_created_forms[form_id][-1]:
+    {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}
     """
     return mem_for_created_forms[form_id][-1]['form_name']
 
 
 def mem_for_created_forms_get_creator_id(form_id: int):
     """ (Для БД) Возвращает айди создателя формы из mem_for_created_forms"""
-
-    """ form_id - айди формы"""
-
     """
-    Пример mem_for_created_forms:
-    {0: [{'question': 'Сос', 'options': ['Лан', ' все'], 'message_id': 0, 'type': 'poll'}, {'question': 'Месяц', 'message_id': 0, 'type': 'msg'}, {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}], 1: [{'question': 'Зе криэтир', 'options': ['Один', ' два'], 'message_id': 0, 'type': 'poll'}, {'form_name': 'Тайлер', 'type': 'info', 'form_id': 1, 'creator_id': 506629389}]}
+        form_id - айди формы
+        Пример mem_for_created_forms[form_id][-1]:
+    {'form_name': 'Формо', 'type': 'info', 'form_id': 0, 'creator_id': 506629389}
     """
     return mem_for_created_forms[form_id][-1]['creator_id']
 
@@ -138,30 +124,39 @@ def completing_forms_dispatcher_get():
 
 
 def registerData_get():
-
+    """ (Для БД) возвращает registerData"""
+    """ 
+        Пример registerData:
+    {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}, ...}
+    """
     return registerData
 
 
 def registerData_get_fio(user_id: int):
     """ (Для БД) Возвращает ФИО юзера из registerData"""
-
-    """ user_id - айди юзера"""
-    
+    """ 
+        Пример registerData[user_id]:
+    {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}
+    """
     return registerData[user_id]['chosen_fio']
 
 
 def registerData_get_group(user_id: int):
     """ (Для БД) Возвращает группу юзера из registerData"""
-
-    """ user_id - айди юзера"""
-
+    """ 
+        Пример registerData[user_id]:
+    {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}
+    """
+    
     return registerData[user_id]['chosen_group']
 
 
 def registerData_get_role(user_id: int):
     """ (Для БД) Возвращает роль юзера из registerData"""
-
-    """ user_id - айди юзера"""
+    """ 
+        Пример registerData[user_id]:
+    {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}
+    """
 
     return registerData[user_id]['chosen_role']
 
@@ -169,57 +164,73 @@ def registerData_get_role(user_id: int):
 def registerData_check_is_in_register_list(user_id: int):
     """ (Для БД) Проверяет есть ли юзер в registerData"""
 
-    """ user_id - айди юзера"""
+    """ user_id - айди юзера (эта функция по факту повторяется, но она нужна)"""
     return user_id in registerData.keys()
 
 
 def registerData_check_is_registered(user_id: int):
     """ (Для БД) Проверяет есть ли юзер в registerData"""
-
-    """ user_id - айди юзера"""
+    """ 
+        Формат registerData:
+        {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': False}, ...}
+    """
     if user_id in registerData.keys():
+
         return registerData[user_id]['confirmed']
     else:
         return False
 
 
 def registerData_check_is_confirmed(user_id: int):
-    """ (Для БД) Проверяет есть ли юзер в registerData"""
+    """ (Для БД) Проверяет подтвержден ли юзер в registerData"""
 
     """ user_id - айди юзера"""
+    """ 
+        Пример registerData[user_id]:
+    {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True/False}
+    """
+
     if user_id in registerData.keys():
-        print(user_id in registerData.keys())
+
         return registerData[user_id]['confirmed']
 
 
 def registerData_check_is_editing(user_id: int):
-   
+    """ Проверяет находится ли пользователь в edited_register_data (словарь с обновленныит рег данными пользователей, которые пока не подтвердил админ)"""
+    """
+        Пример edited_register_data
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role}, ...}
+    """
     return user_id in edited_register_data.keys()
 
 
 def edited_register_data_get():
-    """ Формат:
+    """ Возвращает edited_register_data"""
+    """ Пример edited_register_data
     {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
     """
     return edited_register_data
 
 
 def edited_register_data_get_user(user_id: int):
-    """ Формат:
-    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """ Возвращает данные пользователя из edited_register_data"""
+    """ Пример edited_register_data[user_id]:
+    {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}
     """
     return edited_register_data[user_id]
 
 
 def edited_register_data_get_fio(user_id: int):
-    """ Формат:
+    """ Возвращает обновленное ФИО пользователя из edited_register_data"""
+    """ Пример edited_register_data[user_id]:
     {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
     """
     return edited_register_data[user_id]['new_chosen_fio']
 
 
 def edited_register_data_get_group(user_id: int):
-    """ Формат:
+    """  Возвращает обновленную группу пользователя из edited_register_data"""
+    """ Пример edited_register_data[user_id]:
     {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
     """
     return edited_register_data[user_id]['new_chosen_group']
@@ -241,9 +252,8 @@ def send_forms_mem_get_form(sent_form_id: int):
     """ sent_form_id - айди отправленной формы"""
 
     """ 
-    Формат send_forms_mem
-    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
-
+    Формат send_forms_mem[sent_form_id]
+    {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'got_answers_from': [айдишники]}}
     """
     return send_forms_mem[sent_form_id]
 
@@ -254,9 +264,8 @@ def send_forms_mem_get_form_sent_users(sent_form_id: int):
     """ sent_form_id - айди отправленной формы"""
 
     """ 
-    Формат send_forms_mem
-    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
-    
+    Формат send_forms_mem[sent_form_id]['info']
+    {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'got_answers_from': [айдишники]}
     """
     return send_forms_mem[sent_form_id]['info']['send_to_users_ids']
 
@@ -267,9 +276,8 @@ def send_forms_mem_get_form_completed_users(sent_form_id: int):
     """ sent_form_id - айди отправленной формы"""
 
     """ 
-    Формат send_forms_mem
-    {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [ids], 'got_answers_from': [ids]}, ...} 
-    
+    Формат send_forms_mem[sent_form_id]['info']
+    {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'got_answers_from': [айдишники]}
     """
     return send_forms_mem[sent_form_id]['info']['got_answers_from']
 
@@ -287,13 +295,13 @@ def unique_sent_form_id_get():
 
 
 def unconfirmed_users_get():
-    """ (Для БД) Возвращает счетчик отправленных форм"""
+    """ Возвращает счетчик регистраций, которые ожидают подтверждения админа"""
     # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
     return bot_elements.storages.all_storages.unconfirmed_register_users
 
 
 def unconfirmed_edit_users_get():
-
+    """ Возвращает счетчик регистраций с обновленными данными, которые ожидают подтверждения админа"""
     return bot_elements.storages.all_storages.unconfirmed_edit_users
 
 
