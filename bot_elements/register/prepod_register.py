@@ -3,9 +3,9 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_group, registerData_get_role, registerData_check_is_registered
+from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_role, registerData_check_is_registered, edited_register_data_get_fio, registerData_check_is_confirmed
 
-from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
+from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data
 
 
 all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21', 'М3О-118М-21',
@@ -20,6 +20,10 @@ class registerUser(StatesGroup):
 class register_change_fio_fsm(StatesGroup):
     " FSM для смены ФИО пользователя"
     waiting_for_new_fio = State()
+
+
+async def not_confirmed(message: types.Message):
+    await message.answer(' Ваши рег. данные еще не подтверждены')
 
 
 async def strangeMessagesHandler(message: types.Message): # !
@@ -95,16 +99,15 @@ async def register_change_false(call: types.CallbackQuery, state: FSMContext):
     await call.message.answer('Окес, ничего не меняем')
 
 
-# register_change_fio_fsm.waiting_for_new_fio
 async def register_change_fio_set_fio(message: types.Message, state: FSMContext):
     " (register_change_fio_fsm FSM) Получаем новую фамилию и обновляем данные"
     new_fio = message.text
-    registerData_change_fio_data(user_id=message.chat.id, new_fio=new_fio)
+    await registerData_change_fio_data(user_id=message.chat.id, new_fio=new_fio)
     await state.finish()
     
-    await message.answer('Данные обновлены: ' + '\nВы: ' + str(registerData_get_fio(user_id=message.chat.id)) + '; ' + 'Ваша роль: ' + str(registerData_get_role(user_id=message.chat.id)), reply_markup=types.ReplyKeyboardRemove())
+    await message.answer('Обновленные данные отправлены на проверку: ' + '\nВы: ' + str(edited_register_data_get_fio(user_id=message.chat.id)), reply_markup=types.ReplyKeyboardRemove())
 
-
+   
 async def register_change_fio(call: types.CallbackQuery, state: FSMContext):
     " (register_change_true Func) Предлагаем ввести новую фамилию"
     await call.answer()
@@ -126,13 +129,17 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 def register_handlers_register_prepod(dp: Dispatcher):
     dp.register_message_handler(
         already_registered, lambda message: registerData_check_is_registered(message.chat.id), commands='register')
+    
+    dp.register_message_handler(
+        not_confirmed, lambda message: not registerData_check_is_confirmed(message.chat.id) and registerData_check_is_confirmed(message.chat.id) != None, commands='register')
+
     dp.register_message_handler(ask_fio, commands="register", state="*")
     dp.register_message_handler(choose_fio, state=registerUser.waiting_for_fio)
 
     dp.register_message_handler(
         register_change_fio_set_fio, state=register_change_fio_fsm.waiting_for_new_fio)
 
-    dp.register_message_handler(cancel_handler, commands="cancel", state="*")
+    # dp.register_message_handler(cancel_handler, commands="cancel", state="*")
 
     dp.register_callback_query_handler(
         register_change_true, text="register_change_true")

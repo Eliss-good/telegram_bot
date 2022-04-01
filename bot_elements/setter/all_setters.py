@@ -6,20 +6,52 @@ from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
+from bot_elements.storages.all_storages import edited_register_data
 import bot_elements.storages.all_storages
 from bots import admin_bot, adminIds, student_bot, prepod_bot
 
-from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_registered
-
+from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get
+from bot_elements.remover.all_removers import edited_register_data_remove_user, registerData_remove_user
 
 def unconfirmed_users_plus_one():
     """ Увеличивает счетчик неподтвержденных пользователей на 1"""
-    bot_elements.storages.all_storages.unconfirmed_users += 1
+    bot_elements.storages.all_storages.unconfirmed_register_users += 1
 
 
 def unconfirmed_users_minus_one():
     """ Уменьшает счетчик неподтвержденных пользователей на 1"""
-    bot_elements.storages.all_storages.unconfirmed_users -= 1
+    bot_elements.storages.all_storages.unconfirmed_register_users -= 1
+
+
+def unconfirmed_edit_users_plus_one():
+    """ Увеличивает счетчик редактируемых пользователей на 1"""
+    bot_elements.storages.all_storages.unconfirmed_edit_users += 1
+
+
+def unconfirmed_edit_users_minus_one():
+    """ Уменьшает счетчик редактируемых пользователей на 1"""
+    bot_elements.storages.all_storages.unconfirmed_edit_users -= 1
+
+
+def edited_register_data_set_new_data(new_chosen_fio: str, new_chosen_group: str, new_chosen_role: str, user_id: int):
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    edited_register_data[user_id] = {'new_chosen_fio': new_chosen_fio, 'new_chosen_group': new_chosen_group, 'new_chosen_role': new_chosen_role}
+
+
+def edited_register_data_set_new_fio(new_chosen_fio: str, user_id: int):
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    edited_register_data[user_id]['new_chosen_fio'] = new_chosen_fio
+
+
+def edited_register_data_set_new_group(new_chosen_group: str, user_id: int):
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    edited_register_data[user_id]['new_chosen_group'] = new_chosen_group
 
 
 def temp_form_recipient_data_add_user_data(chat_id: int, form_name: str, type: str, form_id: int, creator_id: int):
@@ -65,8 +97,6 @@ def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, dat
     mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
     
 
-
-
 def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
     """ (Для БД) Изменяет название формы из mem_for_created_forms"""
 
@@ -76,7 +106,6 @@ def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
 
     mem_for_created_forms[form_id][-1]['form_name'] = new_form_name
 
-  
 
 def mem_for_created_forms_set_new_question_name(form_id: int, question_id: int, new_question_name: str):
     """ (Для БД) Изменяет название вопроса формы из mem_for_created_forms"""
@@ -134,6 +163,16 @@ def completing_forms_dispatcher_set_question_id(user_id: int, question_num: int,
     # print(completing_forms_dispatcher[user_id]['form_copy'][question_num])    
 
 
+async def registerData_change_data(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
+    
+    """ (Для БД) Добавляет рег. данные пользователя"""
+    """
+        user_id -айди пользователя, chosen_fio - фио пользователя, chosen_group - группа, chosen_role - роль
+    """
+
+    registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': True}
+
+
 async def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str, chosen_role: str):
     
     """ (Для БД) Добавляет рег. данные пользователя"""
@@ -149,28 +188,45 @@ async def registerData_add_user(user_id: int, chosen_fio: str, chosen_group: str
     registerData[user_id] = {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': False}
 
 
-def registerData_change_group_data(user_id: int, new_group: str):
+async def registerData_change_group_data(user_id: int, new_group: str):
     """ Изменяет группу пользователя"""
     """
-        user_id -айди пользователя, new_group - новая группа
+        user_id - айди пользователя, new_group - новая группа
     """
-    registerData[user_id]['chosen_group'] = new_group
+
+    if not registerData_check_is_editing(user_id):
+
+        unconfirmed_edit_users_plus_one()
+        edited_register_data_set_new_data(new_chosen_fio=registerData_get_fio(user_id), new_chosen_group=new_group, new_chosen_role=registerData_get_role(user_id), user_id=user_id)
+    else:
+        edited_register_data_set_new_group(new_chosen_group=new_group, user_id=user_id)
+
+    for recipient in adminIds:
+        await admin_bot.send_message(text=str(unconfirmed_edit_users_get()) + ' пользователей меняют свои данные', chat_id=recipient)
     
 
-def registerData_change_fio_data(user_id: int, new_fio: str):
+async def registerData_change_fio_data(user_id: int, new_fio: str):
     """ Изменяет ФИО пользователя"""
     """
         user_id -айди пользователя, new_fio - новые ФИО
     """
-    registerData[user_id]['chosen_fio'] = new_fio
+    if not registerData_check_is_editing(user_id):
+        
+        unconfirmed_edit_users_plus_one()
+        edited_register_data_set_new_data(new_chosen_fio=new_fio, new_chosen_group=registerData_get_group(user_id), new_chosen_role=registerData_get_role(user_id), user_id=user_id)
+    else:
+        edited_register_data_set_new_fio(new_chosen_fio=new_fio, user_id=user_id)
 
+    for recipient in adminIds:
+        await admin_bot.send_message(text=str(unconfirmed_edit_users_get()) + ' пользователей меняют свои данные', chat_id=recipient)
+    
 
 async def registerData_accept_register(user_id: int, message: types.Message):
     """ Подтверждает регистрацию пользователя"""
     """
         user_id -айди пользователя
     """
-    if registerData_check_is_registered(user_id):
+    if registerData_check_is_in_register_list(user_id):
         await message.answer('Пользователь ' + str(user_id) + ' подтвержден')
 
         if registerData_get_role(user_id=user_id) == 'prepod':
@@ -190,7 +246,7 @@ async def registerData_deny_register(user_id: int, message: types.Message):
     """
         user_id -айди пользователя
     """
-    if registerData_check_is_registered(user_id): 
+    if registerData_check_is_in_register_list(user_id): 
         await message.answer('Пользователь ' + str(user_id) + ' отправлен на повторную регистрацию')
 
         if registerData_get_role(user_id=user_id) == 'prepod':
@@ -199,10 +255,56 @@ async def registerData_deny_register(user_id: int, message: types.Message):
         elif registerData_get_role(user_id=user_id) == 'student':
             await student_bot.send_message(chat_id=user_id, text='Ваша регистрация не подтверждена админом, пожалуйста, зарегистрируйтесь заново с корректными данными')
         
-        registerData.pop(user_id, None)
+        registerData_remove_user(user_id)
         unconfirmed_users_minus_one()
     else:
         await message.answer('Пользователь не зарегистрирован')
+
+
+async def registerData_accept_register_edit(user_id: int, message: types.Message):
+    """ Подтверждает регистрацию пользователя"""
+    """
+        user_id -айди пользователя
+    """
+    if registerData_check_is_editing(user_id):
+
+        await message.answer('Изменение данных пользователя ' + str(user_id) + ' подтверждено')
+        new_data = edited_register_data_get_user(user_id)
+
+        if registerData_get_role(user_id=user_id) == 'prepod':
+            await prepod_bot.send_message(chat_id=user_id, text='Изменение ваших рег. данных подтверждено админом\n' + 'Ваши новые данные: ФИО: ' + str(new_data['new_chosen_fio']))
+        
+        elif registerData_get_role(user_id=user_id) == 'student':
+            await student_bot.send_message(chat_id=user_id, text='Изменение ваших рег. данных подтверждено админом\n' + 'Ваши новые данные: ФИО: ' + str(new_data['new_chosen_fio']) + ' ГРУППА: ' + str(new_data['new_chosen_group']))
+        
+        
+
+        await registerData_change_data(user_id=user_id, chosen_fio=new_data['new_chosen_fio'], chosen_group=new_data['new_chosen_group'], chosen_role=new_data['new_chosen_role'])
+        
+        edited_register_data_remove_user(user_id)
+        unconfirmed_edit_users_minus_one()
+    else:
+        await message.answer('Пользователь ничего не менял')
+
+
+async def registerData_deny_register_edit(user_id: int, message: types.Message):
+    """ Не подтверждает регистрацию пользователя"""
+    """
+        user_id -айди пользователя
+    """
+    if registerData_check_is_editing(user_id): 
+        await message.answer('Пользователь ' + str(user_id) + ' отправлен на повторную регистрацию')
+
+        if registerData_get_role(user_id=user_id) == 'prepod':
+            await prepod_bot.send_message(chat_id=user_id, text='Изменение ваших рег. данных не подтверждено админом, при необходимости, заново введите корректные рег. данные')
+        
+        elif registerData_get_role(user_id=user_id) == 'student':
+            await student_bot.send_message(chat_id=user_id, text='Изменение ваших рег. данных не подтверждено админом, при необходимости, заново введите корректные рег. данные')
+        
+        edited_register_data_remove_user(user_id)
+        unconfirmed_edit_users_minus_one()
+    else:
+        await message.answer('Пользователь ничего не менял')
 
 
 def unique_form_id_plus_one():

@@ -1,4 +1,6 @@
-registerData = {}  # {*user_id*: {'user_role': *role*, 'user_group': *group*, 'confirmed': true/false}}
+registerData = {}  # {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': False}}
+
+edited_register_data = {} # {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role}}
 
 temp_form_recipient_data = {}  # {'*form_creator_user_id*': {recip data}}
 
@@ -15,6 +17,6 @@ completing_forms_dispatcher = {} # {'user_id': {''unique_form_id'': id, 'unique_
 unique_form_id = 0
 unique_sent_form_id = 0
 
-unconfirmed_users = 0
-
+unconfirmed_register_users = 0
+unconfirmed_edit_users = 0
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher

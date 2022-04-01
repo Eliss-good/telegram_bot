@@ -5,6 +5,7 @@ from bot_elements.storages.all_storages  import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import temp_mem_for_answers
+from bot_elements.storages.all_storages import edited_register_data
 import bot_elements.storages.all_storages
 
 
@@ -165,12 +166,63 @@ def registerData_get_role(user_id: int):
     return registerData[user_id]['chosen_role']
 
 
+def registerData_check_is_in_register_list(user_id: int):
+    """ (Для БД) Проверяет есть ли юзер в registerData"""
+
+    """ user_id - айди юзера"""
+    return user_id in registerData.keys()
+
+
 def registerData_check_is_registered(user_id: int):
     """ (Для БД) Проверяет есть ли юзер в registerData"""
 
     """ user_id - айди юзера"""
-    
-    return user_id in registerData.keys()
+    if user_id in registerData.keys():
+        return registerData[user_id]['confirmed']
+    else:
+        return False
+
+
+def registerData_check_is_confirmed(user_id: int):
+    """ (Для БД) Проверяет есть ли юзер в registerData"""
+
+    """ user_id - айди юзера"""
+    if user_id in registerData.keys():
+        print(user_id in registerData.keys())
+        return registerData[user_id]['confirmed']
+
+
+def registerData_check_is_editing(user_id: int):
+   
+    return user_id in edited_register_data.keys()
+
+
+def edited_register_data_get():
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    return edited_register_data
+
+
+def edited_register_data_get_user(user_id: int):
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    return edited_register_data[user_id]
+
+
+def edited_register_data_get_fio(user_id: int):
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    return edited_register_data[user_id]['new_chosen_fio']
+
+
+def edited_register_data_get_group(user_id: int):
+    """ Формат:
+    {user_id: {'new_chosen_fio': chosen_fio, 'new_chosen_group': chosen_group, 'new_chosen_role': chosen_role, 'confirmed': False}}
+    """
+    return edited_register_data[user_id]['new_chosen_group']
 
 
 def send_forms_mem_get():
@@ -237,7 +289,12 @@ def unique_sent_form_id_get():
 def unconfirmed_users_get():
     """ (Для БД) Возвращает счетчик отправленных форм"""
     # print('unique_sent_form_id ',bot_elements.storages.all_storages.unique_sent_form_id)
-    return bot_elements.storages.all_storages.unconfirmed_users
+    return bot_elements.storages.all_storages.unconfirmed_register_users
+
+
+def unconfirmed_edit_users_get():
+
+    return bot_elements.storages.all_storages.unconfirmed_edit_users
 
 
 def temp_mem_for_answers_get():

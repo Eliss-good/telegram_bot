@@ -4,8 +4,9 @@ from bot_elements.storages.all_storages import mem_for_created_forms
 from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
-
+from bot_elements.storages.all_storages import edited_register_data
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher
+
 
 def temp_form_recipient_data_remove_element(user_id: int):
     """ Убирает 1 элемент из temp_form_recipient_data"""
@@ -38,3 +39,11 @@ def mem_for_created_forms_delete_form(form_id: int):
 def completing_forms_dispatcher_remove_session(user_id: int):
     """ Убирает 1 активную сессию  из completing_forms_dispatcher"""
     completing_forms_dispatcher.pop(user_id, None)
+    
+
+def registerData_remove_user(user_id: int):
+    registerData.pop(user_id, None)
+    
+
+def edited_register_data_remove_user(user_id: int):
+    edited_register_data.pop(user_id, None)

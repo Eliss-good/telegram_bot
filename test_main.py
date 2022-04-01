@@ -51,7 +51,8 @@ async def admin_commands(bot: Bot):
         BotCommand(command="/check_created_forms", description="Все созданные формы"),
         BotCommand(command="/check_sent_forms", description="Отправленные формы"),
         BotCommand(command="/check_completing_forms", description="Выполняемые формы"),
-        BotCommand(command="/check_unregistered_users", description="Пользователи, ожидающие подтверждения"),
+        BotCommand(command="/check_unregistered_users", description="Пользователи, ожидающие подтверждения регистрации"),
+        BotCommand(command="/check_edited_users", description="Пользователи, ожидающие подтверждения изменения данных"),
     ]
     await bot.set_my_commands(student_commands)
 
