@@ -52,14 +52,21 @@ class DataConnect:
         if len(name_cl) != len(new_data)  and  len(equality_cl) != len(con_data):
             print("ERROR блять")
             return
-        
         update_com = 'update ' + name_tb + ' set '
+
         for i in range(0, len(name_cl)):
-            update_com += name_cl[i] + ' = ' + new_data[i]
-        update_com += ' where '
+            update_com += str(name_cl[i]) + ' = ' + str(new_data[i])
+            if i < len(name_cl) - 1:
+                update_com += ' , '
+
+        if equality_cl != []:
+            update_com += ' where '
 
         for i in range(0, len(equality_cl)):
-            update_com += equality_cl[i] + ' = ' + con_data[i]
+            update_com += str(equality_cl[i]) + ' = ' + str(con_data[i])
+            if i < len(equality_cl) - 1:
+                update_com += ' and '
+
         print(update_com)
 
         try:
@@ -125,7 +132,7 @@ class DataConnect:
             print("ERROR блять")
             return
 
-        select_com = self.__select_choice(name_tb,name_cl, status)
+        select_com = self.__select_choice(name_tb, name_cl, status)
         for i in range (0, len(equality_cl)):
             select_com += str(equality_cl[i]) + ' = ' + str(con_data[i])  
             if i < len(equality_cl) - 1:

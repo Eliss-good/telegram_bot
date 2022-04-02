@@ -1,18 +1,15 @@
-
 import db_setting.back_function_db as bf
 import db_setting.poll_db.poll_connect_db as pl
 
 
-def update_sub_news(id_us_tg, status):
+def update_sub_news(id_us_tg: int, status: bool):
     """механизм для редактирования подписки на рассылку"""
     bf.db.update_db('global_tb', ['sub_newslet'], [str(status)], ['gl_teleg_id'], [bf.correct_str(str(id_us_tg))])
 
 
-def update_aprove_prepod(tg_id : int):
+def update_aprove(tg_id : int, status: bool):
     """Обновление информации о подтверждение препода"""
-    if bf.find_role_us(tg_id) == 'prepod':
-        global_id_pr = bf.find_id_global(tg_id)
-        bf.db.update_db('prepod_tb', ['prepod_approved'], ['True'], ['gl_id'], [global_id_pr])
+    bf.db.update_db('global_tb', ['gl_approved'], [str(status)], ['gl_teleg_id'], [bf.correct_str(str(tg_id))])
 
 
 def update_name_form(form_id: int, new_name: str):
@@ -28,15 +25,13 @@ def update_name_form(form_id: int, new_name: str):
         print("ERROR fun", update_name_form.__name__)
     
     
-    
 #####role: prepod / student; command: group / name 
-def update_data_user(role: str, command: str, new_data, id_us_tg : int):
+def update_data_user(tg_id: int, name_us: str, role: str, group=None):
     """Обновление данных о пользователей"""
-    id_global = bf.find_id_global(id_us_tg)
+    id_global = bf.find_id_global(tg_id)
 
-    if command == 'name':
-        bf.db.update_db(role + '_tb', [role + '_' + command], [bf.correct_str(new_data)], ['gl_id'], [str(id_global)])
-
-    elif command == 'group' and role == 'student':
-        id_group = bf.find_id_group(new_data)
-        bf.db.update_db(role + '_tb', [command + '_id'], [id_group], ['gl_id'], [str(id_global)])
+    if role == 'student':
+        id_groups = bf.find_id_group(group)
+        bf.db.update_db('student_tb', ['student_name', 'group_id'], [bf.correct_str(name_us), id_groups], ['gl_id'], [str(id_global)])
+    elif role == 'prepod':
+        bf.db.update_db('prepod_tb', ['prepod_name'], [bf.correct_str(name_us)], ['gl_id'], [str(id_global)])

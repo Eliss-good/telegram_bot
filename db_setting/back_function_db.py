@@ -55,6 +55,14 @@ def add_prepod(name_prepod, tg_id = 1):
         db.insert_db('prepod_tb', ['prepod_name', 'gl_id'], con_data)
 
 
+def add_admin(name_admin: str, tg_id : int):
+    """Добавление нового администратора"""
+    admin_ck = find_id_global(tg_id)
+
+    if admin_ck:
+        db.insert_db('global_tb', ['gl_teleg_id', 'gl_role'], [correct_str(str(tg_id)), 'admin'])
+
+
 def add_group(name_group, status):
     """Добавление новой группы"""
     name_group = correct_str(str(name_group))
@@ -107,6 +115,7 @@ def find_id_prepod(name_prepod):
         return str(db.select_db_where('prepod_tb', ['id'], ['prepod_name'], [name_prepod], 'where')[0][0])
     except:
         print('INDEX ERROR fun', find_id_prepod.__name__)
+
 
 def find_id_global(tg_id):
     """Возвращение ID пользователя из глобальной таблицы"""
@@ -171,8 +180,12 @@ def find_id_prepod_for_tg(tg_id : int):
         print('INDEX ERROR fun', find_name_group.__name__)
 
 
+def authenticity_check(tg_id: int):
+    return db.select_db_where('global_tb', ['gl_approved'], ['gl_teleg_id'], [correct_str(str(tg_id))], 'where')[0][0]
+
 
 def find_tg_id(gl_id):
+    """Возвращает телеграмм ID пользователя"""
     try:
         return db.select_db_where('global_tb', ['gl_teleg_id'], ['id'], [gl_id], 'where')[0][0]
     except IndexError:

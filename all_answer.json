@@ -455,5 +455,56 @@
                 "Нет?": "Дааа"
             }
         ]
+    },
+    "28": {
+        "info_form": [
+            {
+                "question": "У тебя есть писюн?",
+                "options": [
+                    "Да",
+                    " Пизда"
+                ],
+                "message_id": 0,
+                "type": "poll"
+            },
+            {
+                "form_name": "У тебя есть писюн?",
+                "type": "info",
+                "form_id": 32,
+                "creator_id": 802504844
+            }
+        ],
+        "send_group": [],
+        "questions": {
+            "poll": [
+                "У тебя есть писюн?"
+            ]
+        },
+        "all_answer": []
+    },
+    "29": {
+        "info_form": [
+            {
+                "question": "У тебя есть писюн?",
+                "options": [
+                    "Да. Пизда"
+                ],
+                "message_id": 0,
+                "type": "poll"
+            },
+            {
+                "form_name": "1",
+                "type": "info",
+                "form_id": 33,
+                "creator_id": 802504844
+            }
+        ],
+        "send_group": [],
+        "questions": {
+            "poll": [
+                "У тебя есть писюн?"
+            ]
+        },
+        "all_answer": []
     }
 }

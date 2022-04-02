@@ -30,6 +30,16 @@ def add_to_sub_form(form_id, groups):
       print('not find this form')
 
 
+def find_groups_is_form(survey_id: int):
+   all_answer = read_answer_to_file()
+
+   try:
+      return all_answer[str(survey_id)]['send_groups']
+   except:
+      print("ERROR fun", find_groups_is_form.__name__)
+      return []
+
+
 def add_answer_for_survay(new_answer):
    """Добавление новых опросов"""
    form_id = prs_an.search_form_id_json(new_answer)

@@ -4,7 +4,8 @@ CREATE TABLE global_tb
     id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     gl_teleg_id varchar(32) NOT NULL,
     gl_role varchar(8) DEFAULT NULL,
-    sub_newslet bool DEFAULT False NOT NULL
+    sub_newslet bool DEFAULT False NOT NULL,
+    gl_approved bool DEFAULT False NOT NULL
 ); 
 
 CREATE TABLE lesson_tb
@@ -24,7 +25,6 @@ CREATE TABLE prepod_tb
 (
     id int PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     prepod_name varchar(64) NOT NULL,
-    prepod_approved bool DEFAULT False NOT NULL,
     gl_id int REFERENCES global_tb(id)
 );
 

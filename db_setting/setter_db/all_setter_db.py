@@ -67,10 +67,10 @@ def set_start_form_users(form_id, groups):
     return set_form('one', form_id)
 
 
-def set_form_us(tg_id):
+def set_form_us(tg_id: int):
     """Все формы созданные по tg_id"""
 
-    if bf.find_role_us(tg_id) == 'student':
+    if bf.find_role_us(tg_id) != 'prepod':
         """Проверка на то преподаватель ли пользователь"""
         return None
 
@@ -80,7 +80,10 @@ def set_form_us(tg_id):
     user_forms = []
     for item_id in id_forms:
         try:
-            user_forms.append(set_form('one', form_id=item_id[0]))
+            info_form = set_form('one', form_id=item_id[0])
+
+            if info_form != None:
+                user_forms.append(info_form)
         except IndexError:
             print('INDEX ERROR fun', set_form_us.__name__)
 
@@ -126,3 +129,59 @@ def set_all_groups_from_prepod(tg_id: int):
 def set_tg_user_for_from(form_id: int):
     """Возвращает id пользователя, который создал форму"""
     return int(bf.db.select_db_where('survay_tb', ['from_id'], ['form_id'], [str(form_id)], 'where')[0][0])
+
+
+def set_status_authenticity(tg_id: int):
+    return bf.authenticity_check(tg_id)
+
+
+def set_send_form_user(sent_form_id: int):
+    """Возвращенеи всех id пользователей которым отослана форма"""
+    id_survey = bf.find_id_survay(sent_form_id)
+
+    if id_survey:
+        list_groups = poll_db.find_groups_is_form(sent_form_id)
+        list_users = set_id_users(list_groups)
+        return list_users
+    else:
+        return []
+
+
+def get_max_survay():
+    """Кол-во созданных форм"""
+    return bf.max_code_survay()
+
+
+def get_count_send_survay():
+    """Кол-во отправленных форм"""
+    return bf.find_count_send_form()
+
+
+def find_role_us(tg_id: int):
+    """Возвращает роль пользователя"""
+    return bf.find_role_us(tg_id)
+
+
+def find_group_us(tg_id: int):
+    """Возвращает группу студента"""
+    return bf.find_group_us(tg_id)
+
+
+def find_fio_us(tg_id: int):
+    """Возвращает ФИО пользователя"""
+    return bf.find_fio_us(tg_id)
+
+
+def formatted_data_user():
+    """Форматирование данных для бота"""
+    user_name = bf.db.select_db_where('global_tb', ['gl_role'], ['gl_approved'], ['False'], 'where')
+    user_gl_id = bf.db.select_db_where('global_tb', ['gl_teleg_id'], ['gl_approved'], ['False'], 'where')
+
+    formate_all_data = {}
+    for i in range (0,len(user_name)):
+        name_us = bf.find_fio_us(user_gl_id[i][0])
+
+        info_for_us = {'chosen_fio' : name_us, 'chosen_role' : 'prepod', 'confirmed' : False } 
+        formate_all_data[user_gl_id[i][0]] = info_for_us
+
+    return formate_all_data
