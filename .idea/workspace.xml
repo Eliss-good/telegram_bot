@@ -6,10 +6,29 @@
   <component name="ChangeListManager">
     <list default="true" id="3bbc824c-0d7a-45f9-b412-e9d1499e0f49" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/cancel.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/cancel.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/forms/form_display.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/forms/form_display.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/forms/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/forms/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot_elements/forms/forms_editor.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/forms/forms_editor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/forms/forms_menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/forms/forms_menu.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot_elements/getter/all_getters.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/getter/all_getters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/raspisanie/raspisanie.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/raspisanie/raspisanie.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/register/admin_register.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/register/admin_register.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/register/prepod_register.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/register/prepod_register.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/register/student_register.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/register/student_register.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot_elements/remover/all_removers.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/remover/all_removers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db_setting/all_con_bot_bd.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/all_con_bot_bd.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/setter/all_setters.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/setter/all_setters.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/status/status.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/status/status.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot_elements/storages/all_storages.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot_elements/storages/all_storages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/_seting_sql/db_init_code.sql" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/_seting_sql/db_init_code.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/all_con_bot_bd.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/back_function_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/back_function_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/poll_db/poll_connect_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/poll_db/poll_connect_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/register_db/all_register.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/register_db/all_register.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/setter_db/all_setter_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/setter_db/all_setter_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_setting/update_db/all_update.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_setting/update_db/all_update.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +57,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.." />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">

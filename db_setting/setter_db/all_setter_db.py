@@ -8,9 +8,9 @@ def set_id_users(list_name_group : list):
 
     if list_name_group :
         for name_group in list_name_group:
-            name_group[0] = name_group[0].upper()
+            #name_group[0] = name_group[0].upper()
 
-            data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group[0])], 'where')
+            data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group)], 'where')
             for i in data:
                 group_us.append(int(bf.find_tg_id(i[0])))
 
@@ -170,6 +170,16 @@ def find_group_us(tg_id: int):
 def find_fio_us(tg_id: int):
     """Возвращает ФИО пользователя"""
     return bf.find_fio_us(tg_id)
+
+
+def find_all_us_is_group(group: str):
+    fio_users = []
+    tg_users = set_id_users([group])
+
+    for one_us in tg_users:
+        fio_users.append(find_fio_us(int(one_us)))
+
+    return fio_users
 
 
 def formatted_data_user():

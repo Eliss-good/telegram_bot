@@ -1,3 +1,4 @@
+
 import asyncio
 import bot_elements.raspisanie.raspisanie as raspisanie
 from aiogram import Bot, Dispatcher
@@ -19,6 +20,7 @@ from bot_elements.admin_tools.check_storages import register_handlers_forms_chec
 from bot_elements.admin_tools.aproove_register import register_handlers_forms_check_register
 
 from bot_elements.register.registerCheck import register_handlers_register_check
+from bot_elements.admin_tools.get_student_data import register_handlers_get_data
 
 from bots import student_bot, prepod_bot, admin_bot
 
@@ -53,6 +55,7 @@ async def admin_commands(bot: Bot):
         BotCommand(command="/check_completing_forms", description="Выполняемые формы"),
         BotCommand(command="/check_unregistered_users", description="Пользователи, ожидающие подтверждения регистрации"),
         BotCommand(command="/check_edited_users", description="Пользователи, ожидающие подтверждения изменения данных"),
+        BotCommand(command="/get_student_list", description="Получить список студентов по группе (напишите номер группы)"),
     ]
     await bot.set_my_commands(student_commands)
 
@@ -104,6 +107,7 @@ async def main():
     # register_handlers_register_admin(admin_bot_dispatcher)
     register_handlers_forms_check_storages(admin_bot_dispatcher)
     register_handlers_forms_check_register(admin_bot_dispatcher)
+    register_handlers_get_data(admin_bot_dispatcher)
     await asyncio.gather(prepod_bot_dispatcher.start_polling(), student_bot_dispatcher.start_polling(), admin_bot_dispatcher.start_polling())
     
 

@@ -1,3 +1,4 @@
+from tokenize import group
 from urllib3 import Retry
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
@@ -363,3 +364,8 @@ def get_group_users_ids(groups: list):
     """ groups - список с группами"""
     
     return setter_db.set_id_users(groups)
+
+
+#ДОБАВИЛ ИЛЬЯ
+def get_fio_in_group(group: str):
+    return setter_db.find_all_us_is_group(group)
