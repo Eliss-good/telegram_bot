@@ -151,7 +151,7 @@ async def add_quest_false(call: types.CallbackQuery):
     temp_mem_for_form_creator_remove_form(user_id=call.message.chat.id)
     temp_form_recipient_data_remove_element(user_id=call.message.chat.id)
 
-    print('temp_form_recipient_data ', temp_form_recipient_data_get(call.message.chat.id))
+    print('temp_form_recipient_data ', temp_form_recipient_data_get())
 
     await call.message.answer('Форма создана', reply_markup=types.ReplyKeyboardRemove())
 

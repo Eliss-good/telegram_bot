@@ -7,9 +7,14 @@ def update_sub_news(id_us_tg: int, status: bool):
     bf.db.update_db('global_tb', ['sub_newslet'], [str(status)], ['gl_teleg_id'], [bf.correct_str(str(id_us_tg))])
 
 
-def update_aprove(tg_id : int, status: bool):
+def update_aprove(tg_id: int, status: bool):
     """Обновление информации о подтверждение препода"""
     bf.db.update_db('global_tb', ['gl_approved'], [str(status)], ['gl_teleg_id'], [bf.correct_str(str(tg_id))])
+
+
+def update_status_form(form_id: int):
+    """Обновление статуса отправки формы"""
+    bf.db.update_db('survay_tb', ['sending_status'], ['True'], ['form_id'], [form_id])
 
 
 def update_name_form(form_id: int, new_name: str):

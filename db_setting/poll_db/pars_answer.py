@@ -7,6 +7,15 @@ def search_form_id_json(new_answers):
             except KeyError:
                 print("ERROR fun", search_answer_in_json.__name__)
 
+
+def tg_id_answer_is_json(new_anwers):
+    users = []
+    for tg_id in  new_anwers:
+        users.append(tg_id)
+
+    return users
+
+
 def search_answer_in_json(new_answers):
    """Форматирование json результатов опроса"""
    result_answers = {}

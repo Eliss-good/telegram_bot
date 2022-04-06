@@ -506,5 +506,83 @@
             ]
         },
         "all_answer": []
+    },
+    "30": {
+        "info_form": [
+            {
+                "question": "Кто я?",
+                "options": [
+                    "Хуй",
+                    " Пизда"
+                ],
+                "message_id": 0,
+                "type": "poll"
+            },
+            {
+                "form_name": "Эээ",
+                "type": "info",
+                "form_id": 34,
+                "creator_id": 802504844
+            }
+        ],
+        "send_group": [],
+        "questions": {
+            "poll": [
+                "Кто я?"
+            ]
+        },
+        "all_answer": []
+    },
+    "31": {
+        "info_form": [
+            {
+                "question": "Ладей",
+                "options": [
+                    "Да",
+                    "нет"
+                ],
+                "message_id": 0,
+                "type": "poll"
+            },
+            {
+                "form_name": "Хе",
+                "type": "info",
+                "form_id": 35,
+                "creator_id": 622867137
+            }
+        ],
+        "send_group": [],
+        "questions": {
+            "poll": [
+                "Ладей"
+            ]
+        },
+        "all_answer": []
+    },
+    "32": {
+        "info_form": [
+            {
+                "question": "Робит?",
+                "options": [
+                    "Да",
+                    "неи"
+                ],
+                "message_id": 0,
+                "type": "poll"
+            },
+            {
+                "form_name": "Хаахп",
+                "type": "info",
+                "form_id": 36,
+                "creator_id": 622867137
+            }
+        ],
+        "send_group": [],
+        "questions": {
+            "poll": [
+                "Робит?"
+            ]
+        },
+        "all_answer": []
     }
 }

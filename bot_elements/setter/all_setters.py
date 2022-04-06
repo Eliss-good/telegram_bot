@@ -189,16 +189,15 @@ def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
         Пример send_forms_mem[sent_form_id]['info']:
     {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'send_to_groups': [groups],'got_answers_from': [айдишники]}
     """
-
-
-    send_forms_mem[sent_form_id]['info']['got_answers_from'].append(user_id)
+    #send_forms_mem[sent_form_id]['info']['got_answers_from'].append(user_id)
+    
 
 
 def completing_forms_dispatcher_add_session(chat_id: int, unique_form_id: int, unique_sent_form_id: int):
     """ Добавляет 1 сессию в список активных сессий"""
     
-    completing_forms_dispatcher[chat_id] = {
-        'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'current_question_num': 0,'form_copy': mem_for_created_forms[unique_form_id]}
+    #completing_forms_dispatcher[chat_id] = {
+        #'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'current_question_num': 0,'form_copy': mem_for_created_forms[unique_form_id]}
     
 
 def completing_forms_dispatcher_add_1_to_question_num(user_id: int):
@@ -403,5 +402,5 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит словарь со всеми ответами на форму"""
-    print(formAnswer)
+    getter_db.add_answer_for_survay(formAnswer)
     pass

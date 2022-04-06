@@ -359,11 +359,11 @@ def get_all_groups():
     return setter_db.set_any_data('group')
 
 
-def get_group_users_ids(groups: list):
+def get_group_users_ids(groups: list, form_id: int = None):
     """ (Для БД) Возвращает список айдишников студентов из выбранных групп"""
     """ groups - список с группами"""
     
-    return setter_db.set_id_users(groups)
+    return setter_db.set_id_users(groups, form_id = form_id)
 
 
 #ДОБАВИЛ ИЛЬЯ

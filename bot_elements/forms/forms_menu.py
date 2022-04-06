@@ -46,10 +46,11 @@ async def sending(message: types.Message, state: FSMContext): # sender.waiting_f
     
     groupz = message.text.split(',')
     print('\n\n send_to_grps ', groupz)
-    send_to_users = get_group_users_ids(groups=groupz)
-
-
+    #send_to_users = get_group_users_ids(groups=groupz)
+    
     final_data = await state.get_data()
+    send_to_users = get_group_users_ids(groups=groupz, form_id = int(final_data['form_index']) )
+
     form_creator_user_id = mem_for_created_forms_get_creator_id(int(final_data['form_index']))
     # получить id юзеров по группам
     send_forms_mem_add_sent_form(form_id=int(final_data['form_index']), sent_form_id=unique_sent_form_id_get(), form_creator_user_id=form_creator_user_id, send_to_users_ids=send_to_users, groups=groupz)

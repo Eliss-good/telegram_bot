@@ -2,7 +2,7 @@ import db_setting.back_function_db as bf
 import db_setting.poll_db.poll_connect_db as poll_db
 from db_setting.register_db.all_register import reg_us
 from db_setting.poll_db.poll_connect_db import add_survay, add_answer_for_survay
-from db_setting.update_db.all_update import update_data_user, update_sub_news, update_aprove, update_name_form
+from db_setting.update_db.all_update import update_data_user, update_sub_news, update_aprove, update_name_form, update_status_form
 from db_setting.remove_db.all_delete import del_us
 
 
@@ -54,5 +54,10 @@ def update_status(tg_id: int, new_status: bool):
 def update_form_name(form_id : int, new_name : str):
     """Обновляет название формы"""
     update_name_form(form_id, new_name)
+
+
+def update_sending_status(form_id: int):
+    """Подтверждение о отправке формы"""
+    update_status_form(form_id)
 
 #delete_user(622867137)

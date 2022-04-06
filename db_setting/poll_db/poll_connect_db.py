@@ -18,7 +18,7 @@ def write_answer_to_file(all_survay_json):
       json.dump(all_survay_json, data_file, ensure_ascii=False, indent=4)
 
 
-def add_to_sub_form(form_id, groups):
+def add_to_sub_form(form_id: int, groups: list):
    """Добавление к form_id список групп"""
    all_form = read_answer_to_file()
 
@@ -31,6 +31,7 @@ def add_to_sub_form(form_id, groups):
 
 
 def find_groups_is_form(survey_id: int):
+   """Возвращает все группы, которым отправлена форма"""
    all_answer = read_answer_to_file()
 
    try:
@@ -40,6 +41,27 @@ def find_groups_is_form(survey_id: int):
       return []
 
 
+
+def all_users_send_form(users_tg: list, form_id: int):
+   """Добавление пользователей которым отправлена форма"""
+   form_data = read_answer_to_file()
+   id_survey = str(bf.find_id_survay(form_id))
+
+   if id_survey:
+      try:
+         for one_us in users_tg:
+            form_data[id_survey]['send_user'].append(one_us)
+      except:
+         print("ERROR fun", all_users_send_form.__name__)
+         
+
+
+def add_tg_us(form_data: dict, survey_id: int ,tg_id: int):
+   """Добавление пользователя, который проголосовал"""
+   form_data[str(survey_id)]['user_replied'].append(tg_id)
+   return form_data
+
+
 def add_answer_for_survay(new_answer):
    """Добавление новых опросов"""
    form_id = prs_an.search_form_id_json(new_answer)
@@ -47,9 +69,11 @@ def add_answer_for_survay(new_answer):
    data_file = read_answer_to_file()
 
    survay_id = str(bf.find_id_survay(form_id))
+   tg_id = prs_an.tg_id_answer_is_json(new_answer)
 
    try:
       data_file[survay_id]['all_answer'].append(result_answer)
+      data_file = add_tg_us(data_file, survay_id, tg_id[0])
       write_answer_to_file(data_file)
 
       print("Успещно добавлен ответ на опрос id:", form_id)
@@ -80,6 +104,8 @@ def _start_answer(data_survay):
    new_file = {}
    new_file['info_form'] = data_survay
    new_file['send_group'] = []
+   new_file['send_users'] = []
+   new_file['user_replied'] = []
    new_file['questions'] = {}
    new_file['all_answer'] = []
    #########################################

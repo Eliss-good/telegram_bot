@@ -2,7 +2,7 @@ import db_setting.back_function_db as bf
 import db_setting.poll_db.poll_connect_db as poll_db
 
 """Cеттер для данных пользователя"""
-def set_id_users(list_name_group : list):
+def set_id_users(list_name_group : list, form_id: int = None):
     """Возвоащается списком  все ID телеги по указанным группам"""
     group_us = []
 
@@ -13,6 +13,9 @@ def set_id_users(list_name_group : list):
             data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group)], 'where')
             for i in data:
                 group_us.append(int(bf.find_tg_id(i[0])))
+
+        if form_id != None:
+            poll_db.all_users_send_form(group_us,form_id)
 
         return group_us
 
