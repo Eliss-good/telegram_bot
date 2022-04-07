@@ -56,7 +56,7 @@ def registerData_remove_user(user_id: int):
     """ (Для БД) Убирает запись о регистрации пользователя из registerData"""
     """ user_id - айди пользователя"""
     registerData.pop(user_id, None)
-
+#  --- дальше забей ---
 
 def edited_register_data_remove_user(user_id: int):
     edited_register_data.pop(user_id, None)
