@@ -61,7 +61,7 @@ async def rename_question_end(message: types.Message, state: FSMContext): # newQ
     """ (rename)(newQuestionName FSM) Меняет на новый текст вопроса"""
     new_question_name = message.text
     data = await state.get_data()
-    mem_for_created_forms_set_new_question_name(form_id=data['form_id'], question_id=data['question_id'], new_question_name=new_question_name, message=message)
+    mem_for_created_forms_set_new_question_name(form_id=data['form_id'], question_id=data['question_id'], new_question_name=new_question_name)
     await display_form(form_id=data['form_id'], message=message)
     await state.finish()
 
@@ -124,7 +124,7 @@ async def get_options(message: types.Message, state: FSMContext): # form.waiting
 
     temp_mem_for_form_creator_add_element(user_id=message.chat.id, data={'question': data['question'], 'options': data['options'], 'message_id': 0, 'type': 'poll'})
     
-    mem_for_created_forms_insert_question(form_id=data['form_id'], inser_after_id=data['question_id'], data=temp_mem_for_form_creator_get_data(message.chat.id).copy(), message=message)
+    mem_for_created_forms_insert_question(form_id=data['form_id'], inser_after_id=data['question_id'], data=temp_mem_for_form_creator_get_data(message.chat.id).copy())
 
     temp_mem_for_form_creator_remove_form(user_id=message.chat.id)
     
@@ -181,7 +181,7 @@ async def editPollOtions_set_data(message: types.Message, state: FSMContext): # 
 
     data = await state.get_data()
 
-    mem_for_created_forms_edit_poll_options(form_id=data['form_id'], question_id=data['question_id'], new_poll_options=data['options'], message=message)
+    mem_for_created_forms_edit_poll_options(form_id=data['form_id'], question_id=data['question_id'], new_poll_options=data['options'])
     
     await display_form(form_id=data['form_id'], message=message)
     await state.finish()
@@ -199,7 +199,7 @@ async def edit_form_name_finish(message: types.Message, state: FSMContext): # re
     """ (edit)(renameForm FSM) Изменяет название формы"""
     new_name = message.text
     data = await state.get_data()
-    mem_for_created_forms_set_new_form_name(form_id=data['form_id'], new_form_name=new_name, message=message)
+    await mem_for_created_forms_set_new_form_name(form_id=data['form_id'], new_form_name=new_name)
 
     await display_current_mem_status(message=message)
     await state.finish()

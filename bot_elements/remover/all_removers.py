@@ -5,6 +5,9 @@ from bot_elements.storages.all_storages import send_forms_mem
 from bot_elements.storages.all_storages import completing_forms_dispatcher 
 from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import edited_register_data
+from bot_elements.storages.all_storages import choosing_groups_dispatcher
+from bot_elements.storages.all_storages import temp_chosen_groups_data
+from bot_elements.storages.all_storages import temp_form_index_data
 # temp_mem_for_form_creator + temp_poll_recip_data -> mem_for_created_forms -> send_forms_mem -> completing_forms_dispatcher
 
 
@@ -57,3 +60,26 @@ def registerData_remove_user(user_id: int):
 
 def edited_register_data_remove_user(user_id: int):
     edited_register_data.pop(user_id, None)
+
+
+def choosing_groups_dispatcher_remove_user(user_id: int):
+    if user_id in choosing_groups_dispatcher.keys():
+        choosing_groups_dispatcher.pop(user_id, None)
+
+
+def choosing_groups_dispatcher_remove_poll(user_id: int, poll_id: int):
+    if user_id in choosing_groups_dispatcher.keys():
+        for form_id in choosing_groups_dispatcher[user_id]:
+            if choosing_groups_dispatcher[user_id][form_id]['poll_id'] == poll_id:
+                choosing_groups_dispatcher[user_id].pop(form_id, None)
+                break # ругается
+        print(choosing_groups_dispatcher)
+
+
+def chosen_groups_data_remove_user(user_id: int):
+    if user_id in temp_chosen_groups_data.keys():
+        temp_chosen_groups_data.pop(user_id, None)
+
+
+def temp_form_index_data_remove_index(user_id: int):
+    temp_form_index_data.pop(user_id, None)

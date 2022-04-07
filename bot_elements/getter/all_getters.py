@@ -6,6 +6,10 @@ from bot_elements.storages.all_storages import completing_forms_dispatcher
 from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import temp_mem_for_answers
 from bot_elements.storages.all_storages import edited_register_data
+from bot_elements.storages.all_storages import choosing_groups_dispatcher
+from bot_elements.storages.all_storages import temp_chosen_groups_data
+from bot_elements.storages.all_storages import temp_form_index_data
+
 import bot_elements.storages.all_storages
 
 
@@ -175,7 +179,7 @@ def registerData_check_is_registered(user_id: int):
         {user_id: {'chosen_fio': chosen_fio, 'chosen_group': chosen_group, 'chosen_role': chosen_role, 'confirmed': False}, ...}
     """
     if user_id in registerData.keys():
-
+        print(registerData[user_id]['confirmed'])
         return registerData[user_id]['confirmed']
     else:
         return False
@@ -312,13 +316,34 @@ def temp_mem_for_answers_get():
 
 def get_all_groups():
     """ (Для БД) Возвращает список всех групп"""
-    # all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21', 'М3О-118М-21',
-    #           'М3О-111М-21', 'М3О-111М-21', 'М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19']
+    all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21',
+              'М3О-111М-21',  'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19']
 
-    pass
+    return all_groups
 
 
 def get_group_users_ids(groups: list):
     """ (Для БД) Возвращает список айдишников студентов из выбранных групп"""
     """ groups - список с группами"""
+
     pass
+
+def get_choosing_groups_dispatcher_user(user_id: int):
+    """
+        Формат:
+            {user_id: {0: {'poll_id': , 'poll_options': }, 1: {...}, ...}   
+    """
+    if user_id in choosing_groups_dispatcher.keys():
+        return choosing_groups_dispatcher[user_id]
+
+    else:
+        return False
+
+
+def get_chosen_groups_data(user_id: int):
+    if user_id in temp_chosen_groups_data.keys():
+        return temp_chosen_groups_data[user_id]
+    
+
+def get_temp_form_index_data(user_id: int):
+    return temp_form_index_data[user_id]

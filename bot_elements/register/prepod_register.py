@@ -3,13 +3,10 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from bot_elements.getter.all_getters import registerData_get_fio, registerData_get_role, registerData_check_is_registered, edited_register_data_get_fio, registerData_check_is_confirmed
+from bot_elements.getter.all_getters import get_all_groups, registerData_get_fio, registerData_get_role, registerData_check_is_registered, edited_register_data_get_fio, registerData_check_is_confirmed
 
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data
 
-
-all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21', 'М3О-118М-21',
-              'М3О-111М-21', 'М3О-111М-21', 'М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19']
 
 class registerUser(StatesGroup):
     " FSM для регистрации пользователя"
@@ -148,4 +145,4 @@ def register_handlers_register_prepod(dp: Dispatcher):
     dp.register_callback_query_handler(
         register_change_fio, text="register_change_fio")
 
-    dp.register_message_handler(strangeMessagesHandler, lambda message: message.text in all_groups or '; id ' in message.text)
+    dp.register_message_handler(strangeMessagesHandler, lambda message: message.text in get_all_groups() or '; id ' in message.text)

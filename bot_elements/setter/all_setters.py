@@ -1,4 +1,6 @@
 from aiogram import types
+from operator import itemgetter
+from bot_elements.forms.form_display import display_current_mem_status
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
@@ -7,10 +9,13 @@ from bot_elements.storages.all_storages import completing_forms_dispatcher
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
 from bot_elements.storages.all_storages import edited_register_data
+from bot_elements.storages.all_storages import choosing_groups_dispatcher
+from bot_elements.storages.all_storages import temp_chosen_groups_data
+from bot_elements.storages.all_storages import temp_form_index_data
 import bot_elements.storages.all_storages
 from bots import admin_bot, adminIds, student_bot, prepod_bot
 
-from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get
+from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get, registerData_check_is_confirmed
 from bot_elements.remover.all_removers import edited_register_data_remove_user, registerData_remove_user
 
 def unconfirmed_users_plus_one():
@@ -119,7 +124,7 @@ def mem_for_created_forms_insert_question(form_id: int, inser_after_id: int, dat
     mem_for_created_forms[form_id].insert(inser_after_id + 1, data[0])
     
 
-def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
+async def mem_for_created_forms_set_new_form_name(form_id: int, new_form_name: str):
     """ (Для БД) Изменяет название формы из mem_for_created_forms"""
 
     """
@@ -170,6 +175,7 @@ def send_forms_mem_add_sent_form(sent_form_id: int, form_id: int, form_creator_u
     {'sent_form_id': {'form_id': *form_id*, 'info': {'form_creator_user_id': id,'send_to_users_ids': [айдишники], 'send_to_groups': [groups],'got_answers_from': [айдишники]}, ...}
     """
     send_forms_mem[sent_form_id] = {'form_id': form_id, 'info': {'form_creator_user_id': form_creator_user_id, 'send_to_users_ids': send_to_users_ids, 'send_to_groups': groups, 'got_answers_from': []}}
+    print('\n\n', send_forms_mem)
 
 
 def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
@@ -272,7 +278,7 @@ async def registerData_accept_register(user_id: int, message: types.Message):
     """
         user_id -айди пользователя
     """
-    if registerData_check_is_in_register_list(user_id):
+    if registerData_check_is_in_register_list(user_id) and not registerData_check_is_confirmed(user_id):
         await message.answer('Пользователь ' + str(user_id) + ' подтвержден')
 
         if registerData_get_role(user_id=user_id) == 'prepod':
@@ -283,9 +289,9 @@ async def registerData_accept_register(user_id: int, message: types.Message):
         
         confirm_user(user_id)
         unconfirmed_users_minus_one()
-        registerData_remove_user(user_id)
+
     else:
-        await message.answer('Пользователь не зарегистрирован')
+        await message.answer('Пользователя нет в списке на подтверждение регистрации')
 
 
 async def registerData_deny_register(user_id: int, message: types.Message):
@@ -293,7 +299,7 @@ async def registerData_deny_register(user_id: int, message: types.Message):
     """
         user_id -айди пользователя
     """
-    if registerData_check_is_in_register_list(user_id): 
+    if registerData_check_is_in_register_list(user_id) and not registerData_check_is_confirmed(user_id):
         await message.answer('Пользователь ' + str(user_id) + ' отправлен на повторную регистрацию')
 
         if registerData_get_role(user_id=user_id) == 'prepod':
@@ -305,7 +311,7 @@ async def registerData_deny_register(user_id: int, message: types.Message):
         registerData_remove_user(user_id)
         unconfirmed_users_minus_one()
     else:
-        await message.answer('Пользователь не зарегистрирован')
+        await message.answer('Пользователя нет в списке на подтверждение регистрации')
 
 
 async def registerData_accept_register_edit(user_id: int, message: types.Message):
@@ -324,14 +330,13 @@ async def registerData_accept_register_edit(user_id: int, message: types.Message
         elif registerData_get_role(user_id=user_id) == 'student':
             await student_bot.send_message(chat_id=user_id, text='Изменение ваших рег. данных подтверждено админом\n' + 'Ваши новые данные: ФИО: ' + str(new_data['new_chosen_fio']) + ' ГРУППА: ' + str(new_data['new_chosen_group']))
         
-        
-
         await registerData_change_data(user_id=user_id, chosen_fio=new_data['new_chosen_fio'], chosen_group=new_data['new_chosen_group'], chosen_role=new_data['new_chosen_role'])
         
         edited_register_data_remove_user(user_id)
         unconfirmed_edit_users_minus_one()
+
     else:
-        await message.answer('Пользователь ничего не менял')
+        await message.answer('Пользователя нет в списке на изменение регистрации')
 
 
 async def registerData_deny_register_edit(user_id: int, message: types.Message):
@@ -351,7 +356,7 @@ async def registerData_deny_register_edit(user_id: int, message: types.Message):
         edited_register_data_remove_user(user_id)
         unconfirmed_edit_users_minus_one()
     else:
-        await message.answer('Пользователь ничего не менял')
+        await message.answer('Пользователя нет в списке на изменение регистрации')
 
 
 def unique_form_id_plus_one():
@@ -383,5 +388,31 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит словарь со всеми ответами на форму"""
-    print(formAnswer)
+    # print(formAnswer)
     pass
+
+
+def choosing_groups_dispatcher_add_user(user_id: int, poll_id: int, options: list, poll_number: int):
+    """
+    Формат:
+        {user_id: [0: {'poll_id': , 'poll_options': }, 1: ...], ...}   
+    """
+
+    if not user_id in choosing_groups_dispatcher.keys():
+        choosing_groups_dispatcher[user_id] = {}
+
+    choosing_groups_dispatcher[user_id][poll_number] = {'poll_id': poll_id, 'options': options}
+
+
+def chosen_groups_data_add_group(user_id: int, options_ids: list, groups: list):
+    if not user_id in temp_chosen_groups_data.keys():
+        temp_chosen_groups_data[user_id] = []
+    
+    print('\n\n',groups, options_ids)
+
+    print('\n\n neger ', temp_chosen_groups_data, list(itemgetter(*options_ids)(groups)))
+    temp_chosen_groups_data[user_id].extend( list(itemgetter(*options_ids)(groups)))
+
+
+def temp_form_index_data_add_index(user_id: int, form_index: int):
+    temp_form_index_data[user_id] = form_index

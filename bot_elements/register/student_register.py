@@ -3,15 +3,11 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from bot_elements.getter.all_getters import registerData_check_is_confirmed, registerData_get_fio, registerData_get_group, registerData_get_role, registerData_check_is_registered, edited_register_data_get_group, edited_register_data_get_fio
+from bot_elements.getter.all_getters import registerData_check_is_confirmed, registerData_get_fio, registerData_get_group, registerData_get_role, registerData_check_is_registered, edited_register_data_get_group, edited_register_data_get_fio, get_all_groups
 
 import parsers.prep_text_pars as prep_text_pars
 
 from bot_elements.setter.all_setters import registerData_add_user, registerData_change_fio_data, registerData_change_group_data
-
-
-all_groups = ['М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19', 'М3О-118М-21', 'М3О-118М-21',
-              'М3О-111М-21', 'М3О-111М-21', 'М3О-212Б-20', 'М3О-214Б-20', 'М3О-221Б-20', 'М3О-309Б-19', 'М3О-314Б-19']
 
 class registerUser(StatesGroup):
     " FSM для регистрации пользователя"
@@ -75,7 +71,7 @@ async def choose_fio(message: types.Message, state: FSMContext):
     
     marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
 
-    for data in all_groups:
+    for data in get_all_groups():
         marakap.add(KeyboardButton(data))
 
     await message.reply('Выберите группу', reply_markup=marakap)
@@ -163,7 +159,7 @@ async def register_change_group(call: types.CallbackQuery, state: FSMContext):
     await types.Message.edit_reply_markup(self=call.message, reply_markup=None)
     # сделать изменения в бд и проверку, есть ли уже такое
     marakap = ReplyKeyboardMarkup(one_time_keyboard=True)
-    for data in all_groups:
+    for data in get_all_groups():
         marakap.add(KeyboardButton(data))
 
     await register_change_group_fsm.waiting_for_new_group.set()
@@ -191,16 +187,16 @@ def register_handlers_register_student(dp: Dispatcher):
     dp.register_message_handler(get_fio, commands="register", state="*")
     dp.register_message_handler(choose_fio, state=registerUser.waiting_for_fio)
     dp.register_message_handler(
-        choose_group, lambda message: message.text in all_groups, state=registerUser.waiting_for_group)
+        choose_group, lambda message: message.text in get_all_groups(), state=registerUser.waiting_for_group)
 
     dp.register_message_handler(
-        wrong_group, lambda message: message.text not in all_groups, state=registerUser.waiting_for_group)
+        wrong_group, lambda message: message.text not in get_all_groups(), state=registerUser.waiting_for_group)
 
     dp.register_message_handler(
-        register_change_group_set_group, lambda message: message.text in all_groups, state=register_change_group_fsm.waiting_for_new_group)
+        register_change_group_set_group, lambda message: message.text in get_all_groups(), state=register_change_group_fsm.waiting_for_new_group)
 
     dp.register_message_handler(
-        wrong_group, lambda message: message.text not in all_groups, state=register_change_group_fsm.waiting_for_new_group)
+        wrong_group, lambda message: message.text not in get_all_groups(), state=register_change_group_fsm.waiting_for_new_group)
 
     dp.register_message_handler(
         register_change_fio_set_fio, state=register_change_fio_fsm.waiting_for_new_fio)
@@ -216,4 +212,4 @@ def register_handlers_register_student(dp: Dispatcher):
     dp.register_callback_query_handler(
         register_change_group, text="register_change_group")
 
-    dp.register_message_handler(strangeMessagesHandler, lambda message: message.text in all_groups or '; id ' in message.text)
+    dp.register_message_handler(strangeMessagesHandler, lambda message: message.text in get_all_groups() or '; id ' in message.text)
