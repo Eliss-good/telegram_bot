@@ -328,6 +328,8 @@ def get_group_users_ids(groups: list):
 
     pass
 
+
+# ---- дальше забей ------------
 def get_choosing_groups_dispatcher_user(user_id: int):
     """
         Формат:

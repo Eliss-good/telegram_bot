@@ -391,6 +391,7 @@ def sendFormAnswer(formAnswer: dict):
     # print(formAnswer)
     pass
 
+# ---- дальше забей ----
 
 def choosing_groups_dispatcher_add_user(user_id: int, poll_id: int, options: list, poll_number: int):
     """
