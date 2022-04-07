@@ -329,6 +329,13 @@ def get_group_users_ids(groups: list):
     pass
 
 
+def get_document(form_id: int, sent_form_id: int): # Илья сюда
+    """ (Для БД) Возвращает pdf документ с результатом формы"""
+    """ form_id - айдишник формы, sent_form_id - айдишник отправленной формы"""
+
+    pass
+
+
 # ---- дальше забей ------------
 def get_choosing_groups_dispatcher_user(user_id: int):
     """

@@ -388,7 +388,7 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит словарь со всеми ответами на форму"""
-    # print(formAnswer)
+    print(formAnswer)
     pass
 
 # ---- дальше забей ----
