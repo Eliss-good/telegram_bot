@@ -10,12 +10,10 @@ async def get_student_list_pdf(message: types.Message):
     group = message.text[18:].replace('_', '-') # получает ггуппу
     group_ru = translit(group, 'ru')
 
-    all_fio = get_fio_in_group(group_ru)
+    all_fio = get_fio_in_group(group_ru) 
+    document = open(str(all_fio), 'rb')
     
-
-    # здесь пропиши путь к сгенерированному файлу
-    
-    await message.answer(all_fio)
+    await message.answer_document(document)
 
 
 def register_handlers_get_data(dp: Dispatcher):

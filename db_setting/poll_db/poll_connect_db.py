@@ -1,3 +1,4 @@
+from sys import exec_prefix
 import db_setting.back_function_db as bf
 import db_setting.poll_db.pars_answer as prs_an
 import json
@@ -18,6 +19,31 @@ def write_answer_to_file(all_survay_json):
       json.dump(all_survay_json, data_file, ensure_ascii=False, indent=4)
 
 
+def find_user_replied(form_id: int):
+   """Список людей, которые прошли форму"""
+   form_data = read_answer_to_file()
+   id_survey = str(bf.find_id_survay(form_id))
+   
+   try:
+      user_replied: list = form_data[id_survey]['user_replied']
+      return user_replied
+   except:
+      print("ERROR fun", find_user_replied.__name__)
+      return []
+
+
+def find_user_sender(form_id: int):
+   form_data = read_answer_to_file()
+   id_survey = str(bf.find_id_survay(form_id))
+
+   try:
+      user_replied: list = form_data[id_survey]['send_users']
+      return user_replied
+   except:
+      print("ERROR fun", find_user_sender.__name__)
+      return []
+
+
 def add_to_sub_form(form_id: int, groups: list):
    """Добавление к form_id список групп"""
    all_form = read_answer_to_file()
@@ -33,6 +59,7 @@ def add_to_sub_form(form_id: int, groups: list):
 def find_groups_is_form(survey_id: int):
    """Возвращает все группы, которым отправлена форма"""
    all_answer = read_answer_to_file()
+   print('\n\n',survey_id)
 
    try:
       return all_answer[str(survey_id)]['send_groups']
@@ -50,7 +77,8 @@ def all_groups_form(groups: list, form_id: int):
    if id_survey:
       try:
          for one_group in groups:
-            form_data[id_survey]['send_group'].append(one_group)
+            if form_data[id_survey]['send_group'].count(one_group) == 0:
+               form_data[id_survey]['send_group'].append(one_group)
 
          write_answer_to_file(form_data)
       except:
@@ -66,7 +94,8 @@ def all_users_send_form(users_tg: list, form_id: int):
    if id_survey:
       try:
          for one_us in users_tg:
-            form_data[id_survey]['send_users'].append(one_us)
+            if form_data[id_survey]['send_users'].count(one_us) == 0:
+               form_data[id_survey]['send_users'].append(one_us)
          
          write_answer_to_file(form_data)
       except:

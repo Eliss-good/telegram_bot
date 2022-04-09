@@ -3,13 +3,12 @@ import openpyxl
 from random import randint
 from datetime import datetime
 
-NAME_FILE: str = 'groups_list.xlsx'
-
 def create_name_file():
     now = datetime.now()
-    name = 'up_groups_' + str(randint(5000, 10000)) + '_' + now.strftime("%d/%m/%Y_%H:%M:%S") + '.xlsx'
+    name = 'up_groups_' + str(randint(5000, 10000)) + '_' + now.strftime("%d_%m_%Y___%H_%M_%S") + '.xlsx'
+    directory = os.getcwd() + "/create_file/create_csv/athive/" + name
 
-    return name
+    return directory
 
 def create_file_group(uploaded_groups: dict):
     new_name = create_name_file()
@@ -28,7 +27,7 @@ def create_file_group(uploaded_groups: dict):
         row = 1
         column += 1
 
-    book.save(os.getcwd() + '/'+ NAME_FILE)
+    book.save(new_name)
     book.close()
 
-    return os.getcwd() + '/' + NAME_FILE
+    return new_name

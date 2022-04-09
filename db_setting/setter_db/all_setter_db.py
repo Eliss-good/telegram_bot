@@ -10,7 +10,7 @@ def set_id_users(list_name_group : list, form_id: int = None):
     
     if list_name_group :
         for name_group in list_name_group:
-            #name_group[0] = name_group[0].upper()
+            name_group = name_group.upper()
 
             data = bf.db.select_db_where('student_tb', ['gl_id'], ['group_id'], [bf.find_id_group(name_group)], 'where')
             for i in data:
@@ -146,15 +146,7 @@ def set_status_authenticity(tg_id: int):
 
 def set_send_form_user(sent_form_id: int):
     """Возвращенеи всех id пользователей которым отослана форма"""
-    id_survey = bf.find_id_survay(sent_form_id)
-
-    if id_survey:
-        list_groups = poll_db.find_groups_is_form(sent_form_id)
-        list_users = set_id_users(list_groups)
-        return list_users
-    else:
-        return []
-
+    return poll_db.find_user_sender(sent_form_id)
 
 def get_max_survay():
     """Кол-во созданных форм"""

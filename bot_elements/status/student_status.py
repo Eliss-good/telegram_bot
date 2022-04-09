@@ -14,8 +14,8 @@ async def display_user_status(message: types.Message):
         form = send_forms_mem_get()
         select_form = form[form_id]
         if message.chat.id in select_form['info']['send_to_users_ids'] and not message.chat.id in select_form['info']['got_answers_from']:
-            
-            full_message += '\n' + str(mem_for_created_forms_get_form_name(select_form['form_id'])) + ' от пользователя ' + str(mem_for_created_forms_get_creator_id(select_form['form_id'])) + ' /complete_' + str(select_form['form_id']) + '_' + str(selected_form)
+        
+            full_message += '\n' + str(mem_for_created_forms_get_form_name(select_form['form_id'])) + ' от пользователя ' + str(mem_for_created_forms_get_creator_id(select_form['form_id'])) + ' /complete_' + str(select_form['form_id']) + '_' + str(form_id)
     
     if full_message == "Полученные формы:":
         full_message = 'Нет полученных форм'
@@ -28,6 +28,7 @@ async def complete_form(message: types.Message):
         запускает отправку вопросов из нужной формы"""
 
     form_indexes = message.text[10:].split('_')
+    print('\n\n', form_indexes, message.text)
     unique_form_id = int(form_indexes[0])
     unique_sent_form_id = int(form_indexes[1])
 

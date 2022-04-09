@@ -15,7 +15,7 @@ from bot_elements.storages.all_storages import temp_form_index_data
 import bot_elements.storages.all_storages
 from bots import admin_bot, adminIds, student_bot, prepod_bot
 
-from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get, registerData_check_is_confirmed
+from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get, mem_for_created_forms_get_data
 from bot_elements.remover.all_removers import edited_register_data_remove_user, registerData_remove_user
 
 import db_setting.getter_db.all_getter_db as getter_db
@@ -200,10 +200,14 @@ def send_forms_mem_add_completed_user(sent_form_id: int, user_id: int):
 
 def completing_forms_dispatcher_add_session(chat_id: int, unique_form_id: int, unique_sent_form_id: int):
     """ Добавляет 1 сессию в список активных сессий"""
-    
-    #completing_forms_dispatcher[chat_id] = {
-        #'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'current_question_num': 0,'form_copy': mem_for_created_forms[unique_form_id]}
-    
+
+    if not chat_id in completing_forms_dispatcher.keys():
+        completing_forms_dispatcher[chat_id] = {}
+
+    completing_forms_dispatcher[chat_id] = {
+        'chat_id': chat_id, 'unique_form_id': unique_form_id, 'unique_sent_form_id': unique_sent_form_id, 'current_question_num': 0,'form_copy': mem_for_created_forms_get_data(unique_form_id)}
+    print('\n lol ', completing_forms_dispatcher)   
+
 
 def completing_forms_dispatcher_add_1_to_question_num(user_id: int):
     """ Увеличивает на 1 номер текущего задаваемого вопроса"""

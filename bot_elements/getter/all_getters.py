@@ -106,6 +106,7 @@ def completing_forms_dispatcher_get_form_question_message_id(user_id: int, quest
 
 def completing_forms_dispatcher_get_current_question_num(user_id: int):
     """ Возвращает номер текущего вопроса из completing_forms_dispatcher"""
+    print('\n\n', completing_forms_dispatcher)
     return completing_forms_dispatcher[user_id]['current_question_num']
 
 
