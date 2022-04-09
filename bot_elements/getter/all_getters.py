@@ -1,5 +1,3 @@
-from tokenize import group
-from urllib3 import Retry
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
@@ -8,6 +6,10 @@ from bot_elements.storages.all_storages import completing_forms_dispatcher
 from bot_elements.storages.all_storages import registerData
 from bot_elements.storages.all_storages import temp_mem_for_answers
 from bot_elements.storages.all_storages import edited_register_data
+from bot_elements.storages.all_storages import choosing_groups_dispatcher
+from bot_elements.storages.all_storages import temp_chosen_groups_data
+from bot_elements.storages.all_storages import temp_form_index_data
+
 import bot_elements.storages.all_storages
 
 import db_setting.setter_db.all_setter_db as setter_db
@@ -368,4 +370,34 @@ def get_group_users_ids(groups: list, form_id: int = None):
 
 #ДОБАВИЛ ИЛЬЯ
 def get_fio_in_group(group: str):
-    return setter_db.find_all_us_is_group(group)
+    """Возвращает список фио людей которые находятся в этой группе"""
+    return setter_db.find_all_us_is_group([group])
+
+
+def get_document(form_id: int, sent_form_id: int): # Илья сюда
+    """ (Для БД) Возвращает pdf документ с результатом формы"""
+    """ form_id - айдишник формы, sent_form_id - айдишник отправленной формы"""
+
+    pass
+
+
+# ---- дальше забей ------------
+def get_choosing_groups_dispatcher_user(user_id: int):
+    """
+        Формат:
+            {user_id: {0: {'poll_id': , 'poll_options': }, 1: {...}, ...}   
+    """
+    if user_id in choosing_groups_dispatcher.keys():
+        return choosing_groups_dispatcher[user_id]
+
+    else:
+        return False
+
+
+def get_chosen_groups_data(user_id: int):
+    if user_id in temp_chosen_groups_data.keys():
+        return temp_chosen_groups_data[user_id]
+    
+
+def get_temp_form_index_data(user_id: int):
+    return temp_form_index_data[user_id]

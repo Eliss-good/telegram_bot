@@ -1,4 +1,6 @@
 from aiogram import types
+from operator import itemgetter
+from bot_elements.forms.form_display import display_current_mem_status
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
@@ -7,10 +9,13 @@ from bot_elements.storages.all_storages import completing_forms_dispatcher
 from bot_elements.storages.all_storages import registerData 
 from bot_elements.storages.all_storages import temp_mem_for_answers
 from bot_elements.storages.all_storages import edited_register_data
+from bot_elements.storages.all_storages import choosing_groups_dispatcher
+from bot_elements.storages.all_storages import temp_chosen_groups_data
+from bot_elements.storages.all_storages import temp_form_index_data
 import bot_elements.storages.all_storages
 from bots import admin_bot, adminIds, student_bot, prepod_bot
 
-from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get
+from bot_elements.getter.all_getters import unconfirmed_users_get, registerData_get_role, registerData_check_is_in_register_list, registerData_get_group, registerData_get_fio, registerData_get_role, registerData_check_is_editing, edited_register_data_get_user, unconfirmed_users_get, unconfirmed_edit_users_get, registerData_check_is_confirmed
 from bot_elements.remover.all_removers import edited_register_data_remove_user, registerData_remove_user
 
 import db_setting.getter_db.all_getter_db as getter_db
@@ -403,4 +408,30 @@ def sendMsgAnswer(messageAnswer: types.Message, question_number: int, unique_for
 def sendFormAnswer(formAnswer: dict):
     """ Сюда приходит словарь со всеми ответами на форму"""
     getter_db.add_answer_for_survay(formAnswer)
-    pass
+
+# ---- дальше забей ----
+
+def choosing_groups_dispatcher_add_user(user_id: int, poll_id: int, options: list, poll_number: int):
+    """
+    Формат:
+        {user_id: [0: {'poll_id': , 'poll_options': }, 1: ...], ...}   
+    """
+
+    if not user_id in choosing_groups_dispatcher.keys():
+        choosing_groups_dispatcher[user_id] = {}
+
+    choosing_groups_dispatcher[user_id][poll_number] = {'poll_id': poll_id, 'options': options}
+
+
+def chosen_groups_data_add_group(user_id: int, options_ids: list, groups: list):
+    if not user_id in temp_chosen_groups_data.keys():
+        temp_chosen_groups_data[user_id] = []
+    
+    print('\n\n',groups, options_ids)
+
+    print('\n\n neger ', temp_chosen_groups_data, list(itemgetter(*options_ids)(groups)))
+    temp_chosen_groups_data[user_id].extend( list(itemgetter(*options_ids)(groups)))
+
+
+def temp_form_index_data_add_index(user_id: int, form_index: int):
+    temp_form_index_data[user_id] = form_index

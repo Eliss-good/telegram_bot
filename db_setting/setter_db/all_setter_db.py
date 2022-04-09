@@ -1,3 +1,5 @@
+from create_file.create_csv.create_groups_list import create_file_group
+from db_setting.getter_db.all_getter_db import update_sending_status
 import db_setting.back_function_db as bf
 import db_setting.poll_db.poll_connect_db as poll_db
 
@@ -5,7 +7,7 @@ import db_setting.poll_db.poll_connect_db as poll_db
 def set_id_users(list_name_group : list, form_id: int = None):
     """Возвоащается списком  все ID телеги по указанным группам"""
     group_us = []
-
+    
     if list_name_group :
         for name_group in list_name_group:
             #name_group[0] = name_group[0].upper()
@@ -15,7 +17,11 @@ def set_id_users(list_name_group : list, form_id: int = None):
                 group_us.append(int(bf.find_tg_id(i[0])))
 
         if form_id != None:
+            update_sending_status(form_id)
+            
             poll_db.all_users_send_form(group_us,form_id)
+            poll_db.all_groups_form(list_name_group, form_id)
+
 
         return group_us
 
@@ -175,14 +181,19 @@ def find_fio_us(tg_id: int):
     return bf.find_fio_us(tg_id)
 
 
-def find_all_us_is_group(group: str):
-    fio_users = []
-    tg_users = set_id_users([group])
+def find_all_us_is_group(groups: list):
+    """Возвращает фамилии людей по группе"""
+    fio_users = {}
+    
+    for one_group in groups:
+        fio_users[one_group] = []
+        tg_users = set_id_users([one_group])
 
-    for one_us in tg_users:
-        fio_users.append(find_fio_us(int(one_us)))
+        for one_us in tg_users:
+            fio_users[one_group].append(find_fio_us(int(one_us)))
 
-    return fio_users
+    dir = create_file_group(fio_users)
+    return dir
 
 
 def formatted_data_user():

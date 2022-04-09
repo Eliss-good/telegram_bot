@@ -10,9 +10,9 @@ async def display_user_status(message: types.Message):
 
     full_message = "Полученные формы:"
     # print('\n\n\n',send_forms_mem_get())
-    for selected_form in send_forms_mem_get():
+    for form_id in send_forms_mem_get():
         form = send_forms_mem_get()
-        select_form = form[selected_form]
+        select_form = form[form_id]
         if message.chat.id in select_form['info']['send_to_users_ids'] and not message.chat.id in select_form['info']['got_answers_from']:
             
             full_message += '\n' + str(mem_for_created_forms_get_form_name(select_form['form_id'])) + ' от пользователя ' + str(mem_for_created_forms_get_creator_id(select_form['form_id'])) + ' /complete_' + str(select_form['form_id']) + '_' + str(selected_form)
@@ -157,7 +157,7 @@ async def msg_handlr(message: types.Message):
         await go_cycle(message=message, type='launch_from_message_handler')
 
 
-def register_handlers_status(dp: Dispatcher):
+def register_handlers_student_status(dp: Dispatcher):
 
     dp.register_message_handler(
         display_user_status, commands="status", state="*")

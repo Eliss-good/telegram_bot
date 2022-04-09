@@ -8,12 +8,12 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from bot_elements.register.prepod_register import register_handlers_register_prepod
 from bot_elements.register.student_register import register_handlers_register_student
-from bot_elements.register.admin_register import register_handlers_register_admin
 
 
 from bot_elements.forms.forms import register_handlers_forms
 from bot_elements.forms.forms_menu import register_handlers_forms_menu
-from bot_elements.status.status import register_handlers_status
+from bot_elements.status.student_status import register_handlers_student_status
+from bot_elements.status.prepod_status import register_handlers_prepod_status
 from bot_elements.forms.forms_editor import register_handlers_forms_editor
 from bot_elements.cancel import register_handlers_cancel
 from bot_elements.admin_tools.check_storages import register_handlers_forms_check_storages
@@ -44,7 +44,6 @@ async def student_commands(bot: Bot):
         BotCommand(command="/cancel", description="Отменить текущее действие")
     ]
     await bot.set_my_commands(student_commands)
-
 
 
 async def admin_commands(bot: Bot):
@@ -78,7 +77,6 @@ async def main():
     # dp.loop.create_task(raspisanie.rasp_notification('М3О-221Б-20'))
     
 
-
     register_handlers_cancel(prepod_bot_dispatcher)
     register_handlers_cancel(student_bot_dispatcher)
 
@@ -94,7 +92,7 @@ async def main():
     register_handlers_forms_editor(prepod_bot_dispatcher)
     register_handlers_forms(prepod_bot_dispatcher)
     register_handlers_forms_menu(prepod_bot_dispatcher)
-    register_handlers_status(prepod_bot_dispatcher)
+    register_handlers_prepod_status(prepod_bot_dispatcher)
     
 #     dp.register_message_handler(not_confirmed, lambda message: registerData_confirmed_check(message.chat.id), commands="status")
 
@@ -102,7 +100,7 @@ async def main():
     # register_handlers_forms_editor(student_bot_dispatcher)
     # register_handlers_forms(student_bot_dispatcher)
     # register_handlers_forms_menu(student_bot_dispatcher)
-    register_handlers_status(student_bot_dispatcher)
+    register_handlers_student_status(student_bot_dispatcher)
 
     # register_handlers_register_admin(admin_bot_dispatcher)
     register_handlers_forms_check_storages(admin_bot_dispatcher)

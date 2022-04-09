@@ -11,7 +11,7 @@ async def get_student_list_pdf(message: types.Message):
     group_ru = translit(group, 'ru')
 
     all_fio = get_fio_in_group(group_ru)
-    print(all_fio)
+    
 
     # здесь пропиши путь к сгенерированному файлу
     

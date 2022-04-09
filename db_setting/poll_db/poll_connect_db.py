@@ -42,6 +42,22 @@ def find_groups_is_form(survey_id: int):
 
 
 
+def all_groups_form(groups: list, form_id: int):
+   """Добавление групп которым отправлена форма"""
+   form_data = read_answer_to_file()
+   id_survey = str(bf.find_id_survay(form_id))
+
+   if id_survey:
+      try:
+         for one_group in groups:
+            form_data[id_survey]['send_group'].append(one_group)
+
+         write_answer_to_file(form_data)
+      except:
+         print("ERROR fun", all_groups_form.__name__)
+
+
+
 def all_users_send_form(users_tg: list, form_id: int):
    """Добавление пользователей которым отправлена форма"""
    form_data = read_answer_to_file()
@@ -50,20 +66,22 @@ def all_users_send_form(users_tg: list, form_id: int):
    if id_survey:
       try:
          for one_us in users_tg:
-            form_data[id_survey]['send_user'].append(one_us)
+            form_data[id_survey]['send_users'].append(one_us)
+         
+         write_answer_to_file(form_data)
       except:
          print("ERROR fun", all_users_send_form.__name__)
          
 
 
-def add_tg_us(form_data: dict, survey_id: int ,tg_id: int):
+def add_answer_tg_us(form_data: dict, survey_id: int ,tg_id: int):
    """Добавление пользователя, который проголосовал"""
    form_data[str(survey_id)]['user_replied'].append(tg_id)
    return form_data
 
 
 def add_answer_for_survay(new_answer):
-   """Добавление новых опросов"""
+   """Добавление новых ответов"""
    form_id = prs_an.search_form_id_json(new_answer)
    result_answer = prs_an.search_answer_in_json(new_answer)
    data_file = read_answer_to_file()
@@ -71,9 +89,10 @@ def add_answer_for_survay(new_answer):
    survay_id = str(bf.find_id_survay(form_id))
    tg_id = prs_an.tg_id_answer_is_json(new_answer)
 
+
    try:
       data_file[survay_id]['all_answer'].append(result_answer)
-      data_file = add_tg_us(data_file, survay_id, tg_id[0])
+      data_file = add_answer_tg_us(data_file, survay_id, tg_id[0])
       write_answer_to_file(data_file)
 
       print("Успещно добавлен ответ на опрос id:", form_id)
