@@ -3,7 +3,6 @@ from aiogram import Dispatcher, types
 from bot_elements.getter.all_getters import get_document, mem_for_created_forms_get_form_name, send_forms_mem_get
 
 
-
 async def display_user_status(message: types.Message):
 
     full_message = "Отправленные вами формы:"

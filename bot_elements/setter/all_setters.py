@@ -1,6 +1,5 @@
 from aiogram import types
 from operator import itemgetter
-from bot_elements.forms.form_display import display_current_mem_status
 from bot_elements.storages.all_storages import temp_form_recipient_data 
 from bot_elements.storages.all_storages import temp_mem_for_form_creator
 from bot_elements.storages.all_storages import mem_for_created_forms
@@ -266,6 +265,7 @@ async def registerData_change_fio_data(user_id: int, new_fio: str):
         
         unconfirmed_edit_users_plus_one()
         edited_register_data_set_new_data(new_chosen_fio=new_fio, new_chosen_group=registerData_get_group(user_id), new_chosen_role=registerData_get_role(user_id), user_id=user_id)
+    
     else:
         edited_register_data_set_new_fio(new_chosen_fio=new_fio, user_id=user_id)
 
@@ -288,6 +288,7 @@ async def registerData_accept_register(user_id: int, message: types.Message):
             await student_bot.send_message(chat_id=user_id, text='Ваша регистрация подтверждена админом')
         
         confirm_user(user_id)
+        
         unconfirmed_users_minus_one()
 
     else:
@@ -310,6 +311,7 @@ async def registerData_deny_register(user_id: int, message: types.Message):
         
         registerData_remove_user(user_id)
         unconfirmed_users_minus_one()
+
     else:
         await message.answer('Пользователя нет в списке на подтверждение регистрации')
 
@@ -345,7 +347,7 @@ async def registerData_deny_register_edit(user_id: int, message: types.Message):
         user_id -айди пользователя
     """
     if registerData_check_is_editing(user_id): 
-        await message.answer('Пользователь ' + str(user_id) + ' отправлен на повторную регистрацию')
+        await message.answer('Пользователю ' + str(user_id) + ' отказано в изменении рег. данных')
 
         if registerData_get_role(user_id=user_id) == 'prepod':
             await prepod_bot.send_message(chat_id=user_id, text='Изменение ваших рег. данных не подтверждено админом, при необходимости, заново введите корректные рег. данные')
@@ -409,10 +411,14 @@ def chosen_groups_data_add_group(user_id: int, options_ids: list, groups: list):
     if not user_id in temp_chosen_groups_data.keys():
         temp_chosen_groups_data[user_id] = []
     
-    print('\n\n',groups, options_ids)
+    # print('\n\n',groups, options_ids)
 
-    print('\n\n neger ', temp_chosen_groups_data, list(itemgetter(*options_ids)(groups)))
-    temp_chosen_groups_data[user_id].extend( list(itemgetter(*options_ids)(groups)))
+    
+
+    selected_groups = itemgetter(*options_ids)(groups)
+   
+    temp_chosen_groups_data[user_id].extend([selected_groups])
+    print('\n\nfak', temp_chosen_groups_data)
 
 
 def temp_form_index_data_add_index(user_id: int, form_index: int):

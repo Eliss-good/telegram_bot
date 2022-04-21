@@ -33,7 +33,7 @@ async def choose_group(message: types.Message, state: FSMContext):
             temp_groups_list.append('Ни одна из вышеперечисленных')
 
             all_groups = all_groups[9:]
-            print('\n ala ', all_groups)
+            # print('\n ala ', all_groups)
             msg = await prepod_bot.send_poll(chat_id=message.chat.id, question='Выберите получателей', options=temp_groups_list.copy(), is_anonymous=False, allows_multiple_answers=True)
 
             choosing_groups_dispatcher_add_user(user_id=message.chat.id, poll_id=msg.poll.id, options = temp_groups_list.copy(), poll_number=send_poll_counter)
@@ -79,7 +79,7 @@ async def poll_handler(pollAnswer: types.PollAnswer):
 
                 print('\n\n ---', disp)
                 print('\n\n the fuck', pollAnswer.option_ids)
-
+                print(' \n lol', disp[groups_poll_number]['options'])
 
                 chosen_groups_data_add_group(user_id=pollAnswer.user.id, options_ids=pollAnswer.option_ids, groups=disp[groups_poll_number]['options'])
                

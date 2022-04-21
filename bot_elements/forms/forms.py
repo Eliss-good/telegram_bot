@@ -9,7 +9,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from bot_elements.remover.all_removers import temp_form_recipient_data_remove_element, temp_mem_for_form_creator_remove_form, temp_mem_for_form_creator_remove_form_element
 
 
-from bot_elements.getter.all_getters import registerData_check_is_registered, temp_mem_for_form_creator_get_data, temp_form_recipient_data_get_form_id, temp_form_recipient_data_get_recip_data, temp_form_recipient_data_get, temp_mem_for_form_creator_get, mem_for_created_forms_get, unique_form_id_get
+from bot_elements.getter.all_getters import temp_mem_for_form_creator_get_data, temp_form_recipient_data_get_form_id, temp_form_recipient_data_get_recip_data, temp_form_recipient_data_get, temp_mem_for_form_creator_get, mem_for_created_forms_get, unique_form_id_get
 from bot_elements.setter import all_setters
 from bot_elements.setter.all_setters import unique_form_id_plus_one
 from bot_elements.forms.form_display import display_current_temp_mem_status
@@ -146,12 +146,12 @@ async def add_quest_false(call: types.CallbackQuery):
 
     all_setters.mem_for_created_forms_add_element(form_id=temp_form_recipient_data_get_form_id(user_id=call.message.chat.id), data=temp_mem_for_form_creator_get_data(call.message.chat.id).copy())
 
-    print('mem_for_created_forms ', mem_for_created_forms_get())
+    # print('mem_for_created_forms ', mem_for_created_forms_get())
 
     temp_mem_for_form_creator_remove_form(user_id=call.message.chat.id)
     temp_form_recipient_data_remove_element(user_id=call.message.chat.id)
 
-    print('temp_form_recipient_data ', temp_form_recipient_data_get())
+    # print('temp_form_recipient_data ', temp_form_recipient_data_get())
 
     await call.message.answer('Форма создана', reply_markup=types.ReplyKeyboardRemove())
 

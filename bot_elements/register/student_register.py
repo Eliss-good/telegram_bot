@@ -64,7 +64,7 @@ async def get_fio(message: types.Message, state: FSMContext):
     await registerUser.waiting_for_fio.set()
 
 
-async def choose_fio(message: types.Message, state: FSMContext):
+async def get_group(message: types.Message, state: FSMContext):
     " (registerUser FSM) Получаем ФИО и (для студентов) предлагаем выбрать группу"
     fio = message.text
     await state.update_data(chosen_fio=fio)
@@ -83,7 +83,7 @@ async def wrong_group(message: types.Message):
     return await message.reply('Выберите группу из списка')
 
 
-async def choose_group(message: types.Message, state: FSMContext):
+async def save_to_storage(message: types.Message, state: FSMContext):
     " (registerUser FSM) Получаем группу и добавляем пользователя в хранилище"
     user_data = await state.get_data()
     
@@ -110,7 +110,6 @@ async def register_change_true(call: types.CallbackQuery, state: FSMContext):
         types.InlineKeyboardButton(
             text="Группу", callback_data="register_change_group")
     ]
-
 
     keyboard = types.InlineKeyboardMarkup(row_width=2)
     keyboard.add(*buttons)
@@ -185,9 +184,9 @@ def register_handlers_register_student(dp: Dispatcher):
         not_confirmed, lambda message: not registerData_check_is_confirmed(message.chat.id) and registerData_check_is_confirmed(message.chat.id) != None, commands='register')
 
     dp.register_message_handler(get_fio, commands="register", state="*")
-    dp.register_message_handler(choose_fio, state=registerUser.waiting_for_fio)
+    dp.register_message_handler(get_group, state=registerUser.waiting_for_fio)
     dp.register_message_handler(
-        choose_group, lambda message: message.text in get_all_groups(), state=registerUser.waiting_for_group)
+        save_to_storage, lambda message: message.text in get_all_groups(), state=registerUser.waiting_for_group)
 
     dp.register_message_handler(
         wrong_group, lambda message: message.text not in get_all_groups(), state=registerUser.waiting_for_group)
